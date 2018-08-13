@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- CAN BE CHANGED WITH USER SETTING WHICH IS STORED IN SHARED PREFERENCES -->
+
+    <!-- Maximal value of amplitude which not invoke alarm -->
+    <integer name="default_max_ok_amplitude">15000</integer>
+
+    <!-- How often is control last measured amplitude in SoundDetector (in milliseconds) -->
+    <integer name="default_sound_detector_interval">1000</integer>
+
+    <!-- Maximal euclidean distance between two last measurement which not trigger alarm -->
+    <item name="default_move_sensor_sensitivity" format="float" type="dimen">0.2</item>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- CAN NOT CHANGE WITH VALUE FROM SHARED PREFERENCES -->
+
+    <!-- Dimensions of measured data from accelerometer -->
+    <integer name="default_move_sensor_dimensions">3</integer>
+
+
+
+
+
+</resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="key_sound_detector_interval">sound_detector_interval</string>
+
+    <string name="key_max_ok_amplitude">max_ok_amplitude</string>
+
+    <string name="key_move_sensor_sensitivity">move_sensor_sensitivity</string>
+
+</resources>
