@@ -1,33 +1,20 @@
-package com.example.tomas.carsecurity.detectors
+package com.example.tomas.carsecurity.sensors
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.util.TypedValue
-import com.example.tomas.carsecurity.R
+import com.example.tomas.carsecurity.GeneralObservable
+import com.example.tomas.carsecurity.context.MyContext
 
 /**
- * This class is used for movement detection. When movement is detected class call  only parents
+ * This class is used for movement detection. When movement is detected class call only parents
  * methods [setChanged] and [notifyObservers].
  *
- * @property context which is used for getting sharedPreferences, resources and sensors.
+ * @property context which is used for getting global data and preferences.
  */
-class MoveDetector(private val context: Context) : GeneralDetector(), SensorEventListener {
-
-    /** Contains private shared preferences which are shared across application. */
-    private val sharedPreferences: SharedPreferences
-
-    /** Contains default value for accelerometer sensitivity which is taken from resources. */
-    private val defSensitivity :Float
-    /** Returns accelerometer sensitivity. Value is taken from shared preferences or it is used default value. */
-    private val sensitivity
-        get() = sharedPreferences.getFloat(context.getString(R.string.key_move_sensor_sensitivity), defSensitivity)
-
-    /** Contains default dimension of data from accelerometer sensor. Value is taken from resources. */
-    private val dimensions :Int
+class MoveDetector(private val context: MyContext) : GeneralObservable(), SensorEventListener {
 
     /** Array contains data which are given by last acceleration sensor activity. */
     private var lastAcceleration :FloatArray
@@ -46,19 +33,9 @@ class MoveDetector(private val context: Context) : GeneralDetector(), SensorEven
      * Constructor sets all uninitialized variables.
      */
     init {
-        sharedPreferences = context.getSharedPreferences(
-                context.getString(R.string.preference_file_key),
-                Context.MODE_PRIVATE)
+        lastAcceleration = FloatArray(context.moveDetectorContext.dimensions)
 
-
-        val outValue = TypedValue()
-        context.resources.getValue(R.dimen.default_move_sensor_sensitivity, outValue, true)
-        defSensitivity = outValue.float
-
-        dimensions = context.resources.getInteger(R.integer.default_move_sensor_dimensions)
-        lastAcceleration = FloatArray(dimensions)
-
-        manager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        manager = context.appContext.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         sensor = manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
 
         if(sensor == null){
@@ -110,11 +87,11 @@ class MoveDetector(private val context: Context) : GeneralDetector(), SensorEven
      * parent methods [setChanged] and [notifyObservers] are called.
      *
      * Motion is significant when euclidean distance between last sensor values and actual sensors
-     * is greater than value of [sensitivity] variable.
+     * is greater than value of [context.moveDetectorContext.sensitivity] variable.
      */
     override fun onSensorChanged(event: SensorEvent?) {
 
-        if (event?.values?.size == null || event.values.size != dimensions) {
+        if (event?.values?.size == null || event.values.size != context.moveDetectorContext.dimensions) {
             println("Incoming event is invalid or have invalid dimension") // TODO log warn
             return
         }
@@ -129,7 +106,7 @@ class MoveDetector(private val context: Context) : GeneralDetector(), SensorEven
 
         lastAcceleration = event.values.copyOf()
 
-        if (euclideanDist > sensitivity) {
+        if (euclideanDist > context.moveDetectorContext.sensitivity) {
             setChanged()
             notifyObservers()
         }
@@ -137,7 +114,7 @@ class MoveDetector(private val context: Context) : GeneralDetector(), SensorEven
 
     /**
      * Calculates euclidean distance of two points given by two input arrays. Size of booth input
-     * arrays must be equal to [dimensions] variable.
+     * arrays must be equal to [context.moveDetectorContext.dimensions] variable.
      *
      * @param coordinatesA coordinates of first point
      * @param coordinatesB coordinates of second point
@@ -151,7 +128,7 @@ class MoveDetector(private val context: Context) : GeneralDetector(), SensorEven
 
         var sum = 0.0
 
-        for (i in 0 until dimensions) {
+        for (i in 0 until context.moveDetectorContext.dimensions) {
             val number = coordinatesA[i] - coordinatesB[i]
             sum += number * number
         }

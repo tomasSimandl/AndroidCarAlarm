@@ -1,4 +1,4 @@
-package com.example.tomas.carsecurity
+package com.example.tomas.carsecurity.sensors
 
 import android.Manifest
 import android.content.Context
@@ -7,7 +7,7 @@ import android.support.v4.content.ContextCompat
 import com.google.android.gms.location.*
 import java.util.*
 
-class LocationService(private val context: Context) : Observable() {
+class LocationProvider(private val context: Context) : Observable() {
 
     private var fusedLocationClient: FusedLocationProviderClient
 

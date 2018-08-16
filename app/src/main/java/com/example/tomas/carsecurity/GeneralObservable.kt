@@ -1,14 +1,14 @@
-package com.example.tomas.carsecurity.detectors
+package com.example.tomas.carsecurity
 
 import java.util.*
 
 /**
  * This class is used as parent of all detectors. Every child must override methods [disable],
- * [enable] and [isEnable]. Class GeneralDetector using class [Observable] for notification of
+ * [enable] and [isEnable]. Class GeneralObservable using class [Observable] for notification of
  * any class which implements interface [Observer]. When some action is detected child detector must
  * call methods [setChanged] and [notifyObservers] in this order.
  */
-abstract class GeneralDetector : Observable() {
+abstract class GeneralObservable : Observable() {
 
 
 
