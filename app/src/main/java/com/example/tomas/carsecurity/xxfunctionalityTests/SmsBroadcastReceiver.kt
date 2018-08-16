@@ -1,11 +1,10 @@
-package com.example.tomas.carsecurity
+package com.example.tomas.carsecurity.xxfunctionalityTests
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.provider.Telephony
-import android.widget.Toast
 
 class SmsBroadcastReceiver(private final val smsControlNumber: Set<String>) : BroadcastReceiver() {
 

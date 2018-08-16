@@ -11,7 +11,8 @@
     <!-- Maximal euclidean distance between two last measurement which not trigger alarm -->
     <item name="default_move_sensor_sensitivity" format="float" type="dimen">0.2</item>
 
-
+    <!-- Indicates if move observable can be used -->
+    <bool name="default_is_moved_detector_enabled">true</bool>
 
 
 

@@ -1,4 +1,4 @@
-package com.example.tomas.carsecurity
+package com.example.tomas.carsecurity.xxfunctionalityTests
 
 import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver

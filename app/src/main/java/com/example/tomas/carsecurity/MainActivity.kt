@@ -2,14 +2,13 @@ package com.example.tomas.carsecurity
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
-import android.content.Context
-import android.location.LocationManager
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.telephony.SmsManager
-import com.example.tomas.carsecurity.detectors.GeneralDetector
-import com.example.tomas.carsecurity.detectors.MoveDetector
-import com.example.tomas.carsecurity.detectors.SoundDetector
+import com.example.tomas.carsecurity.context.MyContext
+import com.example.tomas.carsecurity.utils.Alarm
+import com.example.tomas.carsecurity.sensors.LocationProvider
+import com.example.tomas.carsecurity.sensors.MoveDetector
+import com.example.tomas.carsecurity.sensors.SoundDetector
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -21,10 +20,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val soundDetector: GeneralDetector = SoundDetector(applicationContext)
-        val moveDetector: GeneralDetector = MoveDetector(applicationContext)
-        val alarmListener = AlarmListener(console)
-        val locationService = LocationService(applicationContext)
+        val context: MyContext = MyContext(applicationContext)
+
+        val soundDetector: GeneralObservable = SoundDetector(context)
+        val moveDetector: GeneralObservable = MoveDetector(context)
+        val alarmListener = Alarm(context, console)
+        val locationService = LocationProvider(applicationContext)
 
         actionRegMoveDetector.setOnClickListener { moveDetector.addObserver(alarmListener) }
         actionRegSoundDetector.setOnClickListener { soundDetector.addObserver(alarmListener) }
@@ -85,16 +86,5 @@ class MainActivity : AppCompatActivity() {
 //        }
 
 
-    }
-
-
-    private fun gpsButtonAction(){
-
-        val locationManager: LocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-
-
-//        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,1000,0,,
-//                locationCallback,
-//                null /* Looper */)
     }
 }
