@@ -25,16 +25,15 @@ class MainActivity : AppCompatActivity() {
         val soundDetector: GeneralObservable = SoundDetector(context)
         val moveDetector: GeneralObservable = MoveDetector(context)
         val alarmListener = Alarm(context, console)
-        val locationService = LocationProvider(applicationContext)
+        val locationService = LocationProvider(context)
 
         actionRegMoveDetector.setOnClickListener { moveDetector.addObserver(alarmListener) }
         actionRegSoundDetector.setOnClickListener { soundDetector.addObserver(alarmListener) }
         actionUnregMoveDetector.setOnClickListener { moveDetector.deleteObserver(alarmListener) }
         actionUnregSoundDetector.setOnClickListener { soundDetector.deleteObserver(alarmListener) }
 
-        locationService.addObserver(alarmListener)
-        actionEnableGps.setOnClickListener { locationService.enable() }
-        actionDisableGps.setOnClickListener { locationService.disable() }
+        actionEnableGps.setOnClickListener { locationService.addObserver(alarmListener) }
+        actionDisableGps.setOnClickListener { locationService.deleteObserver(alarmListener) }
 
         actionStatus.setOnClickListener {
             console.text = ""

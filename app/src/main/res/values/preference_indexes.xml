@@ -6,8 +6,12 @@
 
     <string name="key_move_sensor_sensitivity">move_sensor_sensitivity</string>
 
-    <string name="key_is_move_detector_enabled">is_move_detector_enabled</string>
-
     <string name="key_contact_phone_number">contact_phone_number</string>
+
+    <string name="key_location_update_interval">location_update_interval</string>
+
+    <string name="key_location_max_update_interval">location_max_update_interval</string>
+
+    <string name="key_location_accuracy_priority">location_accuracy_priority</string>
 
 </resources>

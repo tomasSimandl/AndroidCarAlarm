@@ -11,9 +11,14 @@
     <!-- Maximal euclidean distance between two last measurement which not trigger alarm -->
     <item name="default_move_sensor_sensitivity" format="float" type="dimen">0.2</item>
 
-    <!-- Indicates if move observable can be used -->
-    <bool name="default_is_moved_detector_enabled">true</bool>
+    <!-- Interval in which application receive location updates. -->
+    <integer name="default_location_update_interval">3000</integer>
 
+    <!-- Fastest interval in which application receive location updates. -->
+    <integer name="default_max_location_update_interval">1000</integer>
+
+    <!-- Priority constant of LocationProvider. Determines location sensor accuracy. -->
+    <integer name="default_location_accuracy_priority">100</integer> <!--LocationProvider.PRIORITY_HIGH_ACCURACY-->
 
 
 

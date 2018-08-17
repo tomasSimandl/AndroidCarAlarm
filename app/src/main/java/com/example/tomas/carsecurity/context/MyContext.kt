@@ -12,9 +12,10 @@ class MyContext(val appContext: Context ) : Observable() {
             Context.MODE_PRIVATE)
 
 
-    val moveDetectorContext: MoveDetectorContext = MoveDetectorContext(sharedPreferences, appContext)
-    val soundDetectorContext: SoundDetectorContext = SoundDetectorContext(sharedPreferences, appContext)
-    val smsProviderContext: SmsProviderContext = SmsProviderContext(sharedPreferences, appContext)
+    val moveDetectorContext = MoveDetectorContext(sharedPreferences, appContext)
+    val soundDetectorContext = SoundDetectorContext(sharedPreferences, appContext)
+    val smsProviderContext = SmsProviderContext(sharedPreferences, appContext)
+    val locationProviderContext = LocationProviderContext(sharedPreferences, appContext)
 
 
     fun updateContext(){
