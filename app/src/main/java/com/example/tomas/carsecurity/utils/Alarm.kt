@@ -1,54 +1,93 @@
 package com.example.tomas.carsecurity.utils
 
 import android.location.Location
-import android.widget.TextView
-import com.example.tomas.carsecurity.sensors.LocationProvider
-import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.GeneralObservable
-import com.example.tomas.carsecurity.sensors.MoveDetector
-import com.example.tomas.carsecurity.sensors.SoundDetector
+import com.example.tomas.carsecurity.context.MyContext
+import com.example.tomas.carsecurity.sensors.LocationProvider
 import java.util.*
+import com.example.tomas.carsecurity.ObservableEnum as OEnum
 
-class Alarm(private val context: MyContext, private val textView: TextView) : IGeneralUtil{ // TODO remove text view
+class Alarm(private val context: MyContext, private val utilsManager: UtilsManager) : IGeneralUtil(context, utilsManager) {
 
+    private var enabled = false
+    private var alarm = false
+    private var alert = false
 
-    override fun update(observable: Observable?, args: Any?) {
+    private var lastDetection = -1L
+    private var enableTime = -1L
+
+    private var lastLocation: Location? = null
+
+    override fun action(observable: Observable, args: Any?) {
+
+        if(!enabled) return
 
         when(observable){
-            is GeneralObservable -> onAlarm(observable)
             is LocationProvider -> onLocationUpdate(args as Location)
+            is GeneralObservable -> onDetection(observable)
         }
     }
 
-    private fun printLocation(location: Location){
-        textView.text = ""
-        textView.append("""lat: ${location.latitude}, lon: ${location.longitude}""")
-        textView.append("\n")
-        textView.append("""alt: ${location.altitude}, acurrency: ${location.accuracy}""")
-        textView.append("\n")
-        textView.append("""speed: ${location.speed}""")
-        textView.append("\n")
-        textView.append("""provider: ${location.provider}""")
+    private fun onDetection(observable: GeneralObservable){
+
+        val currentTime = Calendar.getInstance().timeInMillis
+
+        println("""Alarm: detection by $observable at $currentTime.""") // TODO log
+
+        // alarm is already activated -> no work
+        if(alarm) return
+
+        // detections are ignored because start alarm interval did not passed.
+        if(currentTime - enableTime < context.alarmContext.startAlarmInterval) return
+
+        // first detection alarm is switched to alert mode
+        if(!alert) {
+            lastDetection = currentTime
+            alert = true
+            return
+        }
+
+        val timeDiff = currentTime - lastDetection
+        // time interval which eliminates short moves did not passed
+        if(timeDiff < context.alarmContext.ignoreAlarmInterval) return
+
+        // if separation is preparation for algorithm extension
+
+        // time before is alarm triggered after detection did not passed
+        if(timeDiff < context.alarmContext.alertAlarmInterval) return
+
+        alarm = true
+        onAlarm()
     }
+
+    private fun onAlarm(){
+        println("Alarm was activated.") // TODO log
+        // TODO notify observers (Siren, ...)
+        // TODO send messages
+        // TODO get actual location
+        // TODO send actual location in loop
+
+        while(true){
+            if(lastLocation != null){
+
+            }
+        }
+    }
+
 
     private fun onLocationUpdate(location: Location){
-        printLocation(location)
-    }
-
-
-    private fun onAlarm(observable: GeneralObservable){
-        when(observable){
-            is SoundDetector -> println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! SOUND ALARM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-            is MoveDetector ->  println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! MOVE  ALARM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-            else ->             println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! UNDEF ALARM !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-        }
+        this.lastLocation = location
     }
 
     fun enableAlarm(){
-
+        enabled = true
+        alarm = false
+        alert = false
+        enableTime = Calendar.getInstance().timeInMillis
     }
 
     fun disableArarm(){
-
+        enabled = false
+        // TODO stop alarm operations
     }
 }
