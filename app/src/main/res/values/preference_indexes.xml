@@ -20,4 +20,10 @@
 
     <string name="key_alarm_start_interval">alarm_start_interval</string>
 
+    <string name="key_util_is_location_provider_available">util_is_location_provider_available</string>
+
+    <string name="key_util_is_sound_detector_available">util_is_sound_detector_available</string>
+
+    <string name="key_util_is_move_detector_available">util_is_move_detector_available</string>
+
 </resources>

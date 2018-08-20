@@ -29,6 +29,15 @@
     <!-- Interval before alarm will be activated after alarm activation. -->
     <integer name="default_alarm_start_interval">30000</integer>
 
+    <!-- Indicates if location provider can be used. -->
+    <bool name="default_util_is_location_provider_available">true</bool>
+
+    <!-- Indicates if move detector can be used. -->
+    <bool name="default_util_is_move_detector_available">true</bool>
+
+    <!-- Indicates if sound detector can be used. -->
+    <bool name="default_util_is_sound_detector_available">false</bool>
+
 
 
 

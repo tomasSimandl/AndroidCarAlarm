@@ -9,6 +9,7 @@ import com.example.tomas.carsecurity.utils.Alarm
 import com.example.tomas.carsecurity.sensors.LocationProvider
 import com.example.tomas.carsecurity.sensors.MoveDetector
 import com.example.tomas.carsecurity.sensors.SoundDetector
+import com.example.tomas.carsecurity.utils.UtilsManager
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -20,28 +21,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val context: MyContext = MyContext(applicationContext)
+        val context = MyContext(applicationContext)
 
-        val soundDetector: GeneralObservable = SoundDetector(context)
-        val moveDetector: GeneralObservable = MoveDetector(context)
-        val alarmListener = Alarm(context, console)
-        val locationService = LocationProvider(context)
+        val utilsManager = UtilsManager(context)
+        val alarm = Alarm(context, utilsManager)
 
-        actionRegMoveDetector.setOnClickListener { moveDetector.addObserver(alarmListener) }
-        actionRegSoundDetector.setOnClickListener { soundDetector.addObserver(alarmListener) }
-        actionUnregMoveDetector.setOnClickListener { moveDetector.deleteObserver(alarmListener) }
-        actionUnregSoundDetector.setOnClickListener { soundDetector.deleteObserver(alarmListener) }
 
-        actionEnableGps.setOnClickListener { locationService.addObserver(alarmListener) }
-        actionDisableGps.setOnClickListener { locationService.deleteObserver(alarmListener) }
-
-        actionStatus.setOnClickListener {
-            console.text = ""
-            console.append("""Move detector enabled: ${moveDetector.isEnable()}""")
-            console.append("\n")
-            console.append("""Sound detector enabled: ${soundDetector.isEnable()}""")
-            console.append("\n")
-        }
+        actionAlarm.setOnClickListener { if(alarm.isEnabled()) alarm.disableArarm() else alarm.enableAlarm() }
     }
 
 

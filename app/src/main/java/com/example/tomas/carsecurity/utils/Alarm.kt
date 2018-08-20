@@ -7,7 +7,7 @@ import com.example.tomas.carsecurity.sensors.LocationProvider
 import java.util.*
 import com.example.tomas.carsecurity.ObservableEnum as OEnum
 
-class Alarm(private val context: MyContext, private val utilsManager: UtilsManager) : IGeneralUtil(context, utilsManager) {
+class Alarm(private val context: MyContext, private val utilsManager: UtilsManager) : GeneralUtil(context, utilsManager) {
 
     private var enabled = false
     private var alarm = false
@@ -67,16 +67,19 @@ class Alarm(private val context: MyContext, private val utilsManager: UtilsManag
         // TODO get actual location
         // TODO send actual location in loop
 
-        while(true){
-            if(lastLocation != null){
+        utilsManager.registerObserver(OEnum.LocationProvider, this) // TODO dynamically register and unregister to save battery.
 
-            }
-        }
+//        while(true){
+//            if(lastLocation != null){
+//
+//            }
+//        }
     }
 
 
     private fun onLocationUpdate(location: Location){
         this.lastLocation = location
+        println("""Alarm get location: $location""")
     }
 
     fun enableAlarm(){
@@ -84,10 +87,22 @@ class Alarm(private val context: MyContext, private val utilsManager: UtilsManag
         alarm = false
         alert = false
         enableTime = Calendar.getInstance().timeInMillis
+
+        utilsManager.registerObserver(OEnum.MoveDetector, this)
+        utilsManager.registerObserver(OEnum.SoundDetector, this)
+        println("Alarm system enabled")
     }
 
     fun disableArarm(){
+        utilsManager.unregisterAllObservables(this)
+
         enabled = false
         // TODO stop alarm operations
+
+        println("Alarm system disabled")
+    }
+
+    fun isEnabled(): Boolean{
+        return enabled
     }
 }

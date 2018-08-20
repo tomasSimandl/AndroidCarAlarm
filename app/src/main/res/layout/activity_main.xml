@@ -7,47 +7,11 @@
     tools:context=".MainActivity">
 
     <Button
-        android:id="@+id/actionRegMoveDetector"
+        android:id="@+id/actionAlarm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Register move detector" />
+        android:text="Alarm"/>
 
-    <Button
-        android:id="@+id/actionUnregMoveDetector"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-
-        android:text="Unregister move detector" />
-
-    <Button
-        android:id="@+id/actionRegSoundDetector"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Register sound detector" />
-
-    <Button
-        android:id="@+id/actionUnregSoundDetector"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Unregister sound detector" />
-
-    <Button
-        android:id="@+id/actionStatus"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Get status"/>
-
-    <Button
-        android:id="@+id/actionEnableGps"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Enable GPS"/>
-
-    <Button
-        android:id="@+id/actionDisableGps"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Disable GPS"/>
 
     <TextView
         android:id="@+id/console"
