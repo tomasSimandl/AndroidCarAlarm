@@ -26,10 +26,15 @@ class MainActivity : AppCompatActivity() {
 
         actionAlarm.setOnClickListener { if(alarm.isEnabled()) alarm.disableArarm() else alarm.enableAlarm() }
 
-
         actionForeground.setOnClickListener {
             val intent = Intent(applicationContext, MainService::class.java)
-            intent.action = "start_foreground_service"
+            intent.action = MainService.Actions.action_start.name
+            startService(intent)
+        }
+
+        actionForegroundStop.setOnClickListener {
+            val intent = Intent(applicationContext, MainService::class.java)
+            intent.action = MainService.Actions.action_stop.name
             startService(intent)
         }
     }

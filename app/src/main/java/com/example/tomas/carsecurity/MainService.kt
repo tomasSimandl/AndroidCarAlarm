@@ -11,7 +11,9 @@ import android.support.v4.app.NotificationCompat
 
 class MainService : Service() {
 
-
+    enum class Actions{
+        action_start, action_stop
+    }
 
     override fun onBind(intent: Intent): IBinder? {
         throw UnsupportedOperationException("Not implemented")
@@ -23,7 +25,13 @@ class MainService : Service() {
             val action: String = intent.action
 
             when(action){
-                "start_foreground_service" -> startForeground()
+                Actions.action_start.name -> {
+                    startForeground()
+                }
+                Actions.action_stop.name -> {
+                    stopForeground(true)
+                    stopSelf()
+                }
                 "" -> println("empty action")
             }
         }
