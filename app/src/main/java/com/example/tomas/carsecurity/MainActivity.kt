@@ -2,13 +2,11 @@ package com.example.tomas.carsecurity
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.utils.Alarm
-import com.example.tomas.carsecurity.sensors.LocationProvider
-import com.example.tomas.carsecurity.sensors.MoveDetector
-import com.example.tomas.carsecurity.sensors.SoundDetector
 import com.example.tomas.carsecurity.utils.UtilsManager
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -26,8 +24,14 @@ class MainActivity : AppCompatActivity() {
         val utilsManager = UtilsManager(context)
         val alarm = Alarm(context, utilsManager)
 
-
         actionAlarm.setOnClickListener { if(alarm.isEnabled()) alarm.disableArarm() else alarm.enableAlarm() }
+
+
+        actionForeground.setOnClickListener {
+            val intent = Intent(applicationContext, MainService::class.java)
+            intent.action = "start_foreground_service"
+            startService(intent)
+        }
     }
 
 

@@ -2,4 +2,12 @@
     <string name="app_name">Car Security</string>
 
     <string name="preference_file_key">SharedPreference</string>
+
+    <string name="foreground_channel_name">ForegroundServiceChannel</string>
+
+    <string name="foreground_channel_description">Notification channel of foreground service</string>
+
+    <string name="chanel_id">foregroundChannelId</string>
+
+    <string name="service_description">Service contains all logic of application.</string>
 </resources>

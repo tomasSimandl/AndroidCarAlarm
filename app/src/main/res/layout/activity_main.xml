@@ -12,6 +12,12 @@
         android:layout_height="wrap_content"
         android:text="Alarm"/>
 
+    <Button
+        android:id="@+id/actionForeground"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Start Foreground"/>
+
 
     <TextView
         android:id="@+id/console"
