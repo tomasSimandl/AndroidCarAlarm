@@ -30,9 +30,7 @@ class MainActivity : AppCompatActivity() {
 
 
             if(!utilEnabled){
-                val sendIntent = Intent(applicationContext, MainService::class.java)
-                sendIntent.action = MainService.Actions.ActionTryStopService.name
-                startService(sendIntent)
+                sendIntent(MainService.Actions.ActionTryStopService.name)
             }
         }
     }
@@ -44,10 +42,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         actionAlarm.setOnClickListener {
-            val intent = Intent(applicationContext, MainService::class.java)
-            intent.action = MainService.Actions.ActionAlarm.name
-            startService(intent)
-
+            sendIntent(MainService.Actions.ActionAlarm.name)
         }
     }
 
@@ -56,6 +51,11 @@ class MainActivity : AppCompatActivity() {
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver,
                 IntentFilter(getString(R.string.utils_ui_update))
         )
+    }
+
+    override fun onResume() {
+        super.onResume()
+        sendIntent(MainService.Actions.ActionStatus.name)
     }
 
     override fun onStop() {
@@ -72,6 +72,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
+    private fun sendIntent(action: String){
+        val intent = Intent(applicationContext, MainService::class.java)
+        intent.action = action
+        startService(intent)
+    }
 
     private val deviceAdr:String = "00:11:67:63:45:CE"
     private fun bluetoothButtonAction(){

@@ -17,7 +17,8 @@ import java.util.concurrent.atomic.AtomicInteger
 class MainService : Service() {
 
     enum class Actions{
-        ActionTryStopService, ActionStopService, ActionAlarm, ActionTracker, ActionWifiHotSpot, ActionAutomaticMode;
+        ActionTryStopService, ActionStopService, ActionStatus,
+        ActionAlarm, ActionTracker, ActionWifiHotSpot, ActionAutomaticMode;
 
         fun getInstance(context: MyContext, utilsManager: UtilsManager): GeneralUtil{
             return when (this){
@@ -37,17 +38,12 @@ class MainService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-
         println("MainService: On create was called") // TODO log
-
-        workerThread.start()
-        workerThread.prepareHandler()
-        startForeground()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        // TODO workerThread.quit() ??
+        workerThread.quit()
         // TODO stopForeground(true)?? stopSelf()??
         // TODO what to do when system kill service on low memory
     }
@@ -69,6 +65,7 @@ class MainService : Service() {
                 Actions.ActionStopService.name -> stopService()
                 Actions.ActionTryStopService.name ->
                     if(tasksInQueue.get() == 0 && !utilsManager.isAnyUtilEnabled()) stopService()
+                Actions.ActionStatus.name -> utilsManager.informUI()
 
 
 //                Actions.ActionStop.name -> {
@@ -85,6 +82,13 @@ class MainService : Service() {
     }
 
     private fun switchUtil(action: Actions){
+        if(!workerThread.isAlive){
+            println("MainService: Start foreground service") // TODO log
+            workerThread.start()
+            workerThread.prepareHandler()
+            startForeground()
+        }
+
         val task = Runnable {
             // task run sequentially in one thread
             val util: GeneralUtil = utilsMap[action] ?: action.getInstance(context, utilsManager)
