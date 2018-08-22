@@ -1,10 +1,10 @@
 package com.example.tomas.carsecurity.utils
 
-import com.example.tomas.carsecurity.ObservableEnum
 import com.example.tomas.carsecurity.context.MyContext
 import java.util.*
 
-abstract class GeneralUtil(private val context: MyContext, private val utilsManager: UtilsManager) : Observer { // TODO rename
+
+abstract class GeneralUtil(private val context: MyContext, private val utilsManager: UtilsManager) : Observer {
 
     //abstract val supportedObservables: Array<ObservableEnum>
 
@@ -17,4 +17,8 @@ abstract class GeneralUtil(private val context: MyContext, private val utilsMana
 
     // TODO getSupportedObservables() : ???
     // TODO getAutoRequestedObservables() : ???
+
+    abstract fun enable()
+    abstract fun disable()
+    abstract fun isEnabled(): Boolean
 }

@@ -5,42 +5,70 @@ import android.bluetooth.BluetoothDevice
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.utils.Alarm
-import com.example.tomas.carsecurity.utils.UtilsManager
 import kotlinx.android.synthetic.main.activity_main.*
+import android.support.v4.content.LocalBroadcastManager
+import android.content.IntentFilter
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.support.v4.content.ContextCompat
+import android.widget.Button
+
 
 class MainActivity : AppCompatActivity() {
 
+    private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val utilName = intent.getStringExtra(getString(R.string.key_util_name))
+            val utilEnabled = intent.getBooleanExtra(getString(R.string.key_util_activated), false)
 
-    private val deviceAdr:String = "00:11:67:63:45:CE"
+            when (utilName) {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+                Alarm::class.java.canonicalName -> changeColor(actionAlarm, utilEnabled)
 
-        val context = MyContext(applicationContext)
+            }
 
-        val utilsManager = UtilsManager(context)
-        val alarm = Alarm(context, utilsManager)
 
-        actionAlarm.setOnClickListener { if(alarm.isEnabled()) alarm.disableArarm() else alarm.enableAlarm() }
-
-        actionForeground.setOnClickListener {
-            val intent = Intent(applicationContext, MainService::class.java)
-            intent.action = MainService.Actions.action_start.name
-            startService(intent)
-        }
-
-        actionForegroundStop.setOnClickListener {
-            val intent = Intent(applicationContext, MainService::class.java)
-            intent.action = MainService.Actions.action_stop.name
-            startService(intent)
         }
     }
 
 
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        actionAlarm.setOnClickListener {
+            val intent = Intent(applicationContext, MainService::class.java)
+            intent.action = MainService.Actions.ActionAlarm.name
+            startService(intent)
+
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver,
+                IntentFilter(getString(R.string.utils_ui_update))
+        )
+    }
+
+    override fun onStop() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
+        super.onStop()
+    }
+
+
+    private fun changeColor(button: Button, enabled: Boolean){
+        if (enabled){
+            button.setBackgroundColor(ContextCompat.getColor(this, R.color.enabled))
+        } else {
+            button.setBackgroundColor(ContextCompat.getColor(this, R.color.disabled))
+        }
+    }
+
+
+    private val deviceAdr:String = "00:11:67:63:45:CE"
     private fun bluetoothButtonAction(){
         val adapter: BluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
         if(!adapter.isEnabled) adapter.enable()

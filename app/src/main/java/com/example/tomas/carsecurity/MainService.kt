@@ -8,11 +8,43 @@ import android.os.Build
 import android.os.IBinder
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
+import com.example.tomas.carsecurity.context.MyContext
+import com.example.tomas.carsecurity.utils.Alarm
+import com.example.tomas.carsecurity.utils.GeneralUtil
+import com.example.tomas.carsecurity.utils.UtilsManager
 
 class MainService : Service() {
 
     enum class Actions{
-        action_start, action_stop
+        ActionStopService, ActionAlarm, ActionTracker, ActionWifiHotSpot, ActionAutomaticMode;
+
+        fun getInstance(context: MyContext, utilsManager: UtilsManager): GeneralUtil{
+            return when (this){
+                ActionAlarm -> Alarm(context, utilsManager)
+                else -> throw UnsupportedOperationException("Class not implemented")
+            }
+        }
+    }
+
+    private val workerThread = WorkerThread("MainServiceThread")
+    private lateinit var context: MyContext
+    private lateinit var utilsManager: UtilsManager
+
+    private val utilsMap: MutableMap<Actions, GeneralUtil> = HashMap()
+
+    override fun onCreate() {
+        super.onCreate()
+
+        workerThread.start()
+        workerThread.prepareHandler()
+        startForeground()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // TODO workerThread.quit() ??
+        // TODO stopForeground(true)?? stopSelf()??
+        // TODO what to do when system kill service on low memory
     }
 
     override fun onBind(intent: Intent): IBinder? {
@@ -21,22 +53,49 @@ class MainService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
+        if (! ::context.isInitialized) context = MyContext(applicationContext)
+        if (! ::utilsManager.isInitialized) utilsManager = UtilsManager(context)
+
         if(intent != null){
             val action: String = intent.action
 
             when(action){
-                Actions.action_start.name -> {
-                    startForeground()
-                }
-                Actions.action_stop.name -> {
-                    stopForeground(true)
-                    stopSelf()
-                }
-                "" -> println("empty action")
+                Actions.ActionAlarm.name -> switchUtil(Actions.ActionAlarm)
+                Actions.ActionStopService.name -> stopService()
+
+
+//                Actions.ActionStop.name -> {
+//                    workerThread.quit()
+//                    stopForeground(true)
+//                    stopSelf()
+//                }
+
+                else -> println("empty action")
             }
         }
 
         return super.onStartCommand(intent, flags, startId)
+    }
+
+    private fun switchUtil(action: Actions){
+        val task = Runnable {
+            val util: GeneralUtil = utilsMap[action] ?: action.getInstance(context, utilsManager)
+
+            if (util.isEnabled()) {
+                util.disable()
+            } else {
+                util.enable()
+            }
+
+            utilsMap[action] = util
+        }
+        workerThread.postTask(task)
+    }
+
+    private fun stopService(){
+        workerThread.quit()
+        stopForeground(true)
+        stopSelf()
     }
 
     private fun startForeground() {

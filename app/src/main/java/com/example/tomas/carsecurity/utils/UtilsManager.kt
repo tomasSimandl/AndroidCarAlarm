@@ -1,7 +1,10 @@
 package com.example.tomas.carsecurity.utils
 
+import android.content.Intent
+import android.support.v4.content.LocalBroadcastManager
 import com.example.tomas.carsecurity.GeneralObservable
 import com.example.tomas.carsecurity.ObservableEnum
+import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.WorkerThread
 import com.example.tomas.carsecurity.context.MyContext
 import java.util.*
@@ -29,9 +32,25 @@ class UtilsManager(private val context: MyContext) {
     }
 
     fun destroy(){
-        workerThread.quit()
+        workerThread.quit() // TODO use method
     }
 
+
+    fun informUI(util: GeneralUtil, enabled: Boolean) {
+        val intent = Intent(context.appContext.getString(R.string.utils_ui_update))
+
+//        val activatedKeys = mutableListOf<String>()
+//        for (util in utilsMap.keys){
+//            if(util.isEnabled()){
+//                activatedKeys.add(util::class.java.canonicalName)
+//            }
+//        }
+//        intent.putExtra(context.appContext.getString(R.string.key_util_activated_array), activatedKeys.toTypedArray())
+
+        intent.putExtra(context.appContext.getString(R.string.key_util_name), util::class.java.canonicalName)
+        intent.putExtra(context.appContext.getString(R.string.key_util_activated), enabled)
+        LocalBroadcastManager.getInstance(context.appContext).sendBroadcast(intent)
+    }
 
 
 

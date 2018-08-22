@@ -2,6 +2,7 @@ package com.example.tomas.carsecurity.utils
 
 import android.location.Location
 import com.example.tomas.carsecurity.GeneralObservable
+import com.example.tomas.carsecurity.MainActivity
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.sensors.LocationProvider
 import java.util.*
@@ -82,7 +83,7 @@ class Alarm(private val context: MyContext, private val utilsManager: UtilsManag
         println("""Alarm get location: $location""")
     }
 
-    fun enableAlarm(){
+    override fun enable(){
         enabled = true
         alarm = false
         alert = false
@@ -90,19 +91,22 @@ class Alarm(private val context: MyContext, private val utilsManager: UtilsManag
 
         utilsManager.registerObserver(OEnum.MoveDetector, this)
         utilsManager.registerObserver(OEnum.SoundDetector, this)
+
         println("Alarm system enabled")
+        utilsManager.informUI(this, true)
     }
 
-    fun disableArarm(){
+    override fun disable(){
         utilsManager.unregisterAllObservables(this)
 
         enabled = false
         // TODO stop alarm operations
 
         println("Alarm system disabled")
+        utilsManager.informUI(this, false)
     }
 
-    fun isEnabled(): Boolean{
+    override fun isEnabled(): Boolean{
         return enabled
     }
 }
