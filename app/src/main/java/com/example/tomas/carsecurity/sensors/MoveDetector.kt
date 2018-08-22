@@ -5,6 +5,7 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.util.Log
 import com.example.tomas.carsecurity.GeneralObservable
 import com.example.tomas.carsecurity.context.MyContext
 
@@ -15,6 +16,8 @@ import com.example.tomas.carsecurity.context.MyContext
  * @property context which is used for getting global data and preferences.
  */
 class MoveDetector(private val context: MyContext) : GeneralObservable(), SensorEventListener {
+
+    private val tag = "sensors.MoveDetector"
 
     /** Array contains data which are given by last acceleration sensor activity. */
     private var lastAcceleration :FloatArray
@@ -39,7 +42,7 @@ class MoveDetector(private val context: MyContext) : GeneralObservable(), Sensor
         sensor = manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
 
         if(sensor == null){
-            println("No acceleration sensor in this device") // TODO log error and return it to GUI
+            Log.e(tag, "No acceleration sensor in this device") // TODO return error to GUI
         }
     }
 
@@ -52,6 +55,7 @@ class MoveDetector(private val context: MyContext) : GeneralObservable(), Sensor
             manager.unregisterListener(this)
             enabled = false
             firstRun = true
+            Log.d(tag, "Detector is disabled")
         }
     }
 
@@ -62,6 +66,7 @@ class MoveDetector(private val context: MyContext) : GeneralObservable(), Sensor
         if(!enabled) {
             manager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)
             enabled = true
+            Log.d(tag, "Detector is enabled")
         }
     }
 
@@ -92,7 +97,7 @@ class MoveDetector(private val context: MyContext) : GeneralObservable(), Sensor
     override fun onSensorChanged(event: SensorEvent?) {
 
         if (event?.values?.size == null || event.values.size != context.moveDetectorContext.dimensions) {
-            println("Incoming event is invalid or have invalid dimension") // TODO log warn
+            Log.w(tag,"Incoming event is invalid or have invalid dimension")
             return
         }
 

@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.media.MediaRecorder
 import android.support.v4.content.ContextCompat
+import android.util.Log
 import com.example.tomas.carsecurity.GeneralObservable
 import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.context.MyContext
@@ -19,6 +20,8 @@ import java.io.IOException
  */
 class SoundDetector(private val context : MyContext) : GeneralObservable() {
 
+    private val tag = "sensors.SoundDetector"
+
     /** Class used for audio recording. When sound detector is disable variable should be null */
     private var recorder: MediaRecorder? = null
     /** Indicates when sound detector is enabled. */
@@ -29,10 +32,13 @@ class SoundDetector(private val context : MyContext) : GeneralObservable() {
      * Method stop sound detector and stop recording audio from microphone.
      */
     override fun disable() {
-        enabled = false
-        recorder?.stop()
-        recorder?.release()
-        recorder = null
+        if(enabled) {
+            enabled = false
+            recorder?.stop()
+            recorder?.release()
+            recorder = null
+            Log.d(tag, "Detector is disabled")
+        }
     }
 
     /**
@@ -57,11 +63,13 @@ class SoundDetector(private val context : MyContext) : GeneralObservable() {
         } catch (e: IOException){
             recorder = null
             enabled = false // TODO maybe can throw exception
+            Log.w(tag, "Detector can to be enabled.")
             return
         }
         recorder?.start()
 
         initSoundChecker()
+        Log.d(tag, "Detector is enabled.")
     }
 
     /**
@@ -83,11 +91,11 @@ class SoundDetector(private val context : MyContext) : GeneralObservable() {
      * state for maximal [context.soundDetectorContext.measureInterval] milliseconds before it ends.
      */
     private fun initSoundChecker(){
-        Thread {
+        Thread { // TODO use timer
             while(enabled) {
                 val amplitude = recorder?.maxAmplitude ?: 0
                 if (amplitude > context.soundDetectorContext.maxAmplitude) {
-                    println("""Max amplitude $amplitude is over limit ${context.soundDetectorContext.maxAmplitude}""") // TODO log dedug
+                    Log.d(tag,"""Max amplitude $amplitude is over limit ${context.soundDetectorContext.maxAmplitude}""")
 
                     setChanged()
                     notifyObservers()

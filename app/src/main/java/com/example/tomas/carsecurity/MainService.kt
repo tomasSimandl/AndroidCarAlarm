@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.IBinder
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
+import android.util.Log
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.utils.Alarm
 import com.example.tomas.carsecurity.utils.GeneralUtil
@@ -28,6 +29,7 @@ class MainService : Service() {
         }
     }
 
+    private val tag = "MainService"
     private val workerThread = WorkerThread("MainServiceThread")
     private lateinit var context: MyContext
     private lateinit var utilsManager: UtilsManager
@@ -38,7 +40,7 @@ class MainService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        println("MainService: On create was called") // TODO log
+        Log.d(tag, "On create was called")
     }
 
     override fun onDestroy() {
@@ -74,7 +76,7 @@ class MainService : Service() {
 //                    stopSelf()
 //                }
 
-                else -> println("empty action")
+                else -> Log.d(tag, "empty action")
             }
         }
 
@@ -83,7 +85,7 @@ class MainService : Service() {
 
     private fun switchUtil(action: Actions){
         if(!workerThread.isAlive){
-            println("MainService: Start foreground service") // TODO log
+            Log.d(tag, "Start foreground service")
             workerThread.start()
             workerThread.prepareHandler()
             startForeground()

@@ -12,13 +12,17 @@ import android.content.IntentFilter
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.support.v4.content.ContextCompat
+import android.util.Log
 import android.widget.Button
 
 
 class MainActivity : AppCompatActivity() {
 
+    private val tag = "MainActivity"
+
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
+            Log.d(tag, "BroadcastReceiver.onReceive was triggered.")
             val utilName = intent.getStringExtra(getString(R.string.key_util_name))
             val utilEnabled = intent.getBooleanExtra(getString(R.string.key_util_activated), false)
 
@@ -31,6 +35,7 @@ class MainActivity : AppCompatActivity() {
 
             if(!utilEnabled){
                 sendIntent(MainService.Actions.ActionTryStopService.name)
+                Log.d(tag, "TryStopService intent was sent to Foreground service")
             }
         }
     }

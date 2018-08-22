@@ -2,6 +2,7 @@ package com.example.tomas.carsecurity.utils
 
 import android.content.Intent
 import android.support.v4.content.LocalBroadcastManager
+import android.util.Log
 import com.example.tomas.carsecurity.GeneralObservable
 import com.example.tomas.carsecurity.ObservableEnum
 import com.example.tomas.carsecurity.R
@@ -12,6 +13,8 @@ import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 
 class UtilsManager(private val context: MyContext) {
+
+    private val tag = "utils.UtilsManager"
 
     private val workerThread = WorkerThread("UtilsThread")
 
@@ -25,6 +28,7 @@ class UtilsManager(private val context: MyContext) {
     }
 
     fun runOnUtilThread(runnable: Runnable){
+        Log.d(tag, """Adding task to ${workerThread.name} thread""")
         workerThread.postTask(runnable)
     }
 
@@ -36,11 +40,13 @@ class UtilsManager(private val context: MyContext) {
     }
 
     fun destroy(){
-        workerThread.quit() // TODO use method
+        Log.d(tag, "Destroying workerThread.")
+        workerThread.quit() // TODO use this 'destroy' method
     }
 
 
     fun informUI(util: GeneralUtil, enabled: Boolean) {
+        Log.d(tag, """Sending information about util to UI. Util: $util is ${if(enabled) "enabled" else "disabled"}.""")
         val intent = Intent(context.appContext.getString(R.string.utils_ui_update))
 
         intent.putExtra(context.appContext.getString(R.string.key_util_name), util::class.java.canonicalName)
@@ -69,11 +75,15 @@ class UtilsManager(private val context: MyContext) {
 
     fun registerObserver(observableEnum: ObservableEnum, util: GeneralUtil): Boolean{
 
+        Log.d(tag, """Registering observer $util to observable $observableEnum""")
+
         if(!observableEnum.isAvailable(context.utilsManagerContext)){
+            Log.d(tag, "Observable is not available.")
             return false // observable is not available (disabled by users setting)
         }
 
         if(utilsMap[util]?.contains(observableEnum) == true){
+            Log.d(tag, """Observer $util is already registered in $observableEnum""")
             return true // already registered
         }
 
@@ -95,6 +105,8 @@ class UtilsManager(private val context: MyContext) {
     }
 
     fun unregisterAllObservables(util: GeneralUtil){
+
+        Log.d(tag, """Unregistering observer $util from all observables.""")
 
         val enums = utilsMap[util] ?: return
 

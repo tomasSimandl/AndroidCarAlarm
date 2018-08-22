@@ -1,8 +1,8 @@
 package com.example.tomas.carsecurity.utils
 
 import android.location.Location
+import android.util.Log
 import com.example.tomas.carsecurity.GeneralObservable
-import com.example.tomas.carsecurity.MainActivity
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.sensors.LocationProvider
 import java.util.*
@@ -10,16 +10,16 @@ import com.example.tomas.carsecurity.ObservableEnum as OEnum
 
 class Alarm(private val context: MyContext, private val utilsManager: UtilsManager) : GeneralUtil(context, utilsManager) {
 
+    private val tag = "utils.Alarm"
+
     private var enabled = false
     private var alarm = false
     private var alert = false
 
-    private var lastDetection = -1L
-    private var enableTime = -1L
-
+    private var enabledTime = -1L
     private var lastLocation: Location? = null
 
-    private val timer= Timer("TimerThread") // TODO magic const
+    private val timer= Timer("TimerThread")
 
     override fun action(observable: Observable, args: Any?) {
         if(!enabled) return
@@ -34,23 +34,23 @@ class Alarm(private val context: MyContext, private val utilsManager: UtilsManag
 
         val currentTime = Calendar.getInstance().timeInMillis
 
-        println("""Alarm: detection by $observable at $currentTime.""") // TODO log
+        Log.d(tag, """Alarm: detection by $observable at $currentTime.""")
 
         // alarm is already activated -> no work
         if(alarm) {
-            println("Alarm is already activated.") // TODO log
+            Log.d(tag,"Alarm is already activated.")
             return
         }
 
         // detections are ignored because start alarm interval did not passed.
-        if(currentTime - enableTime < context.alarmContext.startAlarmInterval) {
-            println("Alarm is waiting for activation") // TODO log
+        if(currentTime - enabledTime < context.alarmContext.startAlarmInterval) {
+            Log.d(tag,"Alarm is waiting for activation")
             return
         }
 
         // first detection alarm is switched to alert mode
         if(!alert) {
-            println("Alarm alert mode activated.") // TODO log
+            Log.d(tag, "Alarm alert mode activated.")
             alert = true
 
             val timerTask = object : TimerTask() {
@@ -69,7 +69,7 @@ class Alarm(private val context: MyContext, private val utilsManager: UtilsManag
     }
 
     private fun onAlarm(){
-        println("Alarm was activated.") // TODO log
+        Log.d(tag,"Alarm was activated.")
         // TODO notify observers (Siren, ...)
         // TODO send messages
         // TODO get actual location
@@ -87,19 +87,19 @@ class Alarm(private val context: MyContext, private val utilsManager: UtilsManag
 
     private fun onLocationUpdate(location: Location){
         this.lastLocation = location
-        println("""Alarm get location: $location""")
+        Log.d(tag,"""Alarm get location: $location""")
     }
 
     override fun enable(){
         enabled = true
         alarm = false
         alert = false
-        enableTime = Calendar.getInstance().timeInMillis
+        enabledTime = Calendar.getInstance().timeInMillis
 
         utilsManager.registerObserver(OEnum.MoveDetector, this)
         utilsManager.registerObserver(OEnum.SoundDetector, this)
 
-        println("Alarm system enabled")
+        Log.d(tag,"Alarm system enabled")
         utilsManager.informUI(this, true)
     }
 
@@ -109,7 +109,7 @@ class Alarm(private val context: MyContext, private val utilsManager: UtilsManag
         enabled = false
         // TODO stop alarm operations
 
-        println("Alarm system disabled")
+        Log.d(tag,"Alarm system disabled")
         utilsManager.informUI(this, false)
     }
 
