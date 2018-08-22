@@ -19,8 +19,9 @@ class Alarm(private val context: MyContext, private val utilsManager: UtilsManag
 
     private var lastLocation: Location? = null
 
-    override fun action(observable: Observable, args: Any?) {
+    private val timer= Timer("TimerThread") // TODO magic const
 
+    override fun action(observable: Observable, args: Any?) {
         if(!enabled) return
 
         when(observable){
@@ -36,29 +37,35 @@ class Alarm(private val context: MyContext, private val utilsManager: UtilsManag
         println("""Alarm: detection by $observable at $currentTime.""") // TODO log
 
         // alarm is already activated -> no work
-        if(alarm) return
-
-        // detections are ignored because start alarm interval did not passed.
-        if(currentTime - enableTime < context.alarmContext.startAlarmInterval) return
-
-        // first detection alarm is switched to alert mode
-        if(!alert) {
-            lastDetection = currentTime
-            alert = true
+        if(alarm) {
+            println("Alarm is already activated.") // TODO log
             return
         }
 
-        val timeDiff = currentTime - lastDetection
-        // time interval which eliminates short moves did not passed
-        if(timeDiff < context.alarmContext.ignoreAlarmInterval) return
+        // detections are ignored because start alarm interval did not passed.
+        if(currentTime - enableTime < context.alarmContext.startAlarmInterval) {
+            println("Alarm is waiting for activation") // TODO log
+            return
+        }
 
-        // if separation is preparation for algorithm extension
+        // first detection alarm is switched to alert mode
+        if(!alert) {
+            println("Alarm alert mode activated.") // TODO log
+            alert = true
 
-        // time before is alarm triggered after detection did not passed
-        if(timeDiff < context.alarmContext.alertAlarmInterval) return
+            val timerTask = object : TimerTask() {
+                override fun run() {
 
-        alarm = true
-        onAlarm()
+                    val task = Runnable {
+                        alarm = true
+                        onAlarm()
+                    }
+                    utilsManager.runOnUtilThread(task)
+                }
+            }
+
+            timer.schedule( timerTask, context.alarmContext.alertAlarmInterval)
+        }
     }
 
     private fun onAlarm(){
@@ -98,7 +105,7 @@ class Alarm(private val context: MyContext, private val utilsManager: UtilsManag
 
     override fun disable(){
         utilsManager.unregisterAllObservables(this)
-
+        timer.cancel()
         enabled = false
         // TODO stop alarm operations
 

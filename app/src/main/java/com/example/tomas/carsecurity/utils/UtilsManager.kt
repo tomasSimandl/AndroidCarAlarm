@@ -24,11 +24,15 @@ class UtilsManager(private val context: MyContext) {
         workerThread.prepareHandler()
     }
 
+    fun runOnUtilThread(runnable: Runnable){
+        workerThread.postTask(runnable)
+    }
+
     fun addUtilsTask(util: GeneralUtil, observable: Observable, any: Any?){
         val task = Runnable {
             util.action(observable, any)
         }
-        workerThread.postTask(task)
+        runOnUtilThread(task)
     }
 
     fun destroy(){
