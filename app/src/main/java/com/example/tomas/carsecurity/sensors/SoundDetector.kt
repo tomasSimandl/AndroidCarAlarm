@@ -11,6 +11,7 @@ import com.example.tomas.carsecurity.GeneralObservable
 import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.context.MyContext
 import java.io.IOException
+import java.util.*
 
 /**
  * This class is used for sound detecting. When sound is detected only calls parents
@@ -27,18 +28,19 @@ class SoundDetector(private val context : MyContext) : GeneralObservable() {
     /** Indicates when sound detector is enabled. */
     private var enabled = false
 
+    private val timer = Timer("SoundDetectorThread")
+
 
     /**
      * Method stop sound detector and stop recording audio from microphone.
      */
     override fun disable() {
-        if(enabled) {
-            enabled = false
-            recorder?.stop()
-            recorder?.release()
-            recorder = null
-            Log.d(tag, "Detector is disabled")
-        }
+        timer.cancel()
+        enabled = false
+        recorder?.stop()
+        recorder?.release()
+        recorder = null
+        Log.d(tag, "Detector is disabled")
     }
 
     /**
@@ -91,8 +93,12 @@ class SoundDetector(private val context : MyContext) : GeneralObservable() {
      * state for maximal [context.soundDetectorContext.measureInterval] milliseconds before it ends.
      */
     private fun initSoundChecker(){
-        Thread { // TODO use timer
-            while(enabled) {
+
+        val timerTask = object : TimerTask() {
+            override fun run() {
+
+                Log.v(tag, "timer thread was triggered.")
+
                 val amplitude = recorder?.maxAmplitude ?: 0
                 if (amplitude > context.soundDetectorContext.maxAmplitude) {
                     Log.d(tag,"""Max amplitude $amplitude is over limit ${context.soundDetectorContext.maxAmplitude}""")
@@ -100,8 +106,8 @@ class SoundDetector(private val context : MyContext) : GeneralObservable() {
                     setChanged()
                     notifyObservers()
                 }
-                Thread.sleep(context.soundDetectorContext.measureInterval)
             }
-        }.start()
+        }
+        timer.schedule( timerTask, context.soundDetectorContext.measureInterval, context.soundDetectorContext.measureInterval)
     }
 }
