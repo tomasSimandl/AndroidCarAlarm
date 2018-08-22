@@ -52,6 +52,16 @@ class UtilsManager(private val context: MyContext) {
         LocalBroadcastManager.getInstance(context.appContext).sendBroadcast(intent)
     }
 
+    fun isAnyUtilEnabled(): Boolean{
+        var isAnyEnabled = false
+        for (util in utilsMap.keys){
+            isAnyEnabled = isAnyEnabled || util.isEnabled()
+            if(isAnyEnabled) break
+        }
+
+        return isAnyEnabled
+    }
+
 
 
 

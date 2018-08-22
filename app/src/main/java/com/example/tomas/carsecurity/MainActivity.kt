@@ -29,6 +29,11 @@ class MainActivity : AppCompatActivity() {
             }
 
 
+            if(!utilEnabled){
+                val sendIntent = Intent(applicationContext, MainService::class.java)
+                sendIntent.action = MainService.Actions.ActionTryStopService.name
+                startService(sendIntent)
+            }
         }
     }
 

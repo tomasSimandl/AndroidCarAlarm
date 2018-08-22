@@ -12,11 +12,12 @@ import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.utils.Alarm
 import com.example.tomas.carsecurity.utils.GeneralUtil
 import com.example.tomas.carsecurity.utils.UtilsManager
+import java.util.concurrent.atomic.AtomicInteger
 
 class MainService : Service() {
 
     enum class Actions{
-        ActionStopService, ActionAlarm, ActionTracker, ActionWifiHotSpot, ActionAutomaticMode;
+        ActionTryStopService, ActionStopService, ActionAlarm, ActionTracker, ActionWifiHotSpot, ActionAutomaticMode;
 
         fun getInstance(context: MyContext, utilsManager: UtilsManager): GeneralUtil{
             return when (this){
@@ -30,10 +31,14 @@ class MainService : Service() {
     private lateinit var context: MyContext
     private lateinit var utilsManager: UtilsManager
 
+    private var tasksInQueue :AtomicInteger = AtomicInteger(0)
+
     private val utilsMap: MutableMap<Actions, GeneralUtil> = HashMap()
 
     override fun onCreate() {
         super.onCreate()
+
+        println("MainService: On create was called") // TODO log
 
         workerThread.start()
         workerThread.prepareHandler()
@@ -62,6 +67,8 @@ class MainService : Service() {
             when(action){
                 Actions.ActionAlarm.name -> switchUtil(Actions.ActionAlarm)
                 Actions.ActionStopService.name -> stopService()
+                Actions.ActionTryStopService.name ->
+                    if(tasksInQueue.get() == 0 && !utilsManager.isAnyUtilEnabled()) stopService()
 
 
 //                Actions.ActionStop.name -> {
@@ -79,6 +86,7 @@ class MainService : Service() {
 
     private fun switchUtil(action: Actions){
         val task = Runnable {
+            // task run sequentially in one thread
             val util: GeneralUtil = utilsMap[action] ?: action.getInstance(context, utilsManager)
 
             if (util.isEnabled()) {
@@ -88,7 +96,9 @@ class MainService : Service() {
             }
 
             utilsMap[action] = util
+            tasksInQueue.decrementAndGet()
         }
+        tasksInQueue.incrementAndGet()
         workerThread.postTask(task)
     }
 
