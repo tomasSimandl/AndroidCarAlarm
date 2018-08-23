@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:padding="16dp"
     tools:context=".MainActivity">
 
     <Button
@@ -11,13 +12,25 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/disabled"
-        android:text="Alarm"/>
+        android:layout_margin="8dp"
+        android:text="Alarm" />
+
+    <Button
+        android:id="@+id/actionTracker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/disabled"
+        android:layout_margin="8dp"
+        android:text="Tracker" />
 
 
     <TextView
         android:id="@+id/console"
-        android:layout_margin="10dp"
+        android:layout_margin="8dp"
         android:layout_width="match_parent"
-        android:layout_height="300dp" />
+        android:layout_height="0dp"
+        android:background="@color/common_google_signin_btn_text_dark_disabled"
+        android:layout_weight="1"
+        android:layout_below="@id/actionAlarm"/>
 
 </LinearLayout>

@@ -12,6 +12,7 @@ import android.util.Log
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.utils.Alarm
 import com.example.tomas.carsecurity.utils.GeneralUtil
+import com.example.tomas.carsecurity.utils.Tracker
 import com.example.tomas.carsecurity.utils.UtilsManager
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -24,6 +25,7 @@ class MainService : Service() {
         fun getInstance(context: MyContext, utilsManager: UtilsManager): GeneralUtil{
             return when (this){
                 ActionAlarm -> Alarm(context, utilsManager)
+                ActionTracker-> Tracker(context,utilsManager)
                 else -> throw UnsupportedOperationException("Class not implemented")
             }
         }
@@ -64,6 +66,7 @@ class MainService : Service() {
 
             when(action){
                 Actions.ActionAlarm.name -> switchUtil(Actions.ActionAlarm)
+                Actions.ActionTracker.name -> switchUtil(Actions.ActionTracker)
                 Actions.ActionStopService.name -> stopService()
                 Actions.ActionTryStopService.name ->
                     if(tasksInQueue.get() == 0 && !utilsManager.isAnyUtilEnabled()) stopService()

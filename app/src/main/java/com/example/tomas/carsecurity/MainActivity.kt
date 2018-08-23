@@ -14,6 +14,7 @@ import android.content.Context
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import android.widget.Button
+import com.example.tomas.carsecurity.utils.Tracker
 
 
 class MainActivity : AppCompatActivity() {
@@ -26,10 +27,11 @@ class MainActivity : AppCompatActivity() {
             val utilName = intent.getStringExtra(getString(R.string.key_util_name))
             val utilEnabled = intent.getBooleanExtra(getString(R.string.key_util_activated), false)
 
+            console.text = "Received broadcast from: \n" + utilName + "\nwith request: " + utilEnabled + "\n" + console.text
+
             when (utilName) {
-
                 Alarm::class.java.canonicalName -> changeColor(actionAlarm, utilEnabled)
-
+                Tracker::class.java.canonicalName -> changeColor(actionTracker, utilEnabled)
             }
 
 
@@ -48,6 +50,10 @@ class MainActivity : AppCompatActivity() {
 
         actionAlarm.setOnClickListener {
             sendIntent(MainService.Actions.ActionAlarm.name)
+        }
+
+        actionTracker.setOnClickListener{
+            sendIntent(MainService.Actions.ActionTracker.name)
         }
     }
 
