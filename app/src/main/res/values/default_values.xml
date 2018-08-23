@@ -36,7 +36,7 @@
     <bool name="default_util_is_move_detector_available">true</bool>
 
     <!-- Indicates if sound detector can be used. -->
-    <bool name="default_util_is_sound_detector_available">false</bool>
+    <bool name="default_util_is_sound_detector_available">true</bool>
 
 
 

@@ -1,14 +1,11 @@
 package com.example.tomas.carsecurity.sensors
 
 import android.Manifest
-import android.content.Context
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.media.MediaRecorder
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import com.example.tomas.carsecurity.GeneralObservable
-import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.context.MyContext
 import java.io.IOException
 import java.util.*

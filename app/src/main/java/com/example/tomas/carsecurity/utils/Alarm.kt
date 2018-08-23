@@ -87,7 +87,7 @@ class Alarm(private val context: MyContext, private val utilsManager: UtilsManag
 
     private fun onLocationUpdate(location: Location){
         this.lastLocation = location
-        Log.d(tag,"""Alarm get location: $location""")
+        Log.d(tag,"""Location update: $location""")
     }
 
     override fun enable(){
