@@ -10,25 +10,14 @@ import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
 import android.util.Log
 import com.example.tomas.carsecurity.context.MyContext
-import com.example.tomas.carsecurity.utils.Alarm
-import com.example.tomas.carsecurity.utils.GeneralUtil
-import com.example.tomas.carsecurity.utils.Tracker
-import com.example.tomas.carsecurity.utils.UtilsManager
+import com.example.tomas.carsecurity.utils.*
 import java.util.concurrent.atomic.AtomicInteger
 
 class MainService : Service() {
 
     enum class Actions{
         ActionTryStopService, ActionStopService, ActionStatus,
-        ActionAlarm, ActionTracker, ActionWifiHotSpot, ActionAutomaticMode;
-
-        fun getInstance(context: MyContext, utilsManager: UtilsManager): GeneralUtil{
-            return when (this){
-                ActionAlarm -> Alarm(context, utilsManager)
-                ActionTracker-> Tracker(context,utilsManager)
-                else -> throw UnsupportedOperationException("Class not implemented")
-            }
-        }
+        ActionSwitchUtil, ActionAutomaticMode;
     }
 
     private val tag = "MainService"
@@ -38,7 +27,7 @@ class MainService : Service() {
 
     private var tasksInQueue :AtomicInteger = AtomicInteger(0)
 
-    private val utilsMap: MutableMap<Actions, GeneralUtil> = HashMap()
+    private val utilsMap: MutableMap<UtilsEnum, GeneralUtil> = HashMap()
 
     override fun onCreate() {
         super.onCreate()
@@ -65,11 +54,9 @@ class MainService : Service() {
             val action: String = intent.action
 
             when(action){
-                Actions.ActionAlarm.name -> switchUtil(Actions.ActionAlarm)
-                Actions.ActionTracker.name -> switchUtil(Actions.ActionTracker)
+                Actions.ActionSwitchUtil.name -> switchUtil(intent.getSerializableExtra("util") as UtilsEnum)
                 Actions.ActionStopService.name -> stopService()
-                Actions.ActionTryStopService.name ->
-                    if(tasksInQueue.get() == 0 && !utilsManager.isAnyUtilEnabled()) stopService()
+                Actions.ActionTryStopService.name -> stopServiceSafely()
                 Actions.ActionStatus.name -> utilsManager.informUI()
 
 
@@ -86,7 +73,7 @@ class MainService : Service() {
         return super.onStartCommand(intent, flags, startId)
     }
 
-    private fun switchUtil(action: Actions){
+    private fun switchUtil(utilEnum: UtilsEnum){
         if(!workerThread.isAlive){
             Log.d(tag, "Start foreground service")
             workerThread.start()
@@ -96,7 +83,7 @@ class MainService : Service() {
 
         val task = Runnable {
             // task run sequentially in one thread
-            val util: GeneralUtil = utilsMap[action] ?: action.getInstance(context, utilsManager)
+            val util: GeneralUtil = utilsMap[utilEnum] ?: utilEnum.getInstance(context, utilsManager)
 
             if (util.isEnabled()) {
                 util.disable()
@@ -104,11 +91,16 @@ class MainService : Service() {
                 util.enable()
             }
 
-            utilsMap[action] = util
+            utilsMap[utilEnum] = util
             tasksInQueue.decrementAndGet()
         }
         tasksInQueue.incrementAndGet()
         workerThread.postTask(task)
+    }
+
+    private fun stopServiceSafely(){
+        if(tasksInQueue.get() == 0 && !utilsManager.isAnyUtilEnabled())
+            stopService()
     }
 
     private fun stopService(){

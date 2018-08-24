@@ -15,6 +15,7 @@ import android.support.v4.content.ContextCompat
 import android.util.Log
 import android.widget.Button
 import com.example.tomas.carsecurity.utils.Tracker
+import com.example.tomas.carsecurity.utils.UtilsEnum
 
 
 class MainActivity : AppCompatActivity() {
@@ -49,11 +50,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         actionAlarm.setOnClickListener {
-            sendIntent(MainService.Actions.ActionAlarm.name)
+            sendIntentSwitchUtil(UtilsEnum.Alarm)
+
         }
 
         actionTracker.setOnClickListener{
-            sendIntent(MainService.Actions.ActionTracker.name)
+            sendIntentSwitchUtil(UtilsEnum.Tracker)
         }
     }
 
@@ -87,6 +89,13 @@ class MainActivity : AppCompatActivity() {
     private fun sendIntent(action: String){
         val intent = Intent(applicationContext, MainService::class.java)
         intent.action = action
+        startService(intent)
+    }
+
+    private fun sendIntentSwitchUtil(util: UtilsEnum){
+        val intent = Intent(applicationContext, MainService::class.java)
+        intent.action = MainService.Actions.ActionSwitchUtil.name
+        intent.putExtra("util", util)
         startService(intent)
     }
 
