@@ -1,5 +1,5 @@
 package com.example.tomas.carsecurity.communication
 
 enum class MessageType {
-    UtilSwitch
+    UtilSwitch, Alarm, Location, BatteryWarn, Status
 }
