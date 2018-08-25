@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger
 class MainService : Service() {
 
     enum class Actions{
-        ActionTryStopService, ActionStopService, ActionStatus,
+        ActionTryStopService, ActionStopService, ActionStatus, ActionStatusUI, ActionGetPosition,
         ActionSwitchUtil, ActionAutomaticMode;
     }
 
@@ -58,7 +58,7 @@ class MainService : Service() {
                 Actions.ActionSwitchUtil.name -> switchUtil(intent.getSerializableExtra("util") as UtilsEnum)
                 Actions.ActionStopService.name -> stopService()
                 Actions.ActionTryStopService.name -> stopServiceSafely()
-                Actions.ActionStatus.name -> informUI()
+                Actions.ActionStatusUI.name -> informUI()
 
 
 //                Actions.ActionStop.name -> {

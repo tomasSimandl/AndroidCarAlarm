@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        sendIntent(MainService.Actions.ActionStatus.name)
+        sendIntent(MainService.Actions.ActionStatusUI.name)
     }
 
     override fun onStop() {
