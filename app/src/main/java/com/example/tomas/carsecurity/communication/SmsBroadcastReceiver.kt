@@ -68,6 +68,7 @@ class SmsBroadcastReceiver : BroadcastReceiver() {
 
         if (phoneNumber != smsSender) { // TODO +420
             Log.d(tag, "Phone number of incoming message is not allowed to control app.")
+            return
         }
 
         when {
@@ -81,10 +82,11 @@ class SmsBroadcastReceiver : BroadcastReceiver() {
     private fun switchUtil(context: Context, smsBody: String){
         try {
             val util = UtilsEnum.valueOf(smsBody)
-            val intent = Intent(context.applicationContext, SmsBroadcastReceiver::class.java)
+            val intent = Intent(context.applicationContext, MainService::class.java)
             intent.action = MainService.Actions.ActionSwitchUtil.name
             intent.putExtra("util", util)
             context.startService(intent)
+            Log.d(tag, "Intent was sent.")
 
         } catch (e: IllegalArgumentException){
             Log.d(tag, "Incoming command had invalid util name")
@@ -93,7 +95,7 @@ class SmsBroadcastReceiver : BroadcastReceiver() {
     }
 
     private fun sendIntent(context: Context, action: String){
-        val intent = Intent(context.applicationContext, SmsBroadcastReceiver::class.java)
+        val intent = Intent(context.applicationContext, MainService::class.java)
         intent.action = action
         context.startService(intent)
     }
