@@ -39,7 +39,8 @@
     <bool name="default_util_is_sound_detector_available">true</bool>
 
 
-
+    <!-- Indicates if messages can be send by default if there is no value in shared preferences. -->
+    <bool name="default_communication_can_send_message">false</bool>
 
 
 

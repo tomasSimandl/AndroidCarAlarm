@@ -20,6 +20,7 @@ class MyContext(val appContext: Context ) : Observable() {
     val utilsManagerContext = UtilsManagerContext(sharedPreferences, appContext)
     val alarmContext = AlarmContext(sharedPreferences, appContext)
 
+    val communicationContext = CommunicationContext(sharedPreferences, appContext)
 
     fun updateContext(){
         setChanged()

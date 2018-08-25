@@ -1,15 +1,16 @@
 package com.example.tomas.carsecurity.communication
 
+import com.example.tomas.carsecurity.utils.UtilsEnum
+
 class CommunicationManager {
 
-    enum class Priority{
-        LOW, MEDIUM, HIGH
+    private val activeCommunicators: MutableSet<ICommunicationProvider> = HashSet()
+
+    fun utilSwitch(util: UtilsEnum, enabled: Boolean) {
+        for (provider in activeCommunicators) {
+            provider.sendUtilSwitch(util, enabled)
+        }
     }
 
-    private val activeComunicators = HashMap<ICommunicationProvider, Priority>()
-
-    fun sendMessage(priority: Priority, text: String){
-        // TODO empty body
-    }
 
 }
