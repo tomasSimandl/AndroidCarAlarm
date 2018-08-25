@@ -8,9 +8,12 @@ import android.os.Build
 import android.os.IBinder
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
+import android.support.v4.content.LocalBroadcastManager
 import android.util.Log
 import com.example.tomas.carsecurity.context.MyContext
-import com.example.tomas.carsecurity.utils.*
+import com.example.tomas.carsecurity.utils.GeneralUtil
+import com.example.tomas.carsecurity.utils.UtilsManager
+import com.example.tomas.carsecurity.utils.UtilsEnum
 import java.util.concurrent.atomic.AtomicInteger
 
 class MainService : Service() {
@@ -26,8 +29,6 @@ class MainService : Service() {
     private lateinit var utilsManager: UtilsManager
 
     private var tasksInQueue :AtomicInteger = AtomicInteger(0)
-
-    private val utilsMap: MutableMap<UtilsEnum, GeneralUtil> = HashMap()
 
     override fun onCreate() {
         super.onCreate()
@@ -57,7 +58,7 @@ class MainService : Service() {
                 Actions.ActionSwitchUtil.name -> switchUtil(intent.getSerializableExtra("util") as UtilsEnum)
                 Actions.ActionStopService.name -> stopService()
                 Actions.ActionTryStopService.name -> stopServiceSafely()
-                Actions.ActionStatus.name -> utilsManager.informUI()
+                Actions.ActionStatus.name -> informUI()
 
 
 //                Actions.ActionStop.name -> {
@@ -83,19 +84,27 @@ class MainService : Service() {
 
         val task = Runnable {
             // task run sequentially in one thread
-            val util: GeneralUtil = utilsMap[utilEnum] ?: utilEnum.getInstance(context, utilsManager)
-
-            if (util.isEnabled()) {
-                util.disable()
-            } else {
-                util.enable()
-            }
-
-            utilsMap[utilEnum] = util
+            val enabled = utilsManager.switchUtil(utilEnum)
+            informUI(utilEnum, enabled)
             tasksInQueue.decrementAndGet()
         }
         tasksInQueue.incrementAndGet()
         workerThread.postTask(task)
+    }
+
+    private fun informUI(utilEnum: UtilsEnum, enabled: Boolean) {
+        Log.d(tag, """Sending information about util to UI. Util: ${utilEnum.name} is ${if(enabled) "enabled" else "disabled"}.""")
+        val intent = Intent(context.appContext.getString(R.string.utils_ui_update))
+
+        intent.putExtra(context.appContext.getString(R.string.key_util_name), utilEnum.name)
+        intent.putExtra(context.appContext.getString(R.string.key_util_activated), enabled)
+        LocalBroadcastManager.getInstance(context.appContext).sendBroadcast(intent)
+    }
+
+    fun informUI(){
+        for (util in utilsManager.getEnabledUtils()){
+            informUI(util, true)
+        }
     }
 
     private fun stopServiceSafely(){

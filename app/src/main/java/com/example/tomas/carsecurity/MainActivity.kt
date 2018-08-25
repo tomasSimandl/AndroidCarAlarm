@@ -31,8 +31,9 @@ class MainActivity : AppCompatActivity() {
             console.text = "Received broadcast from: \n" + utilName + "\nwith request: " + utilEnabled + "\n" + console.text
 
             when (utilName) {
-                Alarm::class.java.canonicalName -> changeColor(actionAlarm, utilEnabled)
-                Tracker::class.java.canonicalName -> changeColor(actionTracker, utilEnabled)
+
+                UtilsEnum.Alarm.name -> changeColor(actionAlarm, utilEnabled)
+                UtilsEnum.Tracker.name -> changeColor(actionTracker, utilEnabled)
             }
 
 

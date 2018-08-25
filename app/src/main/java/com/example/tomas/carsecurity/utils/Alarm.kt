@@ -8,7 +8,7 @@ import com.example.tomas.carsecurity.sensors.LocationProvider
 import java.util.*
 import com.example.tomas.carsecurity.ObservableEnum as OEnum
 
-class Alarm(private val context: MyContext, private val utilsManager: UtilsManager) : GeneralUtil(context, utilsManager) {
+class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper) : GeneralUtil(context, utilsHelper) {
 
     private val tag = "utils.Alarm"
 
@@ -60,7 +60,7 @@ class Alarm(private val context: MyContext, private val utilsManager: UtilsManag
                         alarm = true
                         onAlarm()
                     }
-                    utilsManager.runOnUtilThread(task)
+                    utilsHelper.runOnUtilThread(task)
                 }
             }
 
@@ -75,7 +75,7 @@ class Alarm(private val context: MyContext, private val utilsManager: UtilsManag
         // TODO get actual location
         // TODO send actual location in loop
 
-        utilsManager.registerObserver(OEnum.LocationProvider, this) // TODO dynamically register and unregister to save battery.
+        utilsHelper.registerObserver(OEnum.LocationProvider, this) // TODO dynamically register and unregister to save battery.
 
 //        while(true){
 //            if(lastLocation != null){
@@ -90,27 +90,27 @@ class Alarm(private val context: MyContext, private val utilsManager: UtilsManag
         Log.d(tag,"""Location update: $location""")
     }
 
-    override fun enable(){
+    override fun enable(): Boolean{
         enabled = true
         alarm = false
         alert = false
         enabledTime = Calendar.getInstance().timeInMillis
 
-        utilsManager.registerObserver(OEnum.MoveDetector, this)
-        utilsManager.registerObserver(OEnum.SoundDetector, this)
+        utilsHelper.registerObserver(OEnum.MoveDetector, this)
+        utilsHelper.registerObserver(OEnum.SoundDetector, this)
 
         Log.d(tag,"Alarm system enabled")
-        utilsManager.informUI(this, true)
+        return  true // alarm status
     }
 
-    override fun disable(){
-        utilsManager.unregisterAllObservables(this)
+    override fun disable(): Boolean{
+        utilsHelper.unregisterAllObservables(this)
         timer.cancel()
         enabled = false
         // TODO stop alarm operations
 
         Log.d(tag,"Alarm system disabled")
-        utilsManager.informUI(this, false)
+        return false // alarm status
     }
 
     override fun isEnabled(): Boolean{

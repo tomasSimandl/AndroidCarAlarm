@@ -7,7 +7,7 @@ import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.sensors.LocationProvider
 import java.util.*
 
-class Tracker(private val context: MyContext, private val utilsManager: UtilsManager) : GeneralUtil(context, utilsManager) {
+class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelper) : GeneralUtil(context, utilsHelper) {
 
     private val tag = "utils.Tracker"
     private var enabled = false
@@ -27,16 +27,18 @@ class Tracker(private val context: MyContext, private val utilsManager: UtilsMan
         // TODO send location to server
     }
 
-    override fun enable() {
+    override fun enable(): Boolean{
         enabled = true
-        utilsManager.registerObserver(ObservableEnum.LocationProvider, this)
-        utilsManager.informUI(this, true)
+        utilsHelper.registerObserver(ObservableEnum.LocationProvider, this)
+
+        return true // tracker status
     }
 
-    override fun disable() {
+    override fun disable(): Boolean {
         enabled = false
-        utilsManager.unregisterAllObservables(this)
-        utilsManager.informUI(this, false)
+        utilsHelper.unregisterAllObservables(this)
+
+        return false // tracker status
     }
 
     override fun isEnabled(): Boolean {
