@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.tomas.carsecurity.GeneralObservable
 import com.example.tomas.carsecurity.ObservableEnum
 import com.example.tomas.carsecurity.WorkerThread
+import com.example.tomas.carsecurity.communication.CommunicationManager
 import com.example.tomas.carsecurity.context.MyContext
 
 class UtilsHelper (private val context: MyContext) {
@@ -15,6 +16,8 @@ class UtilsHelper (private val context: MyContext) {
     private val utilsMap: MutableMap<GeneralUtil, MutableSet<ObservableEnum>> = HashMap()
 
     private val observablesMap: MutableMap<ObservableEnum, GeneralObservable> = HashMap()
+
+    val communicationManager = CommunicationManager()
 
 
 

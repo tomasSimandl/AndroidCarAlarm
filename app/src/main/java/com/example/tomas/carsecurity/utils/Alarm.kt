@@ -70,6 +70,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
 
     private fun onAlarm(){
         Log.d(tag,"Alarm was activated.")
+        utilsHelper.communicationManager.sendAlarm()
         // TODO notify observers (Siren, ...)
         // TODO send messages
         // TODO get actual location
@@ -88,6 +89,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
     private fun onLocationUpdate(location: Location){
         this.lastLocation = location
         Log.d(tag,"""Location update: $location""")
+        utilsHelper.communicationManager.sendLocation(location)
     }
 
     override fun enable(): Boolean{
@@ -100,6 +102,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
         utilsHelper.registerObserver(OEnum.SoundDetector, this)
 
         Log.d(tag,"Alarm system enabled")
+        utilsHelper.communicationManager.sendUtilSwitch(UtilsEnum.Alarm, true)
         return  true // alarm status
     }
 
@@ -110,6 +113,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
         // TODO stop alarm operations
 
         Log.d(tag,"Alarm system disabled")
+        utilsHelper.communicationManager.sendUtilSwitch(UtilsEnum.Alarm, false)
         return false // alarm status
     }
 

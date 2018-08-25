@@ -40,7 +40,7 @@
 
 
     <!-- Indicates if messages can be send by default if there is no value in shared preferences. -->
-    <bool name="default_communication_can_send_message">false</bool>
+    <bool name="default_communication_can_send_message">true</bool> <!-- TODO change to false in production -->
 
 
 
