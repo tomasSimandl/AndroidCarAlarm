@@ -2,6 +2,7 @@ package com.example.tomas.carsecurity.communication
 
 import android.location.Location
 import android.telephony.SmsManager
+import android.util.Log
 import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.utils.UtilsEnum
@@ -9,18 +10,22 @@ import com.google.android.gms.common.util.Strings
 import java.util.*
 
 class SmsProvider(private val context: MyContext) : ICommunicationProvider {
+    private val tag = "SmsProvider"
     private val smsManager = SmsManager.getDefault()
 
     override fun sendMessage(text: String): Boolean {
         if(Strings.isEmptyOrWhitespace(context.smsProviderContext.phoneNumber) || Strings.isEmptyOrWhitespace(text)){
+            Log.d(tag, "Empty phone number or text of message is empty")
             return false
         }
 
         val textParts = smsManager.divideMessage(text)
 
         if (textParts.size > 1) {
+            Log.d(tag, "Sending multipart message.")
             smsManager.sendMultipartTextMessage(context.smsProviderContext.phoneNumber,null, textParts, null, null)
         } else {
+            Log.d(tag, "Sending message.")
             smsManager.sendTextMessage(context.smsProviderContext.phoneNumber, null, text, null, null)
         }
         return true
@@ -35,9 +40,11 @@ class SmsProvider(private val context: MyContext) : ICommunicationProvider {
             else
                 context.appContext.getString(R.string.sms_util_disabled, utilsEnum.name)
 
+            Log.d(tag, """Sending sms util switch message of util: ${utilsEnum.name}""")
             sendMessage(text)
 
         } else {
+            Log.d(tag, """Sms util switch message is not allowed for util: ${utilsEnum.name}""")
             false
         }
     }
@@ -45,24 +52,30 @@ class SmsProvider(private val context: MyContext) : ICommunicationProvider {
     override fun sendAlarm(): Boolean{
 
         return if(context.communicationContext.canSendMessage(this.javaClass.name, MessageType.Alarm.name)){
+            Log.d(tag, "Sending alarm sms message.")
             sendMessage(context.appContext.getString(R.string.sms_alarm, Calendar.getInstance().time.toString()))
         } else {
+            Log.d(tag, "Sms message for alarm is not allowed.")
             false
         }
     }
 
     override fun sendLocation(location: Location): Boolean {
         return if(context.communicationContext.canSendMessage(this.javaClass.name, MessageType.Location.name)){
+            Log.d(tag, "Sending sms message with actual device location.")
             sendMessage(context.appContext.getString(R.string.sms_location, location.latitude.toString(), location.longitude.toString()))
         } else {
+            Log.d(tag, "Sms message with location is not allowed.")
             false
         }
     }
 
     override fun sendBatteryWarn(capacity: Int): Boolean {
         return if(context.communicationContext.canSendMessage(this.javaClass.name, MessageType.BatteryWarn.name)){
+            Log.d(tag, "Sending battery warning sms message.")
             sendMessage(context.appContext.getString(R.string.sms_battery_warn, capacity))
         } else {
+            Log.d(tag, "Battery warning sms message is not allowed.")
             false
         }
     }
@@ -82,8 +95,10 @@ class SmsProvider(private val context: MyContext) : ICommunicationProvider {
                 utilsInfo += context.appContext.getString(utilResource, util.name)
             }
 
+            Log.d(tag, "Sending sms status message.")
             sendMessage(batteryInfo + "\n" + powerSaveModeInfo + utilsInfo)
         } else {
+            Log.d(tag, "Status sms message is not allowed.")
             false
         }
     }
