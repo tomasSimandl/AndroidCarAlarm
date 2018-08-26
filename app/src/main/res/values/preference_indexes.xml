@@ -26,4 +26,6 @@
 
     <string name="key_util_is_move_detector_available">util_is_move_detector_available</string>
 
+    <string name="key_communication_active_providers">communication_active_providers</string>
+
 </resources>

@@ -42,6 +42,11 @@
     <!-- Indicates if messages can be send by default if there is no value in shared preferences. -->
     <bool name="default_communication_can_send_message">true</bool> <!-- TODO change to false in production -->
 
+    <!-- List of active communication providers. Name must be equal to provider class name. -->
+    <string-array name="default_communication_active_providers">
+        <item>SmsProvider</item>
+    </string-array>
+
 
 
 

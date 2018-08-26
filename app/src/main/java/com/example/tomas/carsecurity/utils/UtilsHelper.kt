@@ -17,7 +17,7 @@ class UtilsHelper (private val context: MyContext) {
 
     private val observablesMap: MutableMap<ObservableEnum, GeneralObservable> = HashMap()
 
-    val communicationManager = CommunicationManager()
+    val communicationManager = CommunicationManager(context)
 
 
 

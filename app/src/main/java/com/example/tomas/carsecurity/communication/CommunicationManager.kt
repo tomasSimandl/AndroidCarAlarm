@@ -1,11 +1,22 @@
 package com.example.tomas.carsecurity.communication
 
 import android.location.Location
+import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.utils.UtilsEnum
 
-class CommunicationManager {
+class CommunicationManager(context: MyContext) {
 
     private val activeCommunicators: MutableSet<ICommunicationProvider> = HashSet()
+
+    init {
+        for (provider in context.smsProviderContext.activeProviders){
+            when (provider) {
+                SmsProvider::class.java.simpleName -> activeCommunicators.add(SmsProvider(context))
+                "InternetProvider" -> throw UnsupportedOperationException("Not implemented")
+            }
+        }
+    }
+
 
     fun sendUtilSwitch(util: UtilsEnum, enabled: Boolean) {
         for (provider in activeCommunicators) {
