@@ -12,7 +12,7 @@ class CommunicationManager(context: MyContext) {
         for (provider in context.smsProviderContext.activeProviders){
             when (provider) {
                 SmsProvider::class.java.simpleName -> activeCommunicators.add(SmsProvider(context))
-                "InternetProvider" -> throw UnsupportedOperationException("Not implemented")
+                "InternetProvider" -> UnsupportedOperationException("Not implemented")
             }
         }
     }

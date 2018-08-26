@@ -93,26 +93,34 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
     }
 
     override fun enable(): Boolean{
-        enabled = true
-        alarm = false
-        alert = false
-        enabledTime = Calendar.getInstance().timeInMillis
+        if(!enabled){
 
-        utilsHelper.registerObserver(OEnum.MoveDetector, this)
-        utilsHelper.registerObserver(OEnum.SoundDetector, this)
+            enabled = true
+            alarm = false
+            alert = false
+            enabledTime = Calendar.getInstance().timeInMillis
 
-        Log.d(tag,"Alarm system enabled")
+            utilsHelper.registerObserver(OEnum.MoveDetector, this)
+            utilsHelper.registerObserver(OEnum.SoundDetector, this)
+
+            Log.d(tag,"Alarm system enabled")
+        }
+
         utilsHelper.communicationManager.sendUtilSwitch(UtilsEnum.Alarm, true)
         return  true // alarm status
     }
 
     override fun disable(): Boolean{
-        utilsHelper.unregisterAllObservables(this)
-        timer.cancel()
-        enabled = false
-        // TODO stop alarm operations
+        if (enabled) {
 
-        Log.d(tag,"Alarm system disabled")
+            utilsHelper.unregisterAllObservables(this)
+            timer.cancel()
+            enabled = false
+            // TODO stop alarm operations
+
+            Log.d(tag, "Alarm system disabled")
+        }
+
         utilsHelper.communicationManager.sendUtilSwitch(UtilsEnum.Alarm, false)
         return false // alarm status
     }

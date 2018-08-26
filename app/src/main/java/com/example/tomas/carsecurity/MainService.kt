@@ -20,7 +20,7 @@ class MainService : Service() {
 
     enum class Actions{
         ActionTryStopService, ActionStopService, ActionStatus, ActionStatusUI, ActionGetPosition,
-        ActionSwitchUtil, ActionAutomaticMode;
+        ActionSwitchUtil, ActionActivateUtil, ActionDeactivateUtil, ActionAutomaticMode;
     }
 
     private val tag = "MainService"
@@ -55,7 +55,9 @@ class MainService : Service() {
             val action: String = intent.action
 
             when(action){
-                Actions.ActionSwitchUtil.name -> switchUtil(intent.getSerializableExtra("util") as UtilsEnum)
+                Actions.ActionSwitchUtil.name -> switchUtil(intent.getSerializableExtra("util") as UtilsEnum, Actions.ActionSwitchUtil)
+                Actions.ActionActivateUtil.name -> switchUtil(intent.getSerializableExtra("util") as UtilsEnum, Actions.ActionActivateUtil)
+                Actions.ActionDeactivateUtil.name -> switchUtil(intent.getSerializableExtra("util") as UtilsEnum, Actions.ActionDeactivateUtil)
                 Actions.ActionStopService.name -> stopService()
                 Actions.ActionTryStopService.name -> stopServiceSafely()
                 Actions.ActionStatusUI.name -> informUI()
@@ -74,7 +76,7 @@ class MainService : Service() {
         return super.onStartCommand(intent, flags, startId)
     }
 
-    private fun switchUtil(utilEnum: UtilsEnum){
+    private fun switchUtil(utilEnum: UtilsEnum, actions: Actions){
         if(!workerThread.isAlive){
             Log.d(tag, "Start foreground service")
             workerThread.start()
@@ -84,7 +86,12 @@ class MainService : Service() {
 
         val task = Runnable {
             // task run sequentially in one thread
-            val enabled = utilsManager.switchUtil(utilEnum)
+            val enabled = when(actions){
+                Actions.ActionSwitchUtil -> utilsManager.switchUtil(utilEnum)
+                Actions.ActionActivateUtil -> utilsManager.activateUtil(utilEnum)
+                Actions.ActionDeactivateUtil -> utilsManager.deactivateUtil(utilEnum)
+                else -> false
+            }
             informUI(utilEnum, enabled)
             tasksInQueue.decrementAndGet()
         }

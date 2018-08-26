@@ -17,7 +17,7 @@ abstract class GeneralUtil(private val context: MyContext, private val utilsHelp
         }
     }
 
-    abstract fun enable(): Boolean
-    abstract fun disable(): Boolean
+    abstract fun enable(): Boolean // !! Can be call more than once
+    abstract fun disable(): Boolean // !! Can be call more than once
     abstract fun isEnabled(): Boolean
 }

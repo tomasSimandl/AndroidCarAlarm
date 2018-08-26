@@ -72,20 +72,22 @@ class SmsBroadcastReceiver : BroadcastReceiver() {
         }
 
         when {
-            smsBody.startsWith("activate", true) -> switchUtil(context, smsBody.drop(8).trim())
-            smsBody.startsWith("deactivate", true) -> switchUtil(context, smsBody.drop(10).trim())
+            smsBody.startsWith("activate", true) -> switchUtil(context, smsBody.drop(8).trim(), true)
+            smsBody.startsWith("deactivate", true) -> switchUtil(context, smsBody.drop(10).trim(), false)
             smsBody == "info" -> sendIntent(context, MainService.Actions.ActionStatus.name)
             smsBody == "position" -> sendIntent(context, MainService.Actions.ActionGetPosition.name)
         }
     }
 
-    private fun switchUtil(context: Context, smsBody: String){
+    private fun switchUtil(context: Context, smsBody: String, activate: Boolean){
         try {
             val util = UtilsEnum.valueOf(smsBody)
+
             val intent = Intent(context.applicationContext, MainService::class.java)
-            intent.action = MainService.Actions.ActionSwitchUtil.name
+            intent.action = if(activate) MainService.Actions.ActionActivateUtil.name else MainService.Actions.ActionDeactivateUtil.name
             intent.putExtra("util", util)
             context.startService(intent)
+
             Log.d(tag, "Intent was sent.")
 
         } catch (e: IllegalArgumentException){
