@@ -9,6 +9,7 @@ import android.telephony.SmsMessage
 import android.util.Log
 import com.example.tomas.carsecurity.MainService
 import com.example.tomas.carsecurity.R
+import com.example.tomas.carsecurity.context.SmsProviderContext
 import com.example.tomas.carsecurity.utils.UtilsEnum
 import com.google.android.gms.common.util.Strings
 
@@ -17,7 +18,15 @@ class SmsBroadcastReceiver : BroadcastReceiver() {
 
     private val tag = "SmsBroadcastReceiver"
 
+    private lateinit var smsProviderContext: SmsProviderContext
+
+
     override fun onReceive(context: Context, intent: Intent) {
+        if (! ::smsProviderContext.isInitialized) {
+            val sharedPreferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+            smsProviderContext = SmsProviderContext(sharedPreferences, context.applicationContext)
+        }
+
         if (intent.action == Telephony.Sms.Intents.SMS_RECEIVED_ACTION){
 
             var smsSender = ""
@@ -52,14 +61,13 @@ class SmsBroadcastReceiver : BroadcastReceiver() {
                 }
             }
 
-            processMessage(context, smsSender.trim(), smsBody.trim())
+            processMessage(smsSender.trim(), smsBody.trim())
         }
     }
 
-    private fun processMessage(context: Context, smsSender: String, smsBody: String){
+    private fun processMessage(smsSender: String, smsBody: String){
 
-        val sharedPreferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE) // TODO Get from SmsProviderContext
-        val phoneNumber = sharedPreferences.getString(context.getString(R.string.key_contact_phone_number), "") // TODO get from SmsProviderContext
+        val phoneNumber = smsProviderContext.phoneNumber
 
         if(Strings.isEmptyOrWhitespace(phoneNumber)){
             Log.w(tag, "Contact phone number is not set.")
@@ -72,34 +80,33 @@ class SmsBroadcastReceiver : BroadcastReceiver() {
         }
 
         when {
-            smsBody.startsWith("activate", true) -> switchUtil(context, smsBody.drop(8).trim(), true)
-            smsBody.startsWith("deactivate", true) -> switchUtil(context, smsBody.drop(10).trim(), false)
-            smsBody == "info" -> sendIntent(context, MainService.Actions.ActionStatus.name)
-            smsBody == "position" -> sendIntent(context, MainService.Actions.ActionGetPosition.name)
+            smsBody.startsWith("activate", true) -> switchUtil(smsBody.drop(8).trim(), true)
+            smsBody.startsWith("deactivate", true) -> switchUtil(smsBody.drop(10).trim(), false)
+            smsBody == "info" -> sendIntent(MainService.Actions.ActionStatus.name)
+            smsBody == "position" -> sendIntent(MainService.Actions.ActionGetPosition.name)
         }
     }
 
-    private fun switchUtil(context: Context, smsBody: String, activate: Boolean){
+    private fun switchUtil(smsBody: String, activate: Boolean){
         try {
             val util = UtilsEnum.valueOf(smsBody)
 
-            val intent = Intent(context.applicationContext, MainService::class.java)
+            val intent = Intent(smsProviderContext.context, MainService::class.java)
             intent.action = if(activate) MainService.Actions.ActionActivateUtil.name else MainService.Actions.ActionDeactivateUtil.name
             intent.putExtra("util", util)
-            context.startService(intent)
+            smsProviderContext.context.startService(intent)
 
             Log.d(tag, "Intent was sent.")
 
         } catch (e: IllegalArgumentException){
             Log.d(tag, "Incoming command had invalid util name")
         }
-
     }
 
-    private fun sendIntent(context: Context, action: String){
-        val intent = Intent(context.applicationContext, MainService::class.java)
+    private fun sendIntent(action: String){
+        val intent = Intent(smsProviderContext.context, MainService::class.java)
         intent.action = action
-        context.startService(intent)
+        smsProviderContext.context.startService(intent)
     }
 
 }

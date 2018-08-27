@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.example.tomas.carsecurity.R
 
-class SmsProviderContext(private val sharedPreferences: SharedPreferences, private val context: Context) {
+class SmsProviderContext(private val sharedPreferences: SharedPreferences, val context: Context) {
 
     private val defActiveProviders = context.resources.getStringArray(R.array.default_communication_active_providers).toHashSet()
 
