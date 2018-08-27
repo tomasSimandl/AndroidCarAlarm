@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.provider.Telephony
+import android.telephony.PhoneNumberUtils
 import android.telephony.SmsMessage
 import android.util.Log
 import com.example.tomas.carsecurity.MainService
@@ -74,7 +75,7 @@ class SmsBroadcastReceiver : BroadcastReceiver() {
             return
         }
 
-        if (phoneNumber != smsSender) { // TODO +420
+        if (!PhoneNumberUtils.compare(phoneNumber, smsSender)) {
             Log.d(tag, "Phone number of incoming message is not allowed to control app.")
             return
         }
@@ -108,5 +109,4 @@ class SmsBroadcastReceiver : BroadcastReceiver() {
         intent.action = action
         smsProviderContext.context.startService(intent)
     }
-
 }
