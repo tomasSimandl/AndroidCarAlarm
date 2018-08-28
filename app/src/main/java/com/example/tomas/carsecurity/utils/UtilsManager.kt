@@ -1,6 +1,7 @@
 package com.example.tomas.carsecurity.utils
 
 import com.example.tomas.carsecurity.context.MyContext
+import java.util.*
 
 class UtilsManager(private val context: MyContext) {
 
@@ -16,6 +17,21 @@ class UtilsManager(private val context: MyContext) {
         }
 
         return utilsMap[utilEnum] as GeneralUtil
+    }
+
+    fun registerObserver(utilEnum: UtilsEnum, observer: Observer): Boolean{
+
+        if(utilsMap[utilEnum] == null){
+            return false
+        }
+
+        val util: GeneralUtil = getGenericUtil(utilEnum)
+        return if(util.isEnabled()){
+            util.addObserver(observer)
+            true
+        } else {
+            false
+        }
     }
 
     fun switchUtil(utilEnum: UtilsEnum): Boolean {
@@ -37,6 +53,8 @@ class UtilsManager(private val context: MyContext) {
 
     fun deactivateUtil(utilEnum: UtilsEnum): Boolean{
         val util: GeneralUtil = getGenericUtil(utilEnum)
+        util.deleteObservers()
+
         return util.disable()
     }
 

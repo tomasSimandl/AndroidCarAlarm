@@ -21,6 +21,8 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
 
     private val timer= Timer("TimerThread")
 
+    override val thisUtilEnum:UtilsEnum  = UtilsEnum.Alarm
+
     override fun action(observable: Observable, args: Any?) {
         if(!enabled) return
 
@@ -103,10 +105,13 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
             utilsHelper.registerObserver(OEnum.MoveDetector, this)
             utilsHelper.registerObserver(OEnum.SoundDetector, this)
 
+            setChanged()
+            notifyObservers(true)
+
             Log.d(tag,"Alarm system enabled")
         }
 
-        utilsHelper.communicationManager.sendUtilSwitch(UtilsEnum.Alarm, true)
+        utilsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, true)
         return  true // alarm status
     }
 
@@ -118,10 +123,13 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
             enabled = false
             // TODO stop alarm operations
 
+            setChanged()
+            notifyObservers(false)
+
             Log.d(tag, "Alarm system disabled")
         }
 
-        utilsHelper.communicationManager.sendUtilSwitch(UtilsEnum.Alarm, false)
+        utilsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, false)
         return false // alarm status
     }
 

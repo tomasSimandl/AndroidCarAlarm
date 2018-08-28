@@ -12,6 +12,7 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
     private val tag = "utils.Tracker"
     private var enabled = false
 
+    override val thisUtilEnum: UtilsEnum = UtilsEnum.Tracker
     override fun action(observable: Observable, args: Any?) {
         if(!enabled) return
 

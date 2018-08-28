@@ -11,12 +11,11 @@ import android.support.v4.app.NotificationCompat
 import android.support.v4.content.LocalBroadcastManager
 import android.util.Log
 import com.example.tomas.carsecurity.context.MyContext
-import com.example.tomas.carsecurity.utils.GeneralUtil
-import com.example.tomas.carsecurity.utils.UtilsManager
-import com.example.tomas.carsecurity.utils.UtilsEnum
+import com.example.tomas.carsecurity.utils.*
+import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
-class MainService : Service() {
+class MainService : Service(), Observer{
 
     enum class Actions{
         ActionTryStopService, ActionStopService, ActionStatus, ActionStatusUI, ActionGetPosition,
@@ -52,9 +51,7 @@ class MainService : Service() {
         if (! ::utilsManager.isInitialized) utilsManager = UtilsManager(context)
 
         if(intent != null){
-            val action: String = intent.action
-
-            when(action){
+            when(intent.action){
                 Actions.ActionSwitchUtil.name -> switchUtil(intent.getSerializableExtra("util") as UtilsEnum, Actions.ActionSwitchUtil)
                 Actions.ActionActivateUtil.name -> switchUtil(intent.getSerializableExtra("util") as UtilsEnum, Actions.ActionActivateUtil)
                 Actions.ActionDeactivateUtil.name -> switchUtil(intent.getSerializableExtra("util") as UtilsEnum, Actions.ActionDeactivateUtil)
@@ -76,6 +73,13 @@ class MainService : Service() {
         return super.onStartCommand(intent, flags, startId)
     }
 
+    override fun update(observable: Observable, args: Any) {
+
+        if(observable is GeneralUtil && args is Boolean) {
+            informUI(observable.thisUtilEnum, args)
+        }
+    }
+
     private fun switchUtil(utilEnum: UtilsEnum, actions: Actions){
         if(!workerThread.isAlive){
             Log.d(tag, "Start foreground service")
@@ -90,9 +94,12 @@ class MainService : Service() {
                 Actions.ActionSwitchUtil -> utilsManager.switchUtil(utilEnum)
                 Actions.ActionActivateUtil -> utilsManager.activateUtil(utilEnum)
                 Actions.ActionDeactivateUtil -> utilsManager.deactivateUtil(utilEnum)
-                else -> false
+                else -> {false}
             }
-            informUI(utilEnum, enabled)
+            if(enabled){
+                utilsManager.registerObserver(utilEnum, this)
+            }
+            
             tasksInQueue.decrementAndGet()
         }
         tasksInQueue.incrementAndGet()
