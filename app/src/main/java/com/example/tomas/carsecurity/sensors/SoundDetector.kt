@@ -28,7 +28,7 @@ class SoundDetector(private val context : MyContext) : GeneralObservable() {
     /** Indicates when sound detector is enabled. */
     private var enabled = false
 
-    private val timer = Timer("SoundDetectorThread")
+    private var timer = Timer("SoundDetectorThread")
 
 
     /**
@@ -108,6 +108,7 @@ class SoundDetector(private val context : MyContext) : GeneralObservable() {
                 }
             }
         }
+        timer = Timer("SoundDetectorThread")
         timer.schedule( timerTask, soundDetectorContext.measureInterval, soundDetectorContext.measureInterval)
     }
 }
