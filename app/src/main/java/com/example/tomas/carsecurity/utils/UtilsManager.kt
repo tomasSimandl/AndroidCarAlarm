@@ -1,9 +1,10 @@
 package com.example.tomas.carsecurity.utils
 
+import com.example.tomas.carsecurity.BroadcastSender
 import com.example.tomas.carsecurity.context.MyContext
 import java.util.*
 
-class UtilsManager(private val context: MyContext) {
+class UtilsManager(private val context: MyContext, private val broadcastSender: BroadcastSender): Observer {
 
     private val tag = "utils.UtilsManager"
 
@@ -11,27 +12,26 @@ class UtilsManager(private val context: MyContext) {
 
     private val utilsMap: MutableMap<UtilsEnum, GeneralUtil> = HashMap()
 
+    override fun update(observable: Observable, args: Any) {
+
+        if(observable is GeneralUtil && args is Boolean) {
+            broadcastSender.informUI(observable.thisUtilEnum, args)
+        }
+    }
+
     private fun getGenericUtil(utilEnum: UtilsEnum): GeneralUtil{
         if(utilsMap[utilEnum] == null){
             utilsMap[utilEnum] = utilEnum.getInstance(context, utilsHelper)
+            utilsMap[utilEnum]!!.addObserver(this)
         }
 
         return utilsMap[utilEnum] as GeneralUtil
     }
 
-    fun registerObserver(utilEnum: UtilsEnum, observer: Observer): Boolean{
-
-        if(utilsMap[utilEnum] == null){
-            return false
-        }
+    fun registerObserver(utilEnum: UtilsEnum, observer: Observer){
 
         val util: GeneralUtil = getGenericUtil(utilEnum)
-        return if(util.isEnabled()){
-            util.addObserver(observer)
-            true
-        } else {
-            false
-        }
+        util.addObserver(observer)
     }
 
     fun switchUtil(utilEnum: UtilsEnum): Boolean {

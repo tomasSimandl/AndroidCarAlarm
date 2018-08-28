@@ -15,7 +15,7 @@ import com.example.tomas.carsecurity.utils.*
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
-class MainService : Service(), Observer{
+class MainService : Service(){
 
     enum class Actions{
         ActionTryStopService, ActionStopService, ActionStatus, ActionStatusUI, ActionGetPosition,
@@ -24,6 +24,7 @@ class MainService : Service(), Observer{
 
     private val tag = "MainService"
     private val workerThread = WorkerThread("MainServiceThread")
+    private lateinit var broadcastSender: BroadcastSender
     private lateinit var context: MyContext
     private lateinit var utilsManager: UtilsManager
 
@@ -48,7 +49,8 @@ class MainService : Service(), Observer{
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
         if (! ::context.isInitialized) context = MyContext(applicationContext)
-        if (! ::utilsManager.isInitialized) utilsManager = UtilsManager(context)
+        if (! ::broadcastSender.isInitialized) broadcastSender = BroadcastSender(applicationContext)
+        if (! ::utilsManager.isInitialized) utilsManager = UtilsManager(context, broadcastSender)
 
         if(intent != null){
             when(intent.action){
@@ -57,7 +59,7 @@ class MainService : Service(), Observer{
                 Actions.ActionDeactivateUtil.name -> switchUtil(intent.getSerializableExtra("util") as UtilsEnum, Actions.ActionDeactivateUtil)
                 Actions.ActionStopService.name -> stopService()
                 Actions.ActionTryStopService.name -> stopServiceSafely()
-                Actions.ActionStatusUI.name -> informUI()
+                Actions.ActionStatusUI.name -> broadcastSender.informUI(utilsManager.getEnabledUtils())
 
 
 //                Actions.ActionStop.name -> {
@@ -73,13 +75,6 @@ class MainService : Service(), Observer{
         return super.onStartCommand(intent, flags, startId)
     }
 
-    override fun update(observable: Observable, args: Any) {
-
-        if(observable is GeneralUtil && args is Boolean) {
-            informUI(observable.thisUtilEnum, args)
-        }
-    }
-
     private fun switchUtil(utilEnum: UtilsEnum, actions: Actions){
         if(!workerThread.isAlive){
             Log.d(tag, "Start foreground service")
@@ -90,36 +85,20 @@ class MainService : Service(), Observer{
 
         val task = Runnable {
             // task run sequentially in one thread
-            val enabled = when(actions){
+            when(actions){
                 Actions.ActionSwitchUtil -> utilsManager.switchUtil(utilEnum)
                 Actions.ActionActivateUtil -> utilsManager.activateUtil(utilEnum)
                 Actions.ActionDeactivateUtil -> utilsManager.deactivateUtil(utilEnum)
-                else -> {false}
+                else -> {}
             }
-            if(enabled){
-                utilsManager.registerObserver(utilEnum, this)
-            }
-            
+
             tasksInQueue.decrementAndGet()
         }
         tasksInQueue.incrementAndGet()
         workerThread.postTask(task)
     }
 
-    private fun informUI(utilEnum: UtilsEnum, enabled: Boolean) {
-        Log.d(tag, """Sending information about util to UI. Util: ${utilEnum.name} is ${if(enabled) "enabled" else "disabled"}.""")
-        val intent = Intent(context.appContext.getString(R.string.utils_ui_update))
 
-        intent.putExtra(context.appContext.getString(R.string.key_util_name), utilEnum.name)
-        intent.putExtra(context.appContext.getString(R.string.key_util_activated), enabled)
-        LocalBroadcastManager.getInstance(context.appContext).sendBroadcast(intent)
-    }
-
-    fun informUI(){
-        for (util in utilsManager.getEnabledUtils()){
-            informUI(util, true)
-        }
-    }
 
     private fun stopServiceSafely(){
         if(tasksInQueue.get() == 0 && !utilsManager.isAnyUtilEnabled())
