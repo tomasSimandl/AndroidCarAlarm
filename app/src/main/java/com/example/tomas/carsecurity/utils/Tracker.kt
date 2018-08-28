@@ -2,6 +2,7 @@ package com.example.tomas.carsecurity.utils
 
 import android.location.Location
 import android.util.Log
+import com.example.tomas.carsecurity.MainService
 import com.example.tomas.carsecurity.ObservableEnum
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.sensors.LocationProvider
@@ -12,11 +13,14 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
     private val tag = "utils.Tracker"
     private var enabled = false
 
-    override val thisUtilEnum: UtilsEnum = UtilsEnum.Tracker
-    override fun action(observable: Observable, args: Any?) {
-        if(!enabled) return
+    private lateinit var lastLocation: Location
 
-        when(observable){
+    override val thisUtilEnum: UtilsEnum = UtilsEnum.Tracker
+
+    override fun action(observable: Observable, args: Any?) {
+        if (!enabled) return
+
+        when (observable) {
             is LocationProvider -> onLocationUpdate(args as Location)
             else -> Log.w(tag, """Unsupported observable: $observable""")
         }
@@ -24,21 +28,51 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
 
     private fun onLocationUpdate(location: Location) {
         Log.d(tag, """Location update $location""")
-        // TODO store location
-        // TODO send location to server
+
+        if(! ::lastLocation.isInitialized) {
+            lastLocation = location
+            return
+        }
+
+        if (location.distanceTo(lastLocation) > 10) { // TODO const
+            lastLocation = location
+            // TODO store location
+            // TODO send location to server
+
+        } else if (location.time - lastLocation.time > 6000) { // 1000 * 60 * 10 - 10 minutes // TODO const
+            Log.d(tag, "Time not moving time interval passed. Tracker will be stopped.")
+            disable()
+        }
     }
 
-    override fun enable(): Boolean{
-        enabled = true
-        utilsHelper.registerObserver(ObservableEnum.LocationProvider, this)
+    override fun enable(): Boolean {
+        if (!enabled){
+            enabled = true
+            utilsHelper.registerObserver(ObservableEnum.LocationProvider, this)
 
+            setChanged()
+            notifyObservers(true)
+
+            Log.d(tag, "Tracker system is enabled.")
+        }
+
+        utilsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, true)
         return true // tracker status
     }
 
     override fun disable(): Boolean {
-        enabled = false
-        utilsHelper.unregisterAllObservables(this)
+        if(enabled) {
+            enabled = false
+            utilsHelper.unregisterAllObservables(this)
 
+            setChanged()
+            notifyObservers(false)
+
+            Log.d(tag, "Tracker system is disabled.")
+
+        }
+
+        utilsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, false)
         return false // tracker status
     }
 
