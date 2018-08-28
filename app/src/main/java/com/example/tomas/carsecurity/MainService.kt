@@ -85,14 +85,19 @@ class MainService : Service(){
 
         val task = Runnable {
             // task run sequentially in one thread
-            when(actions){
+            val result = when(actions){
                 Actions.ActionSwitchUtil -> utilsManager.switchUtil(utilEnum)
                 Actions.ActionActivateUtil -> utilsManager.activateUtil(utilEnum)
                 Actions.ActionDeactivateUtil -> utilsManager.deactivateUtil(utilEnum)
-                else -> {}
+                else -> {true}
             }
 
             tasksInQueue.decrementAndGet()
+
+            if(!result){
+                stopServiceSafely()
+            }
+
         }
         tasksInQueue.incrementAndGet()
         workerThread.postTask(task)

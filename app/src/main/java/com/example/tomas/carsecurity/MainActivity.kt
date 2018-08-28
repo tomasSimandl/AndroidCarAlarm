@@ -37,10 +37,6 @@ class MainActivity : AppCompatActivity() {
             }
 
 
-            if(!utilEnabled){
-                sendIntent(MainService.Actions.ActionTryStopService.name)
-                Log.d(tag, "TryStopService intent was sent to Foreground service")
-            }
         }
     }
 
