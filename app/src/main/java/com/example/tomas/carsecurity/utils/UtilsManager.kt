@@ -53,8 +53,6 @@ class UtilsManager(private val context: MyContext, private val broadcastSender: 
 
     fun deactivateUtil(utilEnum: UtilsEnum): Boolean{
         val util: GeneralUtil = getGenericUtil(utilEnum)
-        util.deleteObservers()
-
         return util.disable()
     }
 
