@@ -28,12 +28,6 @@ class UtilsManager(private val context: MyContext, private val broadcastSender: 
         return utilsMap[utilEnum] as GeneralUtil
     }
 
-    fun registerObserver(utilEnum: UtilsEnum, observer: Observer){
-
-        val util: GeneralUtil = getGenericUtil(utilEnum)
-        util.addObserver(observer)
-    }
-
     fun switchUtil(utilEnum: UtilsEnum): Boolean {
         // task run sequentially in one thread
 
@@ -57,13 +51,10 @@ class UtilsManager(private val context: MyContext, private val broadcastSender: 
     }
 
     fun isAnyUtilEnabled(): Boolean{
-        var isAnyEnabled = false
         for (util in utilsMap.values){
-            isAnyEnabled = isAnyEnabled || util.isEnabled()
-            if(isAnyEnabled) break
+            if(util.isEnabled()) return true
         }
-
-        return isAnyEnabled
+        return false
     }
 
     fun getEnabledUtils() : Set<UtilsEnum> {
