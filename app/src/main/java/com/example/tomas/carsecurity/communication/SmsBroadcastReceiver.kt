@@ -9,24 +9,16 @@ import android.telephony.PhoneNumberUtils
 import android.telephony.SmsMessage
 import android.util.Log
 import com.example.tomas.carsecurity.MainService
-import com.example.tomas.carsecurity.R
-import com.example.tomas.carsecurity.context.SmsProviderContext
+import com.example.tomas.carsecurity.context.CommunicationContext
 import com.example.tomas.carsecurity.utils.UtilsEnum
 import com.google.android.gms.common.util.Strings
 
 
-class SmsBroadcastReceiver : BroadcastReceiver() {
+class SmsBroadcastReceiver(private val communicationContext: CommunicationContext) : BroadcastReceiver() {
 
     private val tag = "SmsBroadcastReceiver"
 
-    private lateinit var smsProviderContext: SmsProviderContext
-
-
     override fun onReceive(context: Context, intent: Intent) {
-        if (! ::smsProviderContext.isInitialized) {
-            val sharedPreferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-            smsProviderContext = SmsProviderContext(sharedPreferences, context.applicationContext)
-        }
 
         if (intent.action == Telephony.Sms.Intents.SMS_RECEIVED_ACTION){
 
@@ -68,7 +60,7 @@ class SmsBroadcastReceiver : BroadcastReceiver() {
 
     private fun processMessage(smsSender: String, smsBody: String){
 
-        val phoneNumber = smsProviderContext.phoneNumber
+        val phoneNumber = communicationContext.phoneNumber
 
         if(Strings.isEmptyOrWhitespace(phoneNumber)){
             Log.w(tag, "Contact phone number is not set.")
@@ -92,10 +84,10 @@ class SmsBroadcastReceiver : BroadcastReceiver() {
         try {
             val util = UtilsEnum.valueOf(smsBody)
 
-            val intent = Intent(smsProviderContext.context, MainService::class.java)
+            val intent = Intent(communicationContext.context, MainService::class.java)
             intent.action = if(activate) MainService.Actions.ActionActivateUtil.name else MainService.Actions.ActionDeactivateUtil.name
             intent.putExtra("util", util)
-            smsProviderContext.context.startService(intent)
+            communicationContext.context.startService(intent)
 
             Log.d(tag, "Intent was sent.")
 
@@ -105,8 +97,8 @@ class SmsBroadcastReceiver : BroadcastReceiver() {
     }
 
     private fun sendIntent(action: String){
-        val intent = Intent(smsProviderContext.context, MainService::class.java)
+        val intent = Intent(communicationContext.context, MainService::class.java)
         intent.action = action
-        smsProviderContext.context.startService(intent)
+        communicationContext.context.startService(intent)
     }
 }

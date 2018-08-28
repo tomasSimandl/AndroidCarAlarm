@@ -6,10 +6,13 @@ import com.example.tomas.carsecurity.ObservableEnum
 import com.example.tomas.carsecurity.WorkerThread
 import com.example.tomas.carsecurity.communication.CommunicationManager
 import com.example.tomas.carsecurity.context.MyContext
+import com.example.tomas.carsecurity.context.UtilsContext
 
 class UtilsHelper (private val context: MyContext) {
 
     private val tag = "utils.UtilsHelper"
+
+    private val utilsContext = UtilsContext(context.sharedPreferences, context.appContext)
 
     private val workerThread = WorkerThread("UtilsThread")
 
@@ -40,7 +43,7 @@ class UtilsHelper (private val context: MyContext) {
 
         Log.d(tag, """Registering observer $util to observable $observableEnum""")
 
-        if(!observableEnum.isAvailable(context.utilsManagerContext)){
+        if(!observableEnum.isAvailable(utilsContext)){
             Log.d(tag, "Observable is not available.")
             return false // observable is not available (disabled by users setting)
         }
@@ -76,5 +79,6 @@ class UtilsHelper (private val context: MyContext) {
         for (observable in enums){
             observablesMap[observable]?.deleteObserver(util)
         }
+        enums.clear()
     }
 }

@@ -5,12 +5,15 @@ import android.content.pm.PackageManager
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import com.example.tomas.carsecurity.GeneralObservable
+import com.example.tomas.carsecurity.context.LocationProviderContext
 import com.example.tomas.carsecurity.context.MyContext
 import com.google.android.gms.location.*
 
 class LocationProvider(private val context: MyContext) : GeneralObservable() {
 
     private val tag = "sensors.LocationProvi.."
+
+    private val locationProviderContext: LocationProviderContext = LocationProviderContext(context.sharedPreferences, context.appContext)
 
     private var fusedLocationClient: FusedLocationProviderClient
 
@@ -34,9 +37,9 @@ class LocationProvider(private val context: MyContext) : GeneralObservable() {
     override fun enable(){
 
         val locationRequest = LocationRequest().apply {
-            interval = context.locationProviderContext.updateInterval
-            fastestInterval = context.locationProviderContext.maxUpdateInterval
-            priority = context.locationProviderContext.accuracyPriority
+            interval = locationProviderContext.updateInterval
+            fastestInterval = locationProviderContext.maxUpdateInterval
+            priority = locationProviderContext.accuracyPriority
 
         }
 

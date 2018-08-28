@@ -4,17 +4,18 @@ import android.location.Location
 import android.telephony.SmsManager
 import android.util.Log
 import com.example.tomas.carsecurity.R
-import com.example.tomas.carsecurity.context.MyContext
+import com.example.tomas.carsecurity.context.CommunicationContext
 import com.example.tomas.carsecurity.utils.UtilsEnum
 import com.google.android.gms.common.util.Strings
 import java.util.*
 
-class SmsProvider(private val context: MyContext) : ICommunicationProvider {
+class SmsProvider(private val communicationContext: CommunicationContext) : ICommunicationProvider {
     private val tag = "SmsProvider"
+    
     private val smsManager = SmsManager.getDefault()
 
     override fun sendMessage(text: String): Boolean {
-        if(Strings.isEmptyOrWhitespace(context.smsProviderContext.phoneNumber) || Strings.isEmptyOrWhitespace(text)){
+        if(Strings.isEmptyOrWhitespace(communicationContext.phoneNumber) || Strings.isEmptyOrWhitespace(text)){
             Log.d(tag, "Empty phone number or text of message is empty")
             return false
         }
@@ -23,22 +24,22 @@ class SmsProvider(private val context: MyContext) : ICommunicationProvider {
 
         if (textParts.size > 1) {
             Log.d(tag, "Sending multipart message.")
-            smsManager.sendMultipartTextMessage(context.smsProviderContext.phoneNumber,null, textParts, null, null)
+            smsManager.sendMultipartTextMessage(communicationContext.phoneNumber,null, textParts, null, null)
         } else {
             Log.d(tag, "Sending message.")
-            smsManager.sendTextMessage(context.smsProviderContext.phoneNumber, null, text, null, null)
+            smsManager.sendTextMessage(communicationContext.phoneNumber, null, text, null, null)
         }
         return true
     }
 
     override fun sendUtilSwitch(utilsEnum: UtilsEnum, enabled: Boolean): Boolean {
 
-        return if(context.communicationContext.canSendMessage(this.javaClass.name, utilsEnum.name, MessageType.UtilSwitch.name)){
+        return if(communicationContext.canSendMessage(this.javaClass.name, utilsEnum.name, MessageType.UtilSwitch.name)){
 
             val text = if(enabled)
-                context.appContext.getString(R.string.sms_util_enabled, utilsEnum.name)
+                communicationContext.context.getString(R.string.sms_util_enabled, utilsEnum.name)
             else
-                context.appContext.getString(R.string.sms_util_disabled, utilsEnum.name)
+                communicationContext.context.getString(R.string.sms_util_disabled, utilsEnum.name)
 
             Log.d(tag, """Sending sms util switch message of util: ${utilsEnum.name}""")
             sendMessage(text)
@@ -51,9 +52,9 @@ class SmsProvider(private val context: MyContext) : ICommunicationProvider {
 
     override fun sendAlarm(): Boolean{
 
-        return if(context.communicationContext.canSendMessage(this.javaClass.name, MessageType.Alarm.name)){
+        return if(communicationContext.canSendMessage(this.javaClass.name, MessageType.Alarm.name)){
             Log.d(tag, "Sending alarm sms message.")
-            sendMessage(context.appContext.getString(R.string.sms_alarm, Calendar.getInstance().time.toString()))
+            sendMessage(communicationContext.context.getString(R.string.sms_alarm, Calendar.getInstance().time.toString()))
         } else {
             Log.d(tag, "Sms message for alarm is not allowed.")
             false
@@ -61,9 +62,9 @@ class SmsProvider(private val context: MyContext) : ICommunicationProvider {
     }
 
     override fun sendLocation(location: Location): Boolean {
-        return if(context.communicationContext.canSendMessage(this.javaClass.name, MessageType.Location.name)){
+        return if(communicationContext.canSendMessage(this.javaClass.name, MessageType.Location.name)){
             Log.d(tag, "Sending sms message with actual device location.")
-            sendMessage(context.appContext.getString(R.string.sms_location, location.latitude.toString(), location.longitude.toString()))
+            sendMessage(communicationContext.context.getString(R.string.sms_location, location.latitude.toString(), location.longitude.toString()))
         } else {
             Log.d(tag, "Sms message with location is not allowed.")
             false
@@ -71,9 +72,9 @@ class SmsProvider(private val context: MyContext) : ICommunicationProvider {
     }
 
     override fun sendBatteryWarn(capacity: Int): Boolean {
-        return if(context.communicationContext.canSendMessage(this.javaClass.name, MessageType.BatteryWarn.name)){
+        return if(communicationContext.canSendMessage(this.javaClass.name, MessageType.BatteryWarn.name)){
             Log.d(tag, "Sending battery warning sms message.")
-            sendMessage(context.appContext.getString(R.string.sms_battery_warn, capacity))
+            sendMessage(communicationContext.context.getString(R.string.sms_battery_warn, capacity))
         } else {
             Log.d(tag, "Battery warning sms message is not allowed.")
             false
@@ -81,18 +82,18 @@ class SmsProvider(private val context: MyContext) : ICommunicationProvider {
     }
 
     override fun sendStatus(battery: Int, powerSaveMode: Boolean, utils: Map<UtilsEnum, Boolean>): Boolean {
-        return if(context.communicationContext.canSendMessage(this.javaClass.name, MessageType.Status.name)){
+        return if(communicationContext.canSendMessage(this.javaClass.name, MessageType.Status.name)){
 
-            val batteryInfo = context.appContext.getString(R.string.sms_info_battery, battery)
+            val batteryInfo = communicationContext.context.getString(R.string.sms_info_battery, battery)
             val powerSaveModeResource = if(powerSaveMode) R.string.sms_info_power_save_mode_on else R.string.sms_info_power_save_mode_off
-            val powerSaveModeInfo = context.appContext.getString(powerSaveModeResource)
+            val powerSaveModeInfo = communicationContext.context.getString(powerSaveModeResource)
             var utilsInfo = ""
             for(util in utils.keys){
 
                 val utilResource = if(utils[util] == true) R.string.sms_util_enabled else R.string.sms_util_disabled
 
                 utilsInfo += "\n"
-                utilsInfo += context.appContext.getString(utilResource, util.name)
+                utilsInfo += communicationContext.context.getString(utilResource, util.name)
             }
 
             Log.d(tag, "Sending sms status message.")

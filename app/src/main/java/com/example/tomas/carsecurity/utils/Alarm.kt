@@ -3,6 +3,7 @@ package com.example.tomas.carsecurity.utils
 import android.location.Location
 import android.util.Log
 import com.example.tomas.carsecurity.GeneralObservable
+import com.example.tomas.carsecurity.context.AlarmContext
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.sensors.LocationProvider
 import java.util.*
@@ -11,6 +12,8 @@ import com.example.tomas.carsecurity.ObservableEnum as OEnum
 class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper) : GeneralUtil(context, utilsHelper) {
 
     private val tag = "utils.Alarm"
+
+    private val alarmContext = AlarmContext(context.sharedPreferences, context.appContext)
 
     private var enabled = false
     private var alarm = false
@@ -45,7 +48,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
         }
 
         // detections are ignored because start alarm interval did not passed.
-        if(currentTime - enabledTime < context.alarmContext.startAlarmInterval) {
+        if(currentTime - enabledTime < alarmContext.startAlarmInterval) {
             Log.d(tag,"Alarm is waiting for activation")
             return
         }
@@ -66,7 +69,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
                 }
             }
 
-            timer.schedule( timerTask, context.alarmContext.alertAlarmInterval)
+            timer.schedule( timerTask, alarmContext.alertAlarmInterval)
         }
     }
 

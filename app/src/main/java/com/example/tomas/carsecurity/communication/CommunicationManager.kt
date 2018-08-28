@@ -1,6 +1,9 @@
 package com.example.tomas.carsecurity.communication
 
+import android.content.IntentFilter
 import android.location.Location
+import android.support.v4.content.LocalBroadcastManager
+import com.example.tomas.carsecurity.context.CommunicationContext
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.utils.UtilsEnum
 
@@ -8,10 +11,16 @@ class CommunicationManager(context: MyContext) {
 
     private val activeCommunicators: MutableSet<ICommunicationProvider> = HashSet()
 
+    private val communicationContext = CommunicationContext(context.sharedPreferences, context.appContext)
+
     init {
-        for (provider in context.smsProviderContext.activeProviders){
+        for (provider in communicationContext.activeProviders){
             when (provider) {
-                SmsProvider::class.java.simpleName -> activeCommunicators.add(SmsProvider(context))
+                SmsProvider::class.java.simpleName -> {
+                    activeCommunicators.add(SmsProvider(communicationContext))
+                    val intentFilter = IntentFilter("android.provider.Telephony.SMS_RECEIVED")
+                    context.appContext.registerReceiver(SmsBroadcastReceiver(communicationContext), intentFilter)
+                }
                 "InternetProvider" -> UnsupportedOperationException("Not implemented")
             }
         }

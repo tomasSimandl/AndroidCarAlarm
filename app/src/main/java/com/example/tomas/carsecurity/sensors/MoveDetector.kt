@@ -7,6 +7,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.util.Log
 import com.example.tomas.carsecurity.GeneralObservable
+import com.example.tomas.carsecurity.context.MoveDetectorContext
 import com.example.tomas.carsecurity.context.MyContext
 
 /**
@@ -18,6 +19,8 @@ import com.example.tomas.carsecurity.context.MyContext
 class MoveDetector(private val context: MyContext) : GeneralObservable(), SensorEventListener {
 
     private val tag = "sensors.MoveDetector"
+
+    private val moveDetectorContext = MoveDetectorContext(context.sharedPreferences, context.appContext)
 
     /** Array contains data which are given by last acceleration sensor activity. */
     private var lastAcceleration :FloatArray
@@ -36,7 +39,7 @@ class MoveDetector(private val context: MyContext) : GeneralObservable(), Sensor
      * Constructor sets all uninitialized variables.
      */
     init {
-        lastAcceleration = FloatArray(context.moveDetectorContext.dimensions)
+        lastAcceleration = FloatArray(moveDetectorContext.dimensions)
 
         manager = context.appContext.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         sensor = manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
@@ -92,11 +95,11 @@ class MoveDetector(private val context: MyContext) : GeneralObservable(), Sensor
      * parent methods [setChanged] and [notifyObservers] are called.
      *
      * Motion is significant when euclidean distance between last sensor values and actual sensors
-     * is greater than value of [context.moveDetectorContext.sensitivity] variable.
+     * is greater than value of [moveDetectorContext.sensitivity] variable.
      */
     override fun onSensorChanged(event: SensorEvent?) {
 
-        if (event?.values?.size == null || event.values.size != context.moveDetectorContext.dimensions) {
+        if (event?.values?.size == null || event.values.size != moveDetectorContext.dimensions) {
             Log.w(tag,"Incoming event is invalid or have invalid dimension")
             return
         }
@@ -111,7 +114,7 @@ class MoveDetector(private val context: MyContext) : GeneralObservable(), Sensor
 
         lastAcceleration = event.values.copyOf()
 
-        if (euclideanDist > context.moveDetectorContext.sensitivity) {
+        if (euclideanDist > moveDetectorContext.sensitivity) {
             setChanged()
             notifyObservers()
         }
@@ -119,7 +122,7 @@ class MoveDetector(private val context: MyContext) : GeneralObservable(), Sensor
 
     /**
      * Calculates euclidean distance of two points given by two input arrays. Size of booth input
-     * arrays must be equal to [context.moveDetectorContext.dimensions] variable.
+     * arrays must be equal to [moveDetectorContext.dimensions] variable.
      *
      * @param coordinatesA coordinates of first point
      * @param coordinatesB coordinates of second point
@@ -133,7 +136,7 @@ class MoveDetector(private val context: MyContext) : GeneralObservable(), Sensor
 
         var sum = 0.0
 
-        for (i in 0 until context.moveDetectorContext.dimensions) {
+        for (i in 0 until moveDetectorContext.dimensions) {
             val number = coordinatesA[i] - coordinatesB[i]
             sum += number * number
         }

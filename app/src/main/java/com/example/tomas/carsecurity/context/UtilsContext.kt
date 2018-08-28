@@ -12,7 +12,7 @@ import com.example.tomas.carsecurity.utils.UtilsManager
  * Context contains data which are used in [UtilsManager] class and they are stored in
  * shared preferences or in resources.
  */
-class UtilsManagerContext(private val sharedPreferences: SharedPreferences, private val context: Context) {
+class UtilsContext(private val sharedPreferences: SharedPreferences, private val context: Context) {
 
     /** Contains if [LocationProvider] can be in default used. Value is taken from resources. */
     private val isLocationProviderDef :Boolean = context.resources.getBoolean(R.bool.default_util_is_location_provider_available)

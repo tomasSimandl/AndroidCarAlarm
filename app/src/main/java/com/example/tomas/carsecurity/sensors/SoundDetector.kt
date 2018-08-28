@@ -7,6 +7,7 @@ import android.support.v4.content.ContextCompat
 import android.util.Log
 import com.example.tomas.carsecurity.GeneralObservable
 import com.example.tomas.carsecurity.context.MyContext
+import com.example.tomas.carsecurity.context.SoundDetectorContext
 import java.io.IOException
 import java.util.*
 
@@ -19,6 +20,8 @@ import java.util.*
 class SoundDetector(private val context : MyContext) : GeneralObservable() {
 
     private val tag = "sensors.SoundDetector"
+
+    private val soundDetectorContext = SoundDetectorContext(context.sharedPreferences, context.appContext)
 
     /** Class used for audio recording. When sound detector is disable variable should be null */
     private var recorder: MediaRecorder? = null
@@ -82,12 +85,12 @@ class SoundDetector(private val context : MyContext) : GeneralObservable() {
 
     /**
      * Create separate thread which controlling amplitude of signal from microphone. If amplitude
-     * is over limit which is set by [context.soundDetectorContext.maxAmplitude] variable.
+     * is over limit which is set by [soundDetectorContext.maxAmplitude] variable.
      * Interval of controlling last maximal amplitude is set by variable
-     * [context.soundDetectorContext.measureInterval].
+     * [soundDetectorContext.measureInterval].
      *
      * When sound detector is disabled thread ends before next amplitude checking. Can be in sleep
-     * state for maximal [context.soundDetectorContext.measureInterval] milliseconds before it ends.
+     * state for maximal [soundDetectorContext.measureInterval] milliseconds before it ends.
      */
     private fun initSoundChecker(){
 
@@ -97,14 +100,14 @@ class SoundDetector(private val context : MyContext) : GeneralObservable() {
                 Log.v(tag, "timer thread was triggered.")
 
                 val amplitude = recorder?.maxAmplitude ?: 0
-                if (amplitude > context.soundDetectorContext.maxAmplitude) {
-                    Log.d(tag,"""Max amplitude $amplitude is over limit ${context.soundDetectorContext.maxAmplitude}""")
+                if (amplitude > soundDetectorContext.maxAmplitude) {
+                    Log.d(tag,"""Max amplitude $amplitude is over limit ${soundDetectorContext.maxAmplitude}""")
 
                     setChanged()
                     notifyObservers()
                 }
             }
         }
-        timer.schedule( timerTask, context.soundDetectorContext.measureInterval, context.soundDetectorContext.measureInterval)
+        timer.schedule( timerTask, soundDetectorContext.measureInterval, soundDetectorContext.measureInterval)
     }
 }
