@@ -8,6 +8,7 @@
 /captures
 .externalNativeBuild
 .idea/
+xxfunctionalityTests/
 
 
 # Windows thumbnail db
