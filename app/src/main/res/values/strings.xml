@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Car Security</string>
 
+    <string name="notification_description">Application is running in background</string>
+
     <string name="preference_file_key">SharedPreference</string>
 
     <string name="foreground_channel_name">ForegroundServiceChannel</string>

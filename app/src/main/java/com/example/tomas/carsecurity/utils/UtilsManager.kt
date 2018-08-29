@@ -4,13 +4,17 @@ import com.example.tomas.carsecurity.BroadcastSender
 import com.example.tomas.carsecurity.context.MyContext
 import java.util.*
 
-class UtilsManager(private val context: MyContext, private val broadcastSender: BroadcastSender): Observer {
+class UtilsManager(private val context: MyContext, private val broadcastSender: BroadcastSender, reload: Boolean): Observer {
 
     private val tag = "utils.UtilsManager"
 
     private val utilsHelper = UtilsHelper(context)
 
     private val utilsMap: MutableMap<UtilsEnum, GeneralUtil> = HashMap()
+
+    init {
+        // TODO use reload for loading from ServiceState
+    }
 
     override fun update(observable: Observable, args: Any) {
 
@@ -67,5 +71,14 @@ class UtilsManager(private val context: MyContext, private val broadcastSender: 
         }
 
         return enabledUtils
+    }
+
+    fun destroy(){
+
+        for(util in utilsMap.values){
+            util.disable()
+        }
+
+        utilsHelper.destroy() // TODO before or after utils.disable() ???
     }
 }
