@@ -9,101 +9,102 @@ import com.example.tomas.carsecurity.sensors.LocationProvider
 import java.util.*
 import com.example.tomas.carsecurity.ObservableEnum as OEnum
 
-class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper) : GeneralUtil(context, utilsHelper) {
-
-    private val tag = "utils.Alarm"
+class Alarm(context: MyContext, private val utilsHelper: UtilsHelper) : GeneralUtil(utilsHelper) {
 
     private val alarmContext = AlarmContext(context.sharedPreferences, context.appContext)
 
-    private var enabled = false
-    private var alarm = false
-    private var alert = false
+    private val tag = "utils.Alarm"
 
-    private var enabledTime = -1L
+    private var isEnabled = false
+    private var isAlarm = false
+    private var isAlert = false
+
+    private var systemEnabledTime = -1L
     private var lastLocation: Location? = null
+    private var timer: Timer? = null
 
-    private val timer= Timer("TimerThread")
+    override val thisUtilEnum: UtilsEnum = UtilsEnum.Alarm
 
-    override val thisUtilEnum:UtilsEnum  = UtilsEnum.Alarm
 
     override fun action(observable: Observable, args: Any?) {
-        if(!enabled) return
+        if (!isEnabled) return
 
-        when(observable){
+        when (observable) {
             is LocationProvider -> onLocationUpdate(args as Location)
-            is GeneralObservable -> onDetection(observable)
+            is GeneralObservable -> onSensorUpdate(observable)
         }
     }
 
-    private fun onDetection(observable: GeneralObservable){
+
+    private fun onLocationUpdate(location: Location) {
+        Log.d(tag, """Location update: $location""")
+
+        this.lastLocation = location
+        utilsHelper.communicationManager.sendLocation(location)
+    }
+
+    private fun onSensorUpdate(observable: GeneralObservable) {
 
         val currentTime = Calendar.getInstance().timeInMillis
-
         Log.d(tag, """Alarm: detection by $observable at $currentTime.""")
 
         // alarm is already activated -> no work
-        if(alarm) {
-            Log.d(tag,"Alarm is already activated.")
+        if (isAlarm) {
+            Log.d(tag, "Alarm is already activated.")
             return
         }
 
         // detections are ignored because start alarm interval did not passed.
-        if(currentTime - enabledTime < alarmContext.startAlarmInterval) {
-            Log.d(tag,"Alarm is waiting for activation")
+        if (currentTime - systemEnabledTime < alarmContext.startAlarmInterval) {
+            Log.d(tag, "Alarm is waiting for activation")
             return
         }
 
         // first detection alarm is switched to alert mode
-        if(!alert) {
+        if (!isAlert) {
             Log.d(tag, "Alarm alert mode activated.")
-            alert = true
+            isAlert = true
 
             val timerTask = object : TimerTask() {
                 override fun run() {
 
                     val task = Runnable {
-                        alarm = true
+                        isAlarm = true
                         onAlarm()
                     }
-                    utilsHelper.runOnUtilThread(task)
+                    utilsHelper.runOnUtilThread(task) // runOnUtilThread because timer run in own thread.
                 }
             }
-
-            timer.schedule( timerTask, alarmContext.alertAlarmInterval)
+            timer = Timer("TimerThread")
+            timer!!.schedule(timerTask, alarmContext.alertAlarmInterval)
         }
     }
 
-    private fun onAlarm(){
-        Log.d(tag,"Alarm was activated.")
+    private fun onAlarm() {
+        Log.d(tag, "Alarm was activated.")
+
         utilsHelper.communicationManager.sendAlarm()
-        // TODO notify observers (Siren, ...)
+        // TODO notify observers (Siren, ...) ATENCIONE - notifyObservers is used in enable/disable
         // TODO send messages
         // TODO get actual location
         // TODO send actual location in loop
 
         utilsHelper.registerObserver(OEnum.LocationProvider, this) // TODO dynamically register and unregister to save battery.
 
-//        while(true){
+//        while(isAlarm){
 //            if(lastLocation != null){
-//
+//                utilsHelper.registerObserver(OEnum.LocationProvider, this)
 //            }
 //        }
     }
 
+    override fun enable(): Boolean {
+        if (!isEnabled) {
 
-    private fun onLocationUpdate(location: Location){
-        this.lastLocation = location
-        Log.d(tag,"""Location update: $location""")
-        utilsHelper.communicationManager.sendLocation(location)
-    }
-
-    override fun enable(): Boolean{
-        if(!enabled){
-
-            enabled = true
-            alarm = false
-            alert = false
-            enabledTime = Calendar.getInstance().timeInMillis
+            isEnabled = true
+            isAlarm = false
+            isAlert = false
+            systemEnabledTime = Calendar.getInstance().timeInMillis
 
             utilsHelper.registerObserver(OEnum.MoveDetector, this)
             utilsHelper.registerObserver(OEnum.SoundDetector, this)
@@ -111,20 +112,21 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
             setChanged()
             notifyObservers(true)
 
-            Log.d(tag,"Alarm system enabled")
+            Log.d(tag, "Alarm system is enabled")
         }
 
         utilsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, true)
-        return  true // alarm status
+        return true // alarm status
     }
 
-    override fun disable(): Boolean{
-        if (enabled) {
+    override fun disable(): Boolean {
+        if (isEnabled) {
 
             utilsHelper.unregisterAllObservables(this)
-            timer.cancel()
-            enabled = false
-            // TODO stop alarm operations
+            timer?.cancel()
+            isEnabled = false
+            lastLocation = null
+            systemEnabledTime = -1L
 
             setChanged()
             notifyObservers(false)
@@ -136,7 +138,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
         return false // alarm status
     }
 
-    override fun isEnabled(): Boolean{
-        return enabled
+    override fun isEnabled(): Boolean {
+        return isEnabled
     }
 }

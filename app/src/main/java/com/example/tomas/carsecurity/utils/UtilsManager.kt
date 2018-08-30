@@ -1,5 +1,6 @@
 package com.example.tomas.carsecurity.utils
 
+import android.util.Log
 import com.example.tomas.carsecurity.BroadcastSender
 import com.example.tomas.carsecurity.context.MyContext
 import java.util.*
@@ -13,28 +14,19 @@ class UtilsManager(private val context: MyContext, private val broadcastSender: 
     private val utilsMap: MutableMap<UtilsEnum, GeneralUtil> = HashMap()
 
     init {
-        // TODO use reload for loading from ServiceState
+        if (reload) {
+            // TODO use reload for loading from ServiceState
+        }
     }
 
     override fun update(observable: Observable, args: Any) {
-
         if(observable is GeneralUtil && args is Boolean) {
             broadcastSender.informUI(observable.thisUtilEnum, args)
         }
     }
 
-    private fun getGenericUtil(utilEnum: UtilsEnum): GeneralUtil{
-        if(utilsMap[utilEnum] == null){
-            utilsMap[utilEnum] = utilEnum.getInstance(context, utilsHelper)
-            utilsMap[utilEnum]!!.addObserver(this)
-        }
-
-        return utilsMap[utilEnum] as GeneralUtil
-    }
-
     fun switchUtil(utilEnum: UtilsEnum): Boolean {
-        // task run sequentially in one thread
-
+        // tasks are running sequentially in one thread
         val util: GeneralUtil = getGenericUtil(utilEnum)
 
         return if (util.isEnabled()) {
@@ -54,6 +46,15 @@ class UtilsManager(private val context: MyContext, private val broadcastSender: 
         return util.disable()
     }
 
+    private fun getGenericUtil(utilEnum: UtilsEnum): GeneralUtil{
+        if(utilsMap[utilEnum] == null){
+            utilsMap[utilEnum] = utilEnum.getInstance(context, utilsHelper)
+            utilsMap[utilEnum]!!.addObserver(this)
+        }
+
+        return utilsMap[utilEnum] as GeneralUtil
+    }
+
     fun isAnyUtilEnabled(): Boolean{
         for (util in utilsMap.values){
             if(util.isEnabled()) return true
@@ -69,16 +70,18 @@ class UtilsManager(private val context: MyContext, private val broadcastSender: 
                 enabledUtils.add(util)
             }
         }
-
         return enabledUtils
     }
 
     fun destroy(){
+        Log.d(tag, "Destroy")
 
         for(util in utilsMap.values){
+            util.deleteObservers()
             util.disable()
         }
 
-        utilsHelper.destroy() // TODO before or after utils.disable() ???
+        // destroy after all utils are disabled
+        utilsHelper.destroy()
     }
 }

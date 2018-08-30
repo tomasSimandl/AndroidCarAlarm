@@ -1,10 +1,9 @@
 package com.example.tomas.carsecurity.utils
 
-import com.example.tomas.carsecurity.context.MyContext
 import java.util.*
 
 
-abstract class GeneralUtil(private val context: MyContext, private val utilsHelper: UtilsHelper) : Observer, Observable() {
+abstract class GeneralUtil(private val utilsHelper: UtilsHelper) : Observer, Observable() {
 
     abstract val thisUtilEnum: UtilsEnum
 

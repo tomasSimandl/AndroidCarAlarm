@@ -12,17 +12,12 @@ class UtilsHelper (private val context: MyContext) {
 
     private val tag = "utils.UtilsHelper"
 
-    private val utilsContext = UtilsContext(context.sharedPreferences, context.appContext)
-
-    private val workerThread = WorkerThread("UtilsThread")
-
+    private val observablesMap: MutableMap<ObservableEnum, GeneralObservable> = HashMap()
     private val utilsMap: MutableMap<GeneralUtil, MutableSet<ObservableEnum>> = HashMap()
 
-    private val observablesMap: MutableMap<ObservableEnum, GeneralObservable> = HashMap()
-
+    private val workerThread = WorkerThread("UtilsThread")
+    private val utilsContext = UtilsContext(context.sharedPreferences, context.appContext)
     val communicationManager = CommunicationManager(context)
-
-
 
     init {
         workerThread.start()
@@ -30,8 +25,8 @@ class UtilsHelper (private val context: MyContext) {
     }
 
     fun destroy(){
-        Log.d(tag, "Destroying workerThread.")
-        workerThread.quit() // TODO use this 'destroy' method
+        Log.d(tag, "Destroy")
+        workerThread.quit()
     }
 
     fun runOnUtilThread(runnable: Runnable){

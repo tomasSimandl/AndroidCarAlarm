@@ -18,26 +18,21 @@ import java.util.concurrent.atomic.AtomicInteger
 class MainService : Service(){
 
     enum class Actions{
-        ActionTryStopService, ActionStopService, ActionStatus, ActionStatusUI, ActionGetPosition,
+        ActionStatus, ActionStatusUI, ActionGetPosition,
         ActionSwitchUtil, ActionActivateUtil, ActionDeactivateUtil, ActionAutomaticMode;
     }
 
     private val tag = "MainService"
-    private val notificationId = 973920
-    private val workerThread = WorkerThread("MainServiceThread")
+    private val notificationId = 973920 // random number
 
+    private lateinit var workerThread: WorkerThread
     private lateinit var broadcastSender: BroadcastSender
     private lateinit var utilsManager: UtilsManager
     private lateinit var context: MyContext
 
+    private var isForeground = false
     private var tasksInQueue :AtomicInteger = AtomicInteger(0)
 
-
-    override fun onDestroy() {
-        super.onDestroy()
-        workerThread.quit()
-        utilsManager.destroy()
-    }
 
     override fun onBind(intent: Intent): IBinder? {
         throw UnsupportedOperationException("Not implemented")
@@ -50,46 +45,52 @@ class MainService : Service(){
         // intent is null when application is restarted when system kill service
         if (! ::utilsManager.isInitialized) utilsManager = UtilsManager(context, broadcastSender, intent == null)
 
-        if(intent != null){
-            when(intent.action){
-                Actions.ActionStopService.name -> stopService(false)
-                Actions.ActionTryStopService.name -> stopService(true)
-                Actions.ActionSwitchUtil.name -> switchUtil(intent.getSerializableExtra("util") as UtilsEnum, Actions.ActionSwitchUtil)
-                Actions.ActionActivateUtil.name -> switchUtil(intent.getSerializableExtra("util") as UtilsEnum, Actions.ActionActivateUtil)
-                Actions.ActionDeactivateUtil.name -> switchUtil(intent.getSerializableExtra("util") as UtilsEnum, Actions.ActionDeactivateUtil)
 
-                Actions.ActionStatusUI.name -> broadcastSender.informUI(utilsManager.getEnabledUtils())
-                else -> Log.d(tag, "onStartCommand - invalid action")
+        if(intent != null){
+
+            if(! ::workerThread.isInitialized){
+                workerThread = WorkerThread("MainServiceThread")
+                workerThread.start()
+                workerThread.prepareHandler()
             }
+
+            val task = Runnable {
+                // can be there because tasks run sequentially in one thread and when I
+                // call stopService i need to be counter without this thread.
+                tasksInQueue.decrementAndGet()
+
+                val activation = when(intent.action) {
+                    Actions.ActionSwitchUtil.name -> utilsManager.switchUtil(intent.getSerializableExtra("util") as UtilsEnum)
+                    Actions.ActionActivateUtil.name -> utilsManager.activateUtil(intent.getSerializableExtra("util") as UtilsEnum)
+                    Actions.ActionDeactivateUtil.name -> utilsManager.deactivateUtil(intent.getSerializableExtra("util") as UtilsEnum)
+                    else -> null
+                }
+
+                when(activation) {
+                    true -> startForeground()
+                    false -> stopService(true)
+                    null -> {
+                        // process other actions
+                        when(intent.action) {
+
+                            Actions.ActionStatusUI.name -> broadcastSender.informUI(utilsManager.getEnabledUtils())
+                            else -> Log.w(tag, "onStartCommand - invalid action")
+                        }
+                    }
+                }
+            }
+
+            tasksInQueue.incrementAndGet()
+            workerThread.postTask(task)
         }
 
         return Service.START_STICKY
     }
 
-    private fun switchUtil(utilEnum: UtilsEnum, actions: Actions){
-        if(!workerThread.isAlive){
-            Log.d(tag, "Start foreground service")
-            workerThread.start()
-            workerThread.prepareHandler()
-            startForeground()
-        }
-
-        val task = Runnable {
-            // task run sequentially in one thread
-            val result = when(actions){
-                Actions.ActionSwitchUtil -> utilsManager.switchUtil(utilEnum)
-                Actions.ActionActivateUtil -> utilsManager.activateUtil(utilEnum)
-                Actions.ActionDeactivateUtil -> utilsManager.deactivateUtil(utilEnum)
-                else -> {true}
-            }
-
-            tasksInQueue.decrementAndGet()
-            if(!result){
-                stopService(true)
-            }
-        }
-        tasksInQueue.incrementAndGet()
-        workerThread.postTask(task)
+    override fun onDestroy() {
+        super.onDestroy()
+        workerThread.quit()
+        utilsManager.destroy()
     }
 
     private fun stopService(safely: Boolean){
@@ -100,6 +101,9 @@ class MainService : Service(){
     }
 
     private fun startForeground() {
+        if(isForeground) return
+
+        Log.d(tag, "Starting foreground service")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel()
         }
@@ -118,6 +122,7 @@ class MainService : Service(){
                 .build()
 
         startForeground(notificationId, notification)
+        isForeground = true
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
