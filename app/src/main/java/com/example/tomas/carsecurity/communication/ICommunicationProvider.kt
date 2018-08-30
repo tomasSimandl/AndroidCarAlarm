@@ -5,6 +5,8 @@ import com.example.tomas.carsecurity.utils.UtilsEnum
 
 interface ICommunicationProvider {
 
+    fun destroy()
+
     fun sendMessage(text: String): Boolean
 
 

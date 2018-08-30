@@ -1,5 +1,6 @@
 package com.example.tomas.carsecurity.communication
 
+import android.content.IntentFilter
 import android.location.Location
 import android.telephony.SmsManager
 import android.util.Log
@@ -10,9 +11,20 @@ import com.google.android.gms.common.util.Strings
 import java.util.*
 
 class SmsProvider(private val communicationContext: CommunicationContext) : ICommunicationProvider {
+
     private val tag = "SmsProvider"
-    
     private val smsManager = SmsManager.getDefault()
+    private val smsBroadcastReceiver = SmsBroadcastReceiver(communicationContext)
+
+    init {
+        val intentFilter = IntentFilter("android.provider.Telephony.SMS_RECEIVED")
+        communicationContext.context.registerReceiver(smsBroadcastReceiver, intentFilter)
+    }
+
+    override fun destroy(){
+        communicationContext.context.unregisterReceiver(smsBroadcastReceiver)
+    }
+
 
     override fun sendMessage(text: String): Boolean {
         if(Strings.isEmptyOrWhitespace(communicationContext.phoneNumber) || Strings.isEmptyOrWhitespace(text)){

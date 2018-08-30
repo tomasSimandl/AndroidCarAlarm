@@ -27,6 +27,7 @@ class UtilsHelper (private val context: MyContext) {
     fun destroy(){
         Log.d(tag, "Destroy")
         workerThread.quit()
+        communicationManager.destroy()
     }
 
     fun runOnUtilThread(runnable: Runnable){
