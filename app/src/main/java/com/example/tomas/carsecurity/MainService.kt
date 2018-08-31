@@ -90,8 +90,9 @@ class MainService : Service(){
 
     override fun onDestroy() {
         super.onDestroy()
-        workerThread.quit()
-        utilsManager.destroy()
+        if (::context.isInitialized) context.destroy()
+        if (::workerThread.isInitialized) workerThread.quit()
+        if (::utilsManager.isInitialized) utilsManager.destroy()
     }
 
     private fun stopService(safely: Boolean){

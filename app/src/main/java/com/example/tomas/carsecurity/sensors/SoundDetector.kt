@@ -28,14 +28,14 @@ class SoundDetector(private val context : MyContext) : GeneralObservable() {
     /** Indicates when sound detector is enabled. */
     private var enabled = false
 
-    private var timer = Timer("SoundDetectorThread")
+    private lateinit var timer: Timer
 
 
     /**
      * Method stop sound detector and stop recording audio from microphone.
      */
     override fun disable() {
-        timer.cancel()
+        if(::timer.isInitialized) timer.cancel()
         enabled = false
         recorder?.stop()
         recorder?.release()
