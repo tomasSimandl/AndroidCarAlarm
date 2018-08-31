@@ -1,6 +1,7 @@
 package com.example.tomas.carsecurity.utils
 
 import android.location.Location
+import com.example.tomas.carsecurity.storage.entity.Location as DbLocation
 import android.util.Log
 import com.example.tomas.carsecurity.ObservableEnum
 import com.example.tomas.carsecurity.context.MyContext
@@ -8,13 +9,15 @@ import com.example.tomas.carsecurity.context.TrackerContext
 import com.example.tomas.carsecurity.sensors.LocationProvider
 import java.util.*
 
-class Tracker(context: MyContext, private val utilsHelper: UtilsHelper) : GeneralUtil(utilsHelper) {
+class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelper) : GeneralUtil(utilsHelper) {
 
     private val tag = "utils.Tracker"
 
     private val trackerContext = TrackerContext(context.sharedPreferences, context.appContext)
     private var lastLocation: Location? = null
     private var isEnabled = false
+
+    private lateinit var timer: Timer
 
     override val thisUtilEnum: UtilsEnum = UtilsEnum.Tracker
 
@@ -37,8 +40,7 @@ class Tracker(context: MyContext, private val utilsHelper: UtilsHelper) : Genera
 
         if (location.distanceTo(lastLocation) > trackerContext.ignoreDistance) {
             lastLocation = location
-            // TODO store location
-            // TODO send location to server
+            context.database.locationDao().insert(DbLocation(location))
 
         } else if (location.time - lastLocation!!.time > trackerContext.timeout) {
             Log.d(tag, "Time not moving time interval passed. Tracker will be stopped.")
@@ -46,11 +48,41 @@ class Tracker(context: MyContext, private val utilsHelper: UtilsHelper) : Genera
         }
     }
 
+
+    private fun initializeTimer(){
+        val timerTask = object : TimerTask() {
+            override fun run() {
+                Log.d(tag, """Update - Thread: ${Thread.currentThread().name}""")
+                synchronize()
+            }
+        }
+
+        timer = Timer("TrackerTimer")
+        timer.schedule( timerTask, 30000, 30000) // TODO const
+    }
+
+    private fun synchronize() { // TODO move all method to synchronizeManager? and run all in separate thread
+        var run: Boolean
+        do {
+            if(!context.database.isOpen) return
+
+            val locations = context.database.locationDao().getAll(10) // TODO const
+            run = locations.isNotEmpty()
+
+            if(run) {
+                println(locations) // TODO send to server
+                context.database.locationDao().delete(locations) // TODO if send success
+            }
+        } while (run)
+    }
+
     override fun enable(): Boolean {
         if (!isEnabled){
             isEnabled = true
             lastLocation = null
             utilsHelper.registerObserver(ObservableEnum.LocationProvider, this)
+
+            initializeTimer()
 
             setChanged()
             notifyObservers(true)
@@ -66,6 +98,9 @@ class Tracker(context: MyContext, private val utilsHelper: UtilsHelper) : Genera
         if(isEnabled) {
             isEnabled = false
             utilsHelper.unregisterAllObservables(this)
+
+            if(::timer.isInitialized) timer.cancel()
+            synchronize()
 
             setChanged()
             notifyObservers(false)
