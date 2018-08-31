@@ -29,7 +29,7 @@ class MoveDetector(private val context: MyContext) : GeneralObservable(), Sensor
     /** Indicates if move detector is enabled */
     private var enabled = false
 
-    /** Class which is used for accelerometer sensor controling. */
+    /** Class which is used for accelerometer sensor controlling. */
     private val manager :SensorManager
     /** Class represents accelerometer sensor. */
     private val sensor :Sensor?

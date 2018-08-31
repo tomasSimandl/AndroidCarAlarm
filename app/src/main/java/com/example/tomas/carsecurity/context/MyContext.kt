@@ -2,7 +2,6 @@ package com.example.tomas.carsecurity.context
 
 import android.content.Context
 import com.example.tomas.carsecurity.R
-import com.example.tomas.carsecurity.utils.UtilsManager
 import java.util.*
 
 class MyContext(val appContext: Context ) : Observable() {

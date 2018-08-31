@@ -4,8 +4,8 @@
     <string name="sms_util_disabled">%s is disabled</string>
     <string name="sms_alarm">Alarm was triggered at: %s</string>
     <string name="sms_location">Actual car location is lat: %1$s, long: %2$s https://www.google.com/maps/search/\?api=1&amp;query=%1$s,%2$s</string>
-    <string name="sms_battery_warn">Battery capacity is low: %d\%.</string>
-    <string name="sms_info_battery">Battery capacity: %d\%</string>
+    <string name="sms_battery_warn">Battery capacity is low: %d percent.</string>
+    <string name="sms_info_battery">Battery capacity is %d percent</string>
     <string name="sms_info_power_save_mode_on">Power save mode: ON </string>
     <string name="sms_info_power_save_mode_off">Power save mode: OFF </string>
 </resources>

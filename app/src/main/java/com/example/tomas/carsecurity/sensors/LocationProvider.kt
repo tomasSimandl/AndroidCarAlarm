@@ -11,20 +11,15 @@ import com.google.android.gms.location.*
 
 class LocationProvider(private val context: MyContext) : GeneralObservable() {
 
-    private val tag = "sensors.LocationProvi.."
+    private val tag = "sensors.Location"
 
     private val locationProviderContext: LocationProviderContext = LocationProviderContext(context.sharedPreferences, context.appContext)
-
-    private var fusedLocationClient: FusedLocationProviderClient
+    private var fusedLocationClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context.appContext)
 
     private val locationCallback: LocationCallback
-
     private var enabled = false
 
-
     init{
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(context.appContext)
-
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult?) {
                 locationResult ?: return
