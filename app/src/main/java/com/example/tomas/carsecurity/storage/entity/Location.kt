@@ -3,10 +3,20 @@ package com.example.tomas.carsecurity.storage.entity
 import android.arch.persistence.room.ColumnInfo
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
+import android.location.Location
 
 
 @Entity(tableName = "location")
-class Location {
+class Location() {
+
+    constructor(location: Location) : this() {
+        latitude = location.latitude
+        longitude = location.longitude
+        altitude = location.altitude
+        time = location.time
+        accuracy = location.accuracy
+        speed = location.speed
+    }
 
     @PrimaryKey(autoGenerate = true)
     var uid: Int = 0
