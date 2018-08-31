@@ -5,6 +5,7 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.os.Handler
 import android.util.Log
 import com.example.tomas.carsecurity.GeneralObservable
 import com.example.tomas.carsecurity.context.MoveDetectorContext
@@ -67,7 +68,7 @@ class MoveDetector(private val context: MyContext) : GeneralObservable(), Sensor
      */
     override fun enable() {
         if(!enabled) {
-            manager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)
+            manager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL, Handler(context.mainServiceThreadLooper))
             enabled = true
             Log.d(tag, "Detector is enabled")
         }
@@ -117,6 +118,7 @@ class MoveDetector(private val context: MyContext) : GeneralObservable(), Sensor
         if (euclideanDist > moveDetectorContext.sensitivity) {
             setChanged()
             notifyObservers()
+            Log.d(tag, """Update - Thread: ${Thread.currentThread().name}""")
         }
     }
 

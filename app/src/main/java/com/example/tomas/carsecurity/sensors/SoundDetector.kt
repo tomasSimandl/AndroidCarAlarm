@@ -105,6 +105,7 @@ class SoundDetector(private val context : MyContext) : GeneralObservable() {
 
                     setChanged()
                     notifyObservers()
+                    Log.d(tag, """Update - Thread: ${Thread.currentThread().name}""")
                 }
             }
         }

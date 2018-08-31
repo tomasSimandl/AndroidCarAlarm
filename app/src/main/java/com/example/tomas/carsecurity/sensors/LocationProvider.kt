@@ -23,6 +23,7 @@ class LocationProvider(private val context: MyContext) : GeneralObservable() {
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult?) {
                 locationResult ?: return
+                Log.d(tag, """Update - Thread: ${Thread.currentThread().name}""")
                 setChanged()
                 notifyObservers(locationResult.lastLocation)
             }
@@ -39,7 +40,7 @@ class LocationProvider(private val context: MyContext) : GeneralObservable() {
         }
 
         if (ContextCompat.checkSelfPermission(context.appContext, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) { // TODO better permission check
-            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null)
+            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, context.mainServiceThreadLooper)
             enabled = true
             Log.d(tag, "Provider is enabled")
         } else {

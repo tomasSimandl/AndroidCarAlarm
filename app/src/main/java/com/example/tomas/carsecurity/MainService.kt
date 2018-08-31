@@ -40,7 +40,13 @@ class MainService : Service(){
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
-        if (! ::context.isInitialized) context = MyContext(applicationContext)
+        if(! ::workerThread.isInitialized){
+            workerThread = WorkerThread("MainServiceThread")
+            workerThread.start()
+            workerThread.prepareHandler()
+        }
+
+        if (! ::context.isInitialized) context = MyContext(applicationContext, workerThread.looper)
         if (! ::broadcastSender.isInitialized) broadcastSender = BroadcastSender(applicationContext)
         // intent is null when application is restarted when system kill service
         if (! ::utilsManager.isInitialized) utilsManager = UtilsManager(context, broadcastSender, intent == null)
@@ -48,11 +54,6 @@ class MainService : Service(){
 
         if(intent != null){
 
-            if(! ::workerThread.isInitialized){
-                workerThread = WorkerThread("MainServiceThread")
-                workerThread.start()
-                workerThread.prepareHandler()
-            }
 
             val task = Runnable {
                 // can be there because tasks run sequentially in one thread and when I
