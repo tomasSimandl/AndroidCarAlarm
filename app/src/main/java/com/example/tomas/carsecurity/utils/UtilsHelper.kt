@@ -68,7 +68,7 @@ class UtilsHelper (private val context: MyContext) {
 
     fun unregisterAllObservables(util: GeneralUtil){
 
-        Log.d(tag, """Unregistering observer $util from all observables.""")
+        Log.d(tag, """Un-registering observer $util from all observables.""")
 
         val enums = utilsMap[util] ?: return
 

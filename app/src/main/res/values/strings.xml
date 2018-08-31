@@ -12,4 +12,8 @@
     <string name="chanel_id">foregroundChannelId</string>
 
     <string name="service_description">Service contains all logic of application.</string>
+
+    <string name="alarm_button_text">Alarm</string>
+
+    <string name="tracker_button_text">Tracker</string>
 </resources>

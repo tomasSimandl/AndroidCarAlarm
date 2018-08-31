@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:background="@color/disabled"
         android:layout_margin="8dp"
-        android:text="Alarm" />
+        android:text="@string/alarm_button_text" />
 
     <Button
         android:id="@+id/actionTracker"
@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:background="@color/disabled"
         android:layout_margin="8dp"
-        android:text="Tracker" />
+        android:text="@string/tracker_button_text" />
 
 
     <TextView
@@ -30,7 +30,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="@color/common_google_signin_btn_text_dark_disabled"
-        android:layout_weight="1"
-        android:layout_below="@id/actionAlarm"/>
+        android:layout_weight="1" />
 
 </LinearLayout>

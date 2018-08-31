@@ -96,7 +96,7 @@ class MoveDetector(private val context: MyContext) : GeneralObservable(), Sensor
      * parent methods [setChanged] and [notifyObservers] are called.
      *
      * Motion is significant when euclidean distance between last sensor values and actual sensors
-     * is greater than value of [moveDetectorContext.sensitivity] variable.
+     * is greater than value of [moveDetectorContext].sensitivity variable.
      */
     override fun onSensorChanged(event: SensorEvent?) {
 
@@ -124,7 +124,7 @@ class MoveDetector(private val context: MyContext) : GeneralObservable(), Sensor
 
     /**
      * Calculates euclidean distance of two points given by two input arrays. Size of booth input
-     * arrays must be equal to [moveDetectorContext.dimensions] variable.
+     * arrays must be equal to [moveDetectorContext].dimensions variable.
      *
      * @param coordinatesA coordinates of first point
      * @param coordinatesB coordinates of second point

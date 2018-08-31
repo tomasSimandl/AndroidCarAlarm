@@ -3,10 +3,9 @@ package com.example.tomas.carsecurity.context
 import android.content.Context
 import android.content.SharedPreferences
 import com.example.tomas.carsecurity.R
-import com.example.tomas.carsecurity.communication.CommunicationManager
 
 /**
- * Context contains data which are used in [communication] package and they are stored in
+ * Context contains data which are used in communication package and they are stored in
  * shared preferences or in resources.
  */
 class CommunicationContext(private val sharedPreferences: SharedPreferences, val context: Context) {

@@ -85,12 +85,12 @@ class SoundDetector(private val context : MyContext) : GeneralObservable() {
 
     /**
      * Create separate thread which controlling amplitude of signal from microphone. If amplitude
-     * is over limit which is set by [soundDetectorContext.maxAmplitude] variable.
+     * is over limit which is set by [soundDetectorContext].maxAmplitude variable.
      * Interval of controlling last maximal amplitude is set by variable
-     * [soundDetectorContext.measureInterval].
+     * [soundDetectorContext].measureInterval.
      *
      * When sound detector is disabled thread ends before next amplitude checking. Can be in sleep
-     * state for maximal [soundDetectorContext.measureInterval] milliseconds before it ends.
+     * state for maximal [soundDetectorContext].measureInterval milliseconds before it ends.
      */
     private fun initSoundChecker(){
 

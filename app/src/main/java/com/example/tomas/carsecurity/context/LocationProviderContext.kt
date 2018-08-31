@@ -13,16 +13,16 @@ import com.google.android.gms.location.LocationRequest
 class LocationProviderContext(private val sharedPreferences: SharedPreferences, private val context: Context) {
 
     /** Contains default interval for location updates which is taken from resources. */
-    private val defUpdateInterval :Long
+    private val defUpdateInterval :Long = context.resources.getInteger(R.integer.default_location_update_interval).toLong()
 
     /** Contains default maximal interval for location updates which is taken from resources. */
-    private val defMaxUpdateInterval :Long
+    private val defMaxUpdateInterval :Long = context.resources.getInteger(R.integer.default_max_location_update_interval).toLong()
 
     /**
      * Contains default priority of accuracy used when location is requested.
      * Value is taken from resources and it is [LocationRequest] priority constant.
      */
-    private val defAccuracyPriority :Int
+    private val defAccuracyPriority :Int = context.resources.getInteger(R.integer.default_location_accuracy_priority)
 
 
     /** Returns interval for location updates. Value is taken from shared preferences or it is used default value. */
@@ -36,13 +36,6 @@ class LocationProviderContext(private val sharedPreferences: SharedPreferences, 
     /** Returns priority of accuracy requests. Value is taken from shared preferences or it is used default value. */
     val accuracyPriority
         get() = sharedPreferences.getInt(context.getString(R.string.key_location_accuracy_priority), defAccuracyPriority)
-
-
-    init {
-        defUpdateInterval = context.resources.getInteger(R.integer.default_location_update_interval).toLong()
-        defMaxUpdateInterval = context.resources.getInteger(R.integer.default_max_location_update_interval).toLong()
-        defAccuracyPriority = context.resources.getInteger(R.integer.default_location_accuracy_priority)
-    }
 }
 
 

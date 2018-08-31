@@ -84,7 +84,7 @@ class Alarm(context: MyContext, private val utilsHelper: UtilsHelper) : GeneralU
         Log.d(tag, "Alarm was activated.")
 
         utilsHelper.communicationManager.sendAlarm()
-        // TODO notify observers (Siren, ...) ATENCIONE - notifyObservers is used in enable/disable
+        // TODO notify observers (Siren, ...) WARNING - notifyObservers is used in enable/disable
         // TODO send messages
         // TODO get actual location
         // TODO send actual location in loop

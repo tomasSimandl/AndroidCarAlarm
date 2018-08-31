@@ -32,7 +32,7 @@ abstract class GeneralObservable : Observable() {
     }
 
     /**
-     * Method is used for unregistration of observers.
+     * Method is used for un-registration of observers.
      * When last listener is unregistered. Method [disable] is automatically called.
      *
      * @param observer which will be unregistered.
@@ -44,7 +44,7 @@ abstract class GeneralObservable : Observable() {
     }
 
     /**
-     * Method is used for unregistration of all observers.
+     * Method is used for un-registration of all observers.
      * Method [disable] is automatically called.
      */
     override fun deleteObservers() {

@@ -14,8 +14,6 @@
 
     <string name="key_location_accuracy_priority">location_accuracy_priority</string>
 
-    <string name="key_alarm_ignore_interval">alarm_ignore_interval</string>
-
     <string name="key_alarm_alert_interval">alarm_alert_interval</string>
 
     <string name="key_alarm_start_interval">alarm_start_interval</string>
