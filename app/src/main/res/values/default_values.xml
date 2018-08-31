@@ -47,6 +47,12 @@
         <item>SmsProvider</item>
     </string-array>
 
+    <!-- Minimal acceptable distance between last and new location in Tracker. -->
+    <integer name="default_tracker_ignore_distance">10</integer>
+
+    <!-- Milliseconds after Tracker will be disabled when location is not changing. -->
+    <integer name="default_tracker_timeout">6000</integer>
+
 
 
 

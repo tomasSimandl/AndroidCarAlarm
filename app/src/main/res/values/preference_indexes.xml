@@ -28,4 +28,8 @@
 
     <string name="key_communication_active_providers">communication_active_providers</string>
 
+    <string name="key_tracker_ignore_distance">tracker_ignore_distance</string>
+
+    <string name="key_tracker_timeout">tracker_timeout</string>
+
 </resources>

@@ -4,6 +4,7 @@ import android.location.Location
 import android.util.Log
 import com.example.tomas.carsecurity.ObservableEnum
 import com.example.tomas.carsecurity.context.MyContext
+import com.example.tomas.carsecurity.context.TrackerContext
 import com.example.tomas.carsecurity.sensors.LocationProvider
 import java.util.*
 
@@ -11,6 +12,7 @@ class Tracker(context: MyContext, private val utilsHelper: UtilsHelper) : Genera
 
     private val tag = "utils.Tracker"
 
+    private val trackerContext = TrackerContext(context.sharedPreferences, context.appContext)
     private var lastLocation: Location? = null
     private var isEnabled = false
 
@@ -33,12 +35,12 @@ class Tracker(context: MyContext, private val utilsHelper: UtilsHelper) : Genera
             return
         }
 
-        if (location.distanceTo(lastLocation) > 10) { // TODO const
+        if (location.distanceTo(lastLocation) > trackerContext.ignoreDistance) {
             lastLocation = location
             // TODO store location
             // TODO send location to server
 
-        } else if (location.time - lastLocation!!.time > 6000) { // 1000 * 60 * 10 - 10 minutes // TODO const
+        } else if (location.time - lastLocation!!.time > trackerContext.timeout) {
             Log.d(tag, "Time not moving time interval passed. Tracker will be stopped.")
             disable()
         }
