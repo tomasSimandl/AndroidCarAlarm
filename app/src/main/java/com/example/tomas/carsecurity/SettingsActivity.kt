@@ -21,6 +21,7 @@ import android.support.v7.preference.PreferenceGroup
 import android.view.View
 import com.example.tomas.carsecurity.context.AlarmContext
 import com.example.tomas.carsecurity.context.TrackerContext
+import com.example.tomas.carsecurity.preferenceFragments.MyPreferenceFragment
 import com.example.tomas.carsecurity.utils.Alarm
 import com.pavelsikun.seekbarpreference.SeekBarPreferenceCompat
 
@@ -29,7 +30,8 @@ class SettingsActivity : PreferenceActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupActionBar()
-        
+
+
         val sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key),Context.MODE_PRIVATE)
         sharedPreferences.edit().clear().apply()
     }
@@ -70,26 +72,14 @@ class SettingsActivity : PreferenceActivity() {
 
 
 
-    class ToolsPreferenceFragment : PreferenceFragment() {
+    class ToolsPreferenceFragment : MyPreferenceFragment() {
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-
-            preferenceManager.sharedPreferencesName = getString(R.string.preference_file_key)
-            preferenceManager.sharedPreferencesMode = Context.MODE_PRIVATE
+            super.onCreatePreferences(savedInstanceState, rootKey)
 
             addPreferencesFromResource(R.xml.pref_tools)
-            setHasOptionsMenu(true)
-
         }
 
-        override fun onOptionsItemSelected(item: MenuItem): Boolean {
-            val id = item.itemId
-            if (id == android.R.id.home) {
-                startActivity(Intent(activity, SettingsActivity::class.java))
-                return true
-            }
-            return super.onOptionsItemSelected(item)
-        }
     }
 
 
