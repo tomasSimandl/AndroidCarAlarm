@@ -22,7 +22,7 @@ class LocationProviderContext(private val sharedPreferences: SharedPreferences, 
      * Contains default priority of accuracy used when location is requested.
      * Value is taken from resources and it is [LocationRequest] priority constant.
      */
-    private val defAccuracyPriority :Int = context.resources.getInteger(R.integer.default_location_accuracy_priority)
+    private val defAccuracyPriority :String = context.resources.getString(R.string.default_location_accuracy_priority)
 
 
     /** Returns interval for location updates. Value is taken from shared preferences or it is used default value. */
@@ -34,8 +34,8 @@ class LocationProviderContext(private val sharedPreferences: SharedPreferences, 
         get() = sharedPreferences.getLong(context.getString(R.string.key_location_max_update_interval), defMaxUpdateInterval)
 
     /** Returns priority of accuracy requests. Value is taken from shared preferences or it is used default value. */
-    val accuracyPriority
-        get() = sharedPreferences.getInt(context.getString(R.string.key_location_accuracy_priority), defAccuracyPriority)
+    val accuracyPriority: Int
+        get() = Integer.valueOf(sharedPreferences.getString(context.getString(R.string.key_location_accuracy_priority), defAccuracyPriority))
 }
 
 

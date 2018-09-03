@@ -18,7 +18,7 @@
     <integer name="default_max_location_update_interval">1000</integer>
 
     <!-- Priority constant of LocationProvider. Determines location sensor accuracy. -->
-    <integer name="default_location_accuracy_priority">100</integer> <!--LocationProvider.PRIORITY_HIGH_ACCURACY-->
+    <string name="default_location_accuracy_priority">100</string> <!-- INTEGER --> <!--LocationProvider.PRIORITY_HIGH_ACCURACY-->
 
     <!-- Interval before alarm will be triggered after detection. -->
     <integer name="default_alarm_alert_interval">15000</integer>

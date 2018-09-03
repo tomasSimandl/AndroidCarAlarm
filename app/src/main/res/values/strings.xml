@@ -62,4 +62,37 @@
 
     <string name="pref_sensors_move_sensitivity_title">Sensor sensitivity</string>
     <string name="pref_sensors_move_sensitivity_description">Low value means high sensitivity.</string>
+
+    !-- Sensors Sound settings -->
+    <string name="pref_sensors_sound_group_name">Sound sensor</string>
+
+    <string name="pref_sensors_sound_switch_title">Allow Sound sensor</string>
+    <string name="pref_sensors_sound_switch_description"> </string>
+
+    <string name="pref_sensors_sound_max_amplitude_title">Sensor sensitivity</string>
+    <string name="pref_sensors_sound_max_amplitude_description">Low value mean high sensitivity.</string>
+
+    <string name="pref_sensors_sound_interval_title">Measure interval</string>
+    <string name="pref_sensors_sound_interval_description">Interval how often are check sensor data (High interval save battery).</string>
+
+    !-- Sensors Location settings -->
+    <string name="pref_sensors_location_group_name">Location sensor</string>
+
+    <string name="pref_sensors_location_switch_title">Allow Location sensor</string>
+    <string name="pref_sensors_location_switch_description"> </string>
+    
+    <string name="pref_sensors_location_update_interval_title">Location update interval</string>
+    <string name="pref_sensors_location_update_interval_description">How often is stored actual location (Long interval save battery).</string>
+
+    <string name="pref_sensors_location_accuracy_title">Sensor accuracy</string>
+    <string-array name="pref_sensors_location_accuracy_list">
+        <item>High accuracy</item>
+        <item>Balanced power accuracy (±100m)</item>
+        <item>Low power (±10km)</item>
+    </string-array>
+    <string-array name="pref_sensors_location_accuracy_list_values">
+        <item>100</item>
+        <item>102</item>
+        <item>104</item>
+    </string-array>
 </resources>
