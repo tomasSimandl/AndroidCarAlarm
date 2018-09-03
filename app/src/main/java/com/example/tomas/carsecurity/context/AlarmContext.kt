@@ -12,24 +12,24 @@ import com.example.tomas.carsecurity.utils.Alarm
 class AlarmContext(private val sharedPreferences: SharedPreferences, private val context: Context) {
 
     /** Contains default interval between two detections in which alarm will be triggered. Value is taken from resources. */
-    private val defAlertAlarmInterval :Long = context.resources.getInteger(R.integer.default_alarm_alert_interval).toLong()
+    private val defAlertAlarmInterval :Int = context.resources.getInteger(R.integer.default_alarm_alert_interval)
 
     /** Contains default interval for which is detection ignored after alarm activation. */
-    private val defStartAlarmInterval :Long = context.resources.getInteger(R.integer.default_alarm_start_interval).toLong()
+    private val defStartAlarmInterval :Int = context.resources.getInteger(R.integer.default_alarm_start_interval)
 
     /**
      * Returns default interval between two detections in which alarm will be triggered.
      * Value is taken from shared preferences or it is used default value.
      */
     val alertAlarmInterval
-        get() = sharedPreferences.getLong(context.getString(R.string.key_alarm_alert_interval), defAlertAlarmInterval)
+        get() = sharedPreferences.getInt(context.getString(R.string.key_alarm_alert_interval), defAlertAlarmInterval)
 
     /**
      * Returns default interval for which is detection ignored after alarm activation.
      * Value is taken from shared preferences or it is used default value.
      */
     val startAlarmInterval
-        get() = sharedPreferences.getLong(context.getString(R.string.key_alarm_start_interval), defStartAlarmInterval)
+        get() = sharedPreferences.getInt(context.getString(R.string.key_alarm_start_interval), defStartAlarmInterval)
 
 }
 

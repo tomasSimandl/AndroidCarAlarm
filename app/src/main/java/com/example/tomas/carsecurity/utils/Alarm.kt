@@ -76,7 +76,7 @@ class Alarm(context: MyContext, private val utilsHelper: UtilsHelper) : GeneralU
                 }
             }
             timer = Timer("TimerThread")
-            timer!!.schedule(timerTask, alarmContext.alertAlarmInterval)
+            timer!!.schedule(timerTask, alarmContext.alertAlarmInterval.toLong())
         }
     }
 
