@@ -16,4 +16,42 @@
     <string name="alarm_button_text">Alarm</string>
 
     <string name="tracker_button_text">Tracker</string>
+    <string name="title_activity_settings">Settings</string>
+
+
+
+
+
+
+    <!-- Strings related to Settings -->
+
+    <string name="pref_header_sensors">Sensors</string>
+    <string name="pref_header_tools">Tools</string>
+    <string name="pref_header_communication">Communication</string>
+
+    <!-- Tools Alarm settings -->
+    <string name="pref_tools_alarm_group_name">Alarm</string>
+
+    <string name="pref_tools_alarm_switch">Allow Alarm</string>
+    <string name="pref_tools_alarm_switch_description">Allow use of alarm. Does not turn on Alarm system.</string>
+
+    <string name="pref_tools_alarm_start_interval_title">Start interval</string>
+    <string name="pref_tools_alarm_start_interval_description">Interval before alarm system is enabled.</string>
+
+    <string name="pref_tools_alarm_alert_interval_title">Alert interval</string>
+    <string name="pref_tools_alarm_alert_interval_description">Interval before alarm is triggered after any detection.</string>
+
+
+    <!-- Tools Tracker settings -->
+    <string name="pref_tools_tracker_group_name">Tracker</string>
+
+    <string name="pref_tools_tracker_switch">Allow Tracker</string>
+    <string name="pref_tools_tracker_switch_description">Allow use of tracker. Does not turn on Tracker system.</string>
+
+    <string name="pref_tools_tracker_timeout_title">Timeout</string>
+    <string name="pref_tools_tracker_timeout_description">Timeout before tracker is turned of when car is not moving.</string>
+
+    <string name="pref_tools_tracker_ignore_distance_title">Not moving distance</string>
+    <string name="pref_tools_tracker_ignore_distance_description">Minimal distance between last and actual position which is accepted (elimination of error when car is not moving).</string>
+
 </resources>

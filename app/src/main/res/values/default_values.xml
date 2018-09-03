@@ -26,6 +26,9 @@
     <!-- Interval before alarm will be activated after alarm activation. -->
     <integer name="default_alarm_start_interval">30000</integer>
 
+    <!-- Indicates if is alarm system allowed by user to use/ -->
+    <bool name="default_alarm_is_allowed">true</bool>
+
     <!-- Indicates if location provider can be used. -->
     <bool name="default_util_is_location_provider_available">true</bool>
 
@@ -49,6 +52,9 @@
 
     <!-- Milliseconds after Tracker will be disabled when location is not changing. -->
     <integer name="default_tracker_timeout">6000</integer>
+
+    <!-- Indicates if is tracker system allowed by user to use/ -->
+    <bool name="default_tracker_is_allowed">true</bool>
 
 
 
