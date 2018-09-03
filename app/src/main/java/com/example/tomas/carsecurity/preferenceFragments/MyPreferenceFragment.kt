@@ -9,7 +9,6 @@ import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.SettingsActivity
 
 open class MyPreferenceFragment : PreferenceFragment() {
-
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         preferenceManager.sharedPreferencesName = getString(R.string.preference_file_key)
         preferenceManager.sharedPreferencesMode = Context.MODE_PRIVATE

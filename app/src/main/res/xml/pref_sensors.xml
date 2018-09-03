@@ -1,0 +1,26 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:sample="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory android:key="move_category" android:title="@string/pref_sensors_move_group_name">
+
+        <SwitchPreference
+            android:defaultValue="@bool/default_util_is_move_detector_available"
+            android:key="@string/key_util_is_move_detector_available"
+            android:title="@string/pref_sensors_move_switch_title"
+            android:contentDescription="@string/pref_sensors_move_switch_description"/>
+
+        <com.pavelsikun.seekbarpreference.SeekBarPreferenceCompat
+            android:key="@string/key_move_sensor_sensitivity"
+            android:title="@string/pref_sensors_move_sensitivity_title"
+            android:summary="@string/pref_sensors_move_sensitivity_description"
+            android:dependency="@string/key_util_is_move_detector_available"
+            android:defaultValue="@integer/default_move_sensor_sensitivity"
+
+            sample:msbp_minValue="1"
+            sample:msbp_maxValue="500"
+            sample:msbp_interval="1"
+            sample:msbp_measurementUnit=""
+            sample:msbp_dialogEnabled="false"/>
+    </PreferenceCategory>
+
+</PreferenceScreen>

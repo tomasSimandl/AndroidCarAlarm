@@ -9,7 +9,7 @@
     <integer name="default_sound_detector_interval">1000</integer>
 
     <!-- Maximal euclidean distance between two last measurement which not trigger alarm -->
-    <item name="default_move_sensor_sensitivity" format="float" type="dimen">0.2</item>
+    <integer name="default_move_sensor_sensitivity">20</integer>
 
     <!-- Interval in which application receive location updates. -->
     <integer name="default_location_update_interval">3000</integer>

@@ -13,21 +13,14 @@ import com.example.tomas.carsecurity.sensors.MoveDetector
 class MoveDetectorContext(private val sharedPreferences: SharedPreferences, private val context: Context) {
 
     /** Contains default value for accelerometer sensitivity which is taken from resources. */
-    private val defSensitivity :Float
+    private val defSensitivity :Int = context.resources.getInteger(R.integer.default_move_sensor_sensitivity)
     /** Returns accelerometer sensitivity. Value is taken from shared preferences or it is used default value. */
-    val sensitivity
-        get() = sharedPreferences.getFloat(context.getString(R.string.key_move_sensor_sensitivity), defSensitivity)
+    val sensitivity: Float
+        get() = sharedPreferences.getInt(context.getString(R.string.key_move_sensor_sensitivity), defSensitivity) / 100F
 
     /** Contains default dimension of data from accelerometer sensor. Value is taken from resources. */
-    val dimensions :Int
+    val dimensions :Int = context.resources.getInteger(R.integer.default_move_sensor_dimensions)
 
-    init {
-        val outValue = TypedValue()
-        context.resources.getValue(R.dimen.default_move_sensor_sensitivity, outValue, true)
-        defSensitivity = outValue.float
-
-        dimensions = context.resources.getInteger(R.integer.default_move_sensor_dimensions)
-    }
 }
 
 
