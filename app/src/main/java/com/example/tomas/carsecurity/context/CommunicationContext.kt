@@ -29,7 +29,7 @@ class CommunicationContext(private val sharedPreferences: SharedPreferences, val
 
     /** Returns phone number of contact person. Return value from sharedPreferences or empty string. */
     val phoneNumber: String
-        get() = sharedPreferences.getString(context.getString(R.string.key_contact_phone_number), "")
+        get() = sharedPreferences.getString(context.getString(R.string.key_communication_sms_phone_number), "")
 }
 
 

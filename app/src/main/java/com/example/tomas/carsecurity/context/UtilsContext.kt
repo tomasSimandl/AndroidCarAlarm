@@ -18,19 +18,19 @@ class UtilsContext(private val sharedPreferences: SharedPreferences, private val
     private val isLocationProviderDef :Boolean = context.resources.getBoolean(R.bool.default_util_is_location_provider_available)
     /** Returns if [LocationProvider] can be in default used. Value is taken from shared preferences or it is used default value. */
     val isLocationProvider
-        get() = sharedPreferences.getBoolean(context.getString(R.string.key_util_is_location_provider_available), isLocationProviderDef)
+        get() = sharedPreferences.getBoolean(context.getString(R.string.key_sensor_location_is_allowed), isLocationProviderDef)
 
     /** Contains if [MoveDetector] can be in default used. Value is taken from resources. */
     private val isMoveDetectorDef :Boolean = context.resources.getBoolean(R.bool.default_util_is_move_detector_available)
     /** Returns if [MoveDetector] can be in default used. Value is taken from shared preferences or it is used default value. */
     val isMoveDetector
-        get() = sharedPreferences.getBoolean(context.getString(R.string.key_util_is_move_detector_available), isMoveDetectorDef)
+        get() = sharedPreferences.getBoolean(context.getString(R.string.key_sensor_move_is_allowed), isMoveDetectorDef)
 
     /** Contains if [SoundDetector] can be in default used. Value is taken from resources. */
     private val isSoundDetectorDef :Boolean = context.resources.getBoolean(R.bool.default_util_is_sound_detector_available)
     /** Returns if [SoundDetector] can be in default used. Value is taken from shared preferences or it is used default value. */
     val isSoundDetector
-        get() = sharedPreferences.getBoolean(context.getString(R.string.key_util_is_sound_detector_available), isSoundDetectorDef)
+        get() = sharedPreferences.getBoolean(context.getString(R.string.key_sensor_sound_is_allowed), isSoundDetectorDef)
 
 }
 

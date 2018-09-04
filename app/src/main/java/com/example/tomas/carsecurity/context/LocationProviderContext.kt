@@ -27,15 +27,15 @@ class LocationProviderContext(private val sharedPreferences: SharedPreferences, 
 
     /** Returns interval for location updates. Value is taken from shared preferences or it is used default value. */
     val updateInterval
-        get() = sharedPreferences.getLong(context.getString(R.string.key_location_update_interval), defUpdateInterval)
+        get() = sharedPreferences.getLong(context.getString(R.string.key_sensor_location_update_interval), defUpdateInterval)
 
     /** Returns maximal interval for location updates. Value is taken from shared preferences or it is used default value. */
     val maxUpdateInterval
-        get() = sharedPreferences.getLong(context.getString(R.string.key_location_max_update_interval), defMaxUpdateInterval)
+        get() = sharedPreferences.getLong(context.getString(R.string.key_sensor_location_max_update_interval), defMaxUpdateInterval)
 
     /** Returns priority of accuracy requests. Value is taken from shared preferences or it is used default value. */
     val accuracyPriority: Int
-        get() = Integer.valueOf(sharedPreferences.getString(context.getString(R.string.key_location_accuracy_priority), defAccuracyPriority))
+        get() = Integer.valueOf(sharedPreferences.getString(context.getString(R.string.key_sensor_location_accuracy_priority), defAccuracyPriority))
 }
 
 

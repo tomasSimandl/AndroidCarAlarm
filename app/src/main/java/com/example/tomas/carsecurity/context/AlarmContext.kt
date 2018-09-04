@@ -22,14 +22,14 @@ class AlarmContext(private val sharedPreferences: SharedPreferences, private val
      * Value is taken from shared preferences or it is used default value.
      */
     val alertAlarmInterval
-        get() = sharedPreferences.getInt(context.getString(R.string.key_alarm_alert_interval), defAlertAlarmInterval)
+        get() = sharedPreferences.getInt(context.getString(R.string.key_tool_alarm_alert_interval), defAlertAlarmInterval)
 
     /**
      * Returns default interval for which is detection ignored after alarm activation.
      * Value is taken from shared preferences or it is used default value.
      */
     val startAlarmInterval
-        get() = sharedPreferences.getInt(context.getString(R.string.key_alarm_start_interval), defStartAlarmInterval)
+        get() = sharedPreferences.getInt(context.getString(R.string.key_tool_alarm_start_interval), defStartAlarmInterval)
 
 }
 

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--======================================== Sensors ========================================-->
+    <string name="key_sensor_sound_is_allowed">sensor_sound_is_allowed</string>
+    <string name="key_sensor_sound_interval">sensor_sound_interval</string>
+    <string name="key_sensor_sound_max_ok_amplitude">sensor_sound_max_ok_amplitude</string>
+
+    <string name="key_sensor_move_is_allowed">sensor_move_is_allowed</string>
+    <string name="key_sensor_move_sensitivity">sensor_move_sensitivity</string>
+
+    <string name="key_sensor_location_is_allowed">sensor_location_is_allowed</string>
+    <string name="key_sensor_location_update_interval">sensor_location_update_interval</string>
+    <string name="key_sensor_location_max_update_interval">sensor_location_max_update_interval</string>
+    <string name="key_sensor_location_accuracy_priority">sensor_location_accuracy_priority</string>
+
+
+    <!--========================================= Tools =========================================-->
+    <string name="key_tool_alarm_is_allowed">tool_alarm_is_allowed</string>
+    <string name="key_tool_alarm_alert_interval">tool_alarm_alert_interval</string>
+    <string name="key_tool_alarm_start_interval">tool_alarm_start_interval</string>
+
+    <string name="key_tool_tracker_is_allowed">tool_tracker_is_allowed</string>
+    <string name="key_tool_tracker_ignore_distance">tool_tracker_ignore_distance</string>
+    <string name="key_tool_tracker_timeout">tool_tracker_timeout</string>
+
+
+    <!--===================================== Communication =====================================-->
+    <string name="key_communication_sms_is_allowed">communication_sms_is_allowed</string>
+    <string name="key_communication_sms_phone_number">communication_sms_phone_number</string>
+    <string name="key_communication_allowed_message_types">communication_allowed_message_types</string>
+
+
+
+    <string name="key_communication_active_providers">communication_active_providers</string> <!-- TODO duplicate with key_communication_sms_is_allowed -->
+
+
+</resources>

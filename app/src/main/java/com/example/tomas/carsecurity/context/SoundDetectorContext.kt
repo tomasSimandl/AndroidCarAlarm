@@ -13,9 +13,9 @@ class SoundDetectorContext(private val sharedPreferences: SharedPreferences, pri
 
     /** Return maximal allowed amplitude before alarm is triggered. Value is from shared preferences or it is default value. */
     val maxAmplitude
-        get() = sharedPreferences.getInt(context.getString(R.string.key_max_ok_amplitude), defMaxAmplitude)
+        get() = sharedPreferences.getInt(context.getString(R.string.key_sensor_sound_max_ok_amplitude), defMaxAmplitude)
 
     /** Return measure interval from shared preferences or use default value */
     val measureInterval
-        get() = sharedPreferences.getLong(context.getString(R.string.key_sound_detector_interval), defMeasureInterval.toLong())
+        get() = sharedPreferences.getLong(context.getString(R.string.key_sensor_sound_interval), defMeasureInterval.toLong())
 }

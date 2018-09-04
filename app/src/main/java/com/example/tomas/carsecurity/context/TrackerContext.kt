@@ -18,11 +18,11 @@ class TrackerContext(private val sharedPreferences: SharedPreferences, private v
 
     /** Returns new location ignore distance in meters. Value is taken from shared preferences or it is used default value. */
     val ignoreDistance
-        get() = sharedPreferences.getInt(context.getString(R.string.key_tracker_ignore_distance), defIgnoreDistance)
+        get() = sharedPreferences.getInt(context.getString(R.string.key_tool_tracker_ignore_distance), defIgnoreDistance)
 
     /** Returns not moving timeout in milliseconds. Value is taken from shared preferences or it is used default value. */
     val timeout
-        get() = sharedPreferences.getInt(context.getString(R.string.key_tracker_timeout), defTimeout)
+        get() = sharedPreferences.getInt(context.getString(R.string.key_tool_tracker_timeout), defTimeout)
 }
 
 
