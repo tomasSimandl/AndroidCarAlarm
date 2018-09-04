@@ -12,7 +12,7 @@ class CommunicationManager(context: MyContext) {
 
     init {
 
-        if(communicationContext.isProviderAllowed(SmsProvider::class.java.simpleName)){
+        if(communicationContext.isProviderAllowed(SmsProvider::class.java.name)){
             activeCommunicators.add(SmsProvider(communicationContext))
         }
     }

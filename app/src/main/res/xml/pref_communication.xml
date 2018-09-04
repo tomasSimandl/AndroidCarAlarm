@@ -1,5 +1,4 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:sample="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- MOVE SENSOR -->
     <PreferenceCategory android:key="sms_category" android:title="@string/pref_communication_sms_group_name">
@@ -15,9 +14,9 @@
             android:title="@string/pref_communication_sms_phone_number_title" />
 
         <MultiSelectListPreference
-            android:dialogTitle="@string/pref_communication_sms_message_types_title"
             android:key="@string/key_communication_sms_allowed_message_types"
-            android:title="@string/pref_communication_sms_message_types_description"
+            android:title="@string/pref_communication_sms_message_types_title"
+            android:dialogTitle="@string/pref_communication_sms_message_types_title"
             android:entries="@array/pref_communication_sms_messages"
             android:entryValues="@array/pref_communication_sms_messages_values"
             android:defaultValue="@array/pref_communication_sms_messages_values" />

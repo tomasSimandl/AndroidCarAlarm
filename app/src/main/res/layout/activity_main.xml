@@ -23,6 +23,13 @@
         android:layout_margin="8dp"
         android:text="@string/tracker_button_text" />
 
+    <Button
+        android:id="@+id/actionSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:text="Setting" />
+
 
     <TextView
         android:id="@+id/console"

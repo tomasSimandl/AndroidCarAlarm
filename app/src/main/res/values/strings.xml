@@ -127,7 +127,7 @@
         <item>AlarmLocation_send</item>
         <item>BatteryWarn_send</item>
 
-        <item>UtilsSwitch_recv</item>
+        <item>UtilSwitch_recv</item>
         <item>Status_recv</item>
         <item>Location_recv</item>
     </string-array>

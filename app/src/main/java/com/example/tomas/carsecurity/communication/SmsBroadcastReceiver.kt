@@ -76,18 +76,18 @@ class SmsBroadcastReceiver(private val communicationContext: CommunicationContex
             smsBody.startsWith("activate", true) -> switchUtil(smsBody.drop(8).trim(), true)
             smsBody.startsWith("deactivate", true) -> switchUtil(smsBody.drop(10).trim(), false)
             smsBody == "info" ->
-                if(communicationContext.isMessageAllowed(SmsProvider::class.java.simpleName, MessageType.Status.name, "recv")) {
+                if(communicationContext.isMessageAllowed(SmsProvider::class.java.name, MessageType.Status.name, "recv")) {
                     sendIntent(MainService.Actions.ActionStatus.name)
                 }
             smsBody == "position" ->
-                if(communicationContext.isMessageAllowed(SmsProvider::class.java.simpleName, MessageType.Location.name, "recv")) {
+                if(communicationContext.isMessageAllowed(SmsProvider::class.java.name, MessageType.Location.name, "recv")) {
                     sendIntent(MainService.Actions.ActionGetPosition.name)
                 }
         }
     }
 
     private fun switchUtil(smsBody: String, activate: Boolean){
-        if(!communicationContext.isMessageAllowed(SmsProvider::class.java.simpleName, MessageType.UtilSwitch.name, "recv")){
+        if(!communicationContext.isMessageAllowed(SmsProvider::class.java.name, MessageType.UtilSwitch.name, "recv")){
             Log.d(tag, "Util switch command is not allowed.")
             return
         }

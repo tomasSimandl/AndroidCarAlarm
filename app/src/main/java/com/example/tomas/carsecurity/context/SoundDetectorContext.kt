@@ -16,6 +16,6 @@ class SoundDetectorContext(private val sharedPreferences: SharedPreferences, pri
         get() = sharedPreferences.getInt(context.getString(R.string.key_sensor_sound_max_ok_amplitude), defMaxAmplitude)
 
     /** Return measure interval from shared preferences or use default value */
-    val measureInterval
-        get() = sharedPreferences.getLong(context.getString(R.string.key_sensor_sound_interval), defMeasureInterval.toLong())
+    val measureInterval: Int
+        get() = sharedPreferences.getInt(context.getString(R.string.key_sensor_sound_interval), defMeasureInterval)
 }

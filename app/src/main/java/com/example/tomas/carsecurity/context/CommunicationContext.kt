@@ -17,7 +17,7 @@ class CommunicationContext(private val sharedPreferences: SharedPreferences, val
     fun isProviderAllowed(provider: String): Boolean{
 
         val keysId = when(provider){
-            SmsProvider::class.java.simpleName -> arrayOf(R.string.key_communication_sms_is_allowed, R.bool.default_communication_sms_is_allowed)
+            SmsProvider::class.java.name -> arrayOf(R.string.key_communication_sms_is_allowed, R.bool.default_communication_sms_is_allowed)
             else -> return false
         }
 
@@ -26,7 +26,7 @@ class CommunicationContext(private val sharedPreferences: SharedPreferences, val
 
     fun isMessageAllowed(provider: String, vararg parameters: String): Boolean{
         val stringSet = when(provider){
-            SmsProvider::class.java.simpleName -> sharedPreferences.getStringSet(context.resources.getString(R.string.key_communication_sms_allowed_message_types),null)
+            SmsProvider::class.java.name -> sharedPreferences.getStringSet(context.resources.getString(R.string.key_communication_sms_allowed_message_types),null)
             else -> return false
         }
 

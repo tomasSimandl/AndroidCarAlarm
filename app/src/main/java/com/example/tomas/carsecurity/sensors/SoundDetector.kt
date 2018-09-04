@@ -110,6 +110,6 @@ class SoundDetector(private val context : MyContext) : GeneralObservable() {
             }
         }
         timer = Timer("SoundDetectorThread")
-        timer.schedule( timerTask, soundDetectorContext.measureInterval, soundDetectorContext.measureInterval)
+        timer.schedule( timerTask, soundDetectorContext.measureInterval.toLong(), soundDetectorContext.measureInterval.toLong())
     }
 }

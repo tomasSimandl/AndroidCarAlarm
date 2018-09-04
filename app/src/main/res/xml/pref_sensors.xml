@@ -10,10 +10,10 @@
             android:contentDescription="@string/pref_sensors_move_switch_description"/>
 
         <com.pavelsikun.seekbarpreference.SeekBarPreferenceCompat
-            android:key="@string/key_move_sensor_sensitivity"
+            android:key="@string/key_sensor_move_sensitivity"
             android:title="@string/pref_sensors_move_sensitivity_title"
             android:summary="@string/pref_sensors_move_sensitivity_description"
-            android:dependency="@string/key_util_is_move_detector_available"
+            android:dependency="@string/key_sensor_move_is_allowed"
             android:defaultValue="@integer/default_move_sensor_sensitivity"
 
             sample:msbp_minValue="1"
@@ -32,10 +32,10 @@
             android:contentDescription="@string/pref_sensors_sound_switch_description"/>
 
         <com.pavelsikun.seekbarpreference.SeekBarPreferenceCompat
-            android:key="@string/key_max_ok_amplitude"
+            android:key="@string/key_sensor_sound_max_ok_amplitude"
             android:title="@string/pref_sensors_sound_max_amplitude_title"
             android:summary="@string/pref_sensors_sound_max_amplitude_description"
-            android:dependency="@string/key_util_is_sound_detector_available"
+            android:dependency="@string/key_sensor_sound_is_allowed"
             android:defaultValue="@integer/default_max_ok_amplitude"
 
             sample:msbp_minValue="1000"
@@ -45,10 +45,10 @@
             sample:msbp_dialogEnabled="false"/>
 
         <com.pavelsikun.seekbarpreference.SeekBarPreferenceCompat
-            android:key="@string/key_sound_detector_interval"
+            android:key="@string/key_sensor_sound_interval"
             android:title="@string/pref_sensors_sound_interval_title"
             android:summary="@string/pref_sensors_sound_interval_description"
-            android:dependency="@string/key_util_is_sound_detector_available"
+            android:dependency="@string/key_sensor_sound_is_allowed"
             android:defaultValue="@integer/default_sound_detector_interval"
 
             sample:msbp_minValue="1000"
@@ -67,10 +67,10 @@
             android:contentDescription="@string/pref_sensors_location_switch_description"/>
 
         <com.pavelsikun.seekbarpreference.SeekBarPreferenceCompat
-            android:key="@string/key_location_update_interval"
+            android:key="@string/key_sensor_location_update_interval"
             android:title="@string/pref_sensors_location_update_interval_title"
             android:summary="@string/pref_sensors_location_update_interval_description"
-            android:dependency="@string/key_util_is_location_provider_available"
+            android:dependency="@string/key_sensor_location_is_allowed"
             android:defaultValue="@integer/default_location_update_interval"
 
             sample:msbp_minValue="1000"

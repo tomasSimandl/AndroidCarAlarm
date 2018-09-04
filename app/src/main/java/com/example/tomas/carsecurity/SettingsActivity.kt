@@ -44,7 +44,7 @@ class SettingsActivity : PreferenceActivity() {
         return PreferenceFragment::class.java.name == fragmentName
                 || ToolsPreferenceFragment::class.java.name == fragmentName
                 || SensorsPreferenceFragment::class.java.name == fragmentName
-//                || CommunicationPreferenceFragment::class.java.name == fragmentName
+                || CommunicationPreferenceFragment::class.java.name == fragmentName
     }
 
 

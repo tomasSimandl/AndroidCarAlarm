@@ -78,7 +78,7 @@ class UtilsManager(private val context: MyContext, private val broadcastSender: 
 
         for(util in utilsMap.values){
             util.deleteObservers()
-            util.disable()
+            if(util.isEnabled()) util.disable()
         }
 
         // destroy after all utils are disabled

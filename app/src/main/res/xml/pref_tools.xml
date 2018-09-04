@@ -10,10 +10,10 @@
             android:contentDescription="@string/pref_tools_alarm_switch_description"/>
 
         <com.pavelsikun.seekbarpreference.SeekBarPreferenceCompat
-            android:key="@string/key_alarm_start_interval"
+            android:key="@string/key_tool_alarm_start_interval"
             android:title="@string/pref_tools_alarm_start_interval_title"
             android:summary="@string/pref_tools_alarm_start_interval_description"
-            android:dependency="@string/key_alarm_is_allowed"
+            android:dependency="@string/key_tool_alarm_is_allowed"
             android:defaultValue="@integer/default_alarm_start_interval"
 
             sample:msbp_minValue="0"
@@ -23,10 +23,10 @@
             sample:msbp_dialogEnabled="false"/>
 
         <com.pavelsikun.seekbarpreference.SeekBarPreferenceCompat
-            android:key="@string/key_alarm_alert_interval"
+            android:key="@string/key_tool_alarm_alert_interval"
             android:title="@string/pref_tools_alarm_alert_interval_title"
             android:summary="@string/pref_tools_alarm_alert_interval_description"
-            android:dependency="@string/key_alarm_is_allowed"
+            android:dependency="@string/key_tool_alarm_is_allowed"
             android:defaultValue="@integer/default_alarm_alert_interval"
 
             sample:msbp_minValue="0"
@@ -47,10 +47,10 @@
             android:contentDescription="@string/pref_tools_tracker_switch_description"/>
 
         <com.pavelsikun.seekbarpreference.SeekBarPreferenceCompat
-            android:key="@string/key_tracker_ignore_distance"
+            android:key="@string/key_tool_tracker_ignore_distance"
             android:title="@string/pref_tools_tracker_ignore_distance_title"
             android:summary="@string/pref_tools_tracker_ignore_distance_description"
-            android:dependency="@string/key_tracker_is_allowed"
+            android:dependency="@string/key_tool_tracker_is_allowed"
             android:defaultValue="@integer/default_tracker_ignore_distance"
 
             sample:msbp_minValue="0"
@@ -60,10 +60,10 @@
             sample:msbp_dialogEnabled="false"/>
 
         <com.pavelsikun.seekbarpreference.SeekBarPreferenceCompat
-            android:key="@string/key_tracker_timeout"
+            android:key="@string/key_tool_tracker_timeout"
             android:title="@string/pref_tools_tracker_timeout_title"
             android:summary="@string/pref_tools_tracker_timeout_description"
-            android:dependency="@string/key_tracker_is_allowed"
+            android:dependency="@string/key_tool_tracker_is_allowed"
             android:defaultValue="@integer/default_tracker_timeout"
 
             sample:msbp_minValue="5000"
