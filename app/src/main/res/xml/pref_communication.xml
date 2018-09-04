@@ -17,6 +17,7 @@
             android:key="@string/key_communication_sms_allowed_message_types"
             android:title="@string/pref_communication_sms_message_types_title"
             android:dialogTitle="@string/pref_communication_sms_message_types_title"
+            android:dependency="@string/key_communication_sms_is_allowed"
             android:entries="@array/pref_communication_sms_messages"
             android:entryValues="@array/pref_communication_sms_messages_values"
             android:defaultValue="@array/pref_communication_sms_messages_values" />

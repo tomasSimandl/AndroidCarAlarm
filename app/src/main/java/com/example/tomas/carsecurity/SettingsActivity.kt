@@ -9,7 +9,7 @@ import android.preference.PreferenceActivity
 import android.support.v14.preference.PreferenceFragment
 import com.example.tomas.carsecurity.preferenceFragments.MyPreferenceFragment
 
-class SettingsActivity : PreferenceActivity() {
+class SettingsActivity : AppCompatPreferenceActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
