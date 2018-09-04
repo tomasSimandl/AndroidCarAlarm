@@ -98,7 +98,7 @@ class Alarm(context: MyContext, private val utilsHelper: UtilsHelper) : GeneralU
 //        }
     }
 
-    override fun enable(): Boolean {
+    override fun enable() {
         if (!isEnabled) {
 
             isEnabled = true
@@ -116,10 +116,9 @@ class Alarm(context: MyContext, private val utilsHelper: UtilsHelper) : GeneralU
         }
 
         utilsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, true)
-        return true // alarm status
     }
 
-    override fun disable(): Boolean {
+    override fun disable() {
         if (isEnabled) {
 
             utilsHelper.unregisterAllObservables(this)
@@ -135,7 +134,6 @@ class Alarm(context: MyContext, private val utilsHelper: UtilsHelper) : GeneralU
         }
 
         utilsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, false)
-        return false // alarm status
     }
 
     override fun isEnabled(): Boolean {

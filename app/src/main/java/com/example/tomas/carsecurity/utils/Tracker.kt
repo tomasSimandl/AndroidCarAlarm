@@ -76,7 +76,7 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
         } while (run)
     }
 
-    override fun enable(): Boolean {
+    override fun enable() {
         if (!isEnabled){
             isEnabled = true
             lastLocation = null
@@ -91,10 +91,9 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
         }
 
         utilsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, true)
-        return true // tracker status
     }
 
-    override fun disable(): Boolean {
+    override fun disable() {
         if(isEnabled) {
             isEnabled = false
             utilsHelper.unregisterAllObservables(this)
@@ -106,11 +105,9 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
             notifyObservers(false)
 
             Log.d(tag, "Tracker system is disabled.")
-
         }
 
         utilsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, false)
-        return false // tracker status
     }
 
     override fun isEnabled(): Boolean {

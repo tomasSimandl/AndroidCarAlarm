@@ -18,7 +18,7 @@ abstract class GeneralUtil(private val utilsHelper: UtilsHelper) : Observer, Obs
         }
     }
 
-    abstract fun enable(): Boolean // !! Can be call more than once
-    abstract fun disable(): Boolean // !! Can be call more than once
+    abstract fun enable() // !! Can be call more than once
+    abstract fun disable() // !! Can be call more than once
     abstract fun isEnabled(): Boolean
 }

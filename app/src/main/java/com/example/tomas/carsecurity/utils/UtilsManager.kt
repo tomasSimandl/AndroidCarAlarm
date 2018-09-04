@@ -2,10 +2,11 @@ package com.example.tomas.carsecurity.utils
 
 import android.util.Log
 import com.example.tomas.carsecurity.BroadcastSender
+import com.example.tomas.carsecurity.MainService
 import com.example.tomas.carsecurity.context.MyContext
 import java.util.*
 
-class UtilsManager(private val context: MyContext, private val broadcastSender: BroadcastSender, reload: Boolean): Observer {
+class UtilsManager(private val context: MyContext, reload: Boolean): Observer, Observable() {
 
     private val tag = "utils.UtilsManager"
 
@@ -19,40 +20,48 @@ class UtilsManager(private val context: MyContext, private val broadcastSender: 
         }
     }
 
+    fun destroy(){
+        Log.d(tag, "Destroy")
+
+        for(util in utilsMap.values){
+            util.deleteObservers()
+            if(util.isEnabled()) util.disable()
+        }
+
+        // destroy after all utils are disabled
+        utilsHelper.destroy()
+    }
+
     override fun update(observable: Observable, args: Any) {
         if(observable is GeneralUtil && args is Boolean) {
-            broadcastSender.informUI(observable.thisUtilEnum, args)
+
+            setChanged()
+            notifyObservers(Pair(observable.thisUtilEnum, args))
+
+            if(!isAnyUtilEnabled()){
+                setChanged()
+                notifyObservers(MainService.Actions.ActionForegroundStop)
+            }
         }
     }
 
-    fun switchUtil(utilEnum: UtilsEnum): Boolean {
+    fun switchUtil(utilEnum: UtilsEnum) {
         // tasks are running sequentially in one thread
         val util: GeneralUtil = getGenericUtil(utilEnum)
 
-        return if (util.isEnabled()) {
+        if (util.isEnabled()) {
             util.disable()
         } else {
             util.enable()
         }
     }
 
-    fun activateUtil(utilEnum: UtilsEnum): Boolean{
-        val util: GeneralUtil = getGenericUtil(utilEnum)
-        return util.enable()
+    fun activateUtil(utilEnum: UtilsEnum) {
+        getGenericUtil(utilEnum).enable()
     }
 
-    fun deactivateUtil(utilEnum: UtilsEnum): Boolean{
-        val util: GeneralUtil = getGenericUtil(utilEnum)
-        return util.disable()
-    }
-
-    private fun getGenericUtil(utilEnum: UtilsEnum): GeneralUtil{
-        if(utilsMap[utilEnum] == null){
-            utilsMap[utilEnum] = utilEnum.getInstance(context, utilsHelper)
-            utilsMap[utilEnum]!!.addObserver(this)
-        }
-
-        return utilsMap[utilEnum] as GeneralUtil
+    fun deactivateUtil(utilEnum: UtilsEnum) {
+        getGenericUtil(utilEnum).disable()
     }
 
     fun isAnyUtilEnabled(): Boolean{
@@ -73,15 +82,12 @@ class UtilsManager(private val context: MyContext, private val broadcastSender: 
         return enabledUtils
     }
 
-    fun destroy(){
-        Log.d(tag, "Destroy")
-
-        for(util in utilsMap.values){
-            util.deleteObservers()
-            if(util.isEnabled()) util.disable()
+    private fun getGenericUtil(utilEnum: UtilsEnum): GeneralUtil{
+        if(utilsMap[utilEnum] == null){
+            utilsMap[utilEnum] = utilEnum.getInstance(context, utilsHelper)
+            utilsMap[utilEnum]!!.addObserver(this)
         }
 
-        // destroy after all utils are disabled
-        utilsHelper.destroy()
+        return utilsMap[utilEnum] as GeneralUtil
     }
 }

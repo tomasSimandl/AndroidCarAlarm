@@ -13,12 +13,13 @@ import android.util.Log
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.utils.UtilsEnum
 import com.example.tomas.carsecurity.utils.UtilsManager
+import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
-class MainService : Service(){
+class MainService : Service(), Observer {
 
     enum class Actions{
-        ActionStatus, ActionStatusUI, ActionGetPosition,
+        ActionStatus, ActionStatusUI, ActionGetPosition, ActionForegroundStop,
         ActionSwitchUtil, ActionActivateUtil, ActionDeactivateUtil, ActionAutomaticMode;
     }
 
@@ -33,6 +34,21 @@ class MainService : Service(){
     private var isForeground = false
     private var tasksInQueue :AtomicInteger = AtomicInteger(0)
 
+
+    override fun update(observable: Observable, args: Any) {
+        if(observable is UtilsManager) {
+            when(args){
+                is Pair<*, *> ->
+                    if(args.first is UtilsEnum && args.second is Boolean){
+                        broadcastSender.informUI(args.first as UtilsEnum, args.second as Boolean)
+                        if(args.second == true){
+                            startForeground()
+                        }
+                    }
+                is Actions -> processAction(Intent(args.name))
+            }
+        }
+    }
 
     override fun onBind(intent: Intent): IBinder? {
         throw UnsupportedOperationException("Not implemented")
@@ -49,43 +65,36 @@ class MainService : Service(){
         if (! ::context.isInitialized) context = MyContext(applicationContext, workerThread.looper)
         if (! ::broadcastSender.isInitialized) broadcastSender = BroadcastSender(applicationContext)
         // intent is null when application is restarted when system kill service
-        if (! ::utilsManager.isInitialized) utilsManager = UtilsManager(context, broadcastSender, intent == null)
-
+        if (! ::utilsManager.isInitialized) {
+            utilsManager = UtilsManager(context, intent == null)
+            utilsManager.addObserver(this)
+        }
 
         if(intent != null){
-
-
-            val task = Runnable {
-                // can be there because tasks run sequentially in one thread and when I
-                // call stopService i need to be counter without this thread.
-                tasksInQueue.decrementAndGet()
-
-                val activation = when(intent.action) {
-                    Actions.ActionSwitchUtil.name -> utilsManager.switchUtil(intent.getSerializableExtra("util") as UtilsEnum)
-                    Actions.ActionActivateUtil.name -> utilsManager.activateUtil(intent.getSerializableExtra("util") as UtilsEnum)
-                    Actions.ActionDeactivateUtil.name -> utilsManager.deactivateUtil(intent.getSerializableExtra("util") as UtilsEnum)
-                    else -> null
-                }
-
-                when(activation) {
-                    true -> startForeground()
-                    false -> stopService(true)
-                    null -> {
-                        // process other actions
-                        when(intent.action) {
-
-                            Actions.ActionStatusUI.name -> broadcastSender.informUI(utilsManager.getEnabledUtils())
-                            else -> Log.w(tag, "onStartCommand - invalid action")
-                        }
-                    }
-                }
-            }
-
-            tasksInQueue.incrementAndGet()
-            workerThread.postTask(task)
+            processAction(intent)
         }
 
         return Service.START_STICKY
+    }
+
+    private fun processAction(intent: Intent){
+        val task = Runnable {
+            // can be there because tasks run sequentially in one thread and when I
+            // call stopService i need to be counter without this thread.
+            tasksInQueue.decrementAndGet()
+
+            when(intent.action) {
+                Actions.ActionSwitchUtil.name -> utilsManager.switchUtil(intent.getSerializableExtra("util") as UtilsEnum)
+                Actions.ActionActivateUtil.name -> utilsManager.activateUtil(intent.getSerializableExtra("util") as UtilsEnum)
+                Actions.ActionDeactivateUtil.name -> utilsManager.deactivateUtil(intent.getSerializableExtra("util") as UtilsEnum)
+                Actions.ActionStatusUI.name -> broadcastSender.informUI(utilsManager.getEnabledUtils())
+                Actions.ActionForegroundStop.name -> stopService(true)
+                else -> Log.w(tag, "onStartCommand - invalid action")
+            }
+        }
+
+        tasksInQueue.incrementAndGet()
+        workerThread.postTask(task)
     }
 
     override fun onDestroy() {
