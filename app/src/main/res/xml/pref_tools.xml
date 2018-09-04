@@ -43,7 +43,7 @@
         <SwitchPreference
             android:defaultValue="@bool/default_tracker_is_allowed"
             android:key="@string/key_tool_tracker_is_allowed"
-            android:title="@string/pref_tools_alarm_switch_title"
+            android:title="@string/pref_tools_tracker_switch_title"
             android:contentDescription="@string/pref_tools_tracker_switch_description"/>
 
         <com.pavelsikun.seekbarpreference.SeekBarPreferenceCompat
