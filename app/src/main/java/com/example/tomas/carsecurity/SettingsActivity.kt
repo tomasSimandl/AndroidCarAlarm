@@ -73,5 +73,11 @@ class SettingsActivity : PreferenceActivity() {
         }
     }
 
+    class CommunicationPreferenceFragment : MyPreferenceFragment() {
+        override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            super.onCreatePreferences(savedInstanceState, rootKey)
 
+            addPreferencesFromResource(R.xml.pref_communication)
+        }
+    }
 }

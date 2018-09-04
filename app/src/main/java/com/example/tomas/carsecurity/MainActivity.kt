@@ -42,6 +42,11 @@ class MainActivity : AppCompatActivity() {
         actionTracker.setOnClickListener{
             sendIntentSwitchUtil(UtilsEnum.Tracker)
         }
+
+        actionSetting.setOnClickListener{
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     override fun onResume() {

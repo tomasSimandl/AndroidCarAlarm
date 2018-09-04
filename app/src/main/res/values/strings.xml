@@ -63,7 +63,7 @@
     <string name="pref_sensors_move_sensitivity_title">Sensor sensitivity</string>
     <string name="pref_sensors_move_sensitivity_description">Low value means high sensitivity.</string>
 
-    !-- Sensors Sound settings -->
+    <!-- Sensors Sound settings -->
     <string name="pref_sensors_sound_group_name">Sound sensor</string>
 
     <string name="pref_sensors_sound_switch_title">Allow Sound sensor</string>
@@ -75,7 +75,7 @@
     <string name="pref_sensors_sound_interval_title">Measure interval</string>
     <string name="pref_sensors_sound_interval_description">Interval how often are check sensor data (High interval save battery).</string>
 
-    !-- Sensors Location settings -->
+    <!-- Sensors Location settings -->
     <string name="pref_sensors_location_group_name">Location sensor</string>
 
     <string name="pref_sensors_location_switch_title">Allow Location sensor</string>
@@ -95,4 +95,42 @@
         <item>102</item>
         <item>104</item>
     </string-array>
+
+
+    <!-- Communication sms settings -->
+    <string name="pref_communication_sms_group_name">SMS</string>
+
+    <string name="pref_communication_sms_switch_title">Allow sms communication</string>
+    <string name="pref_communication_sms_switch_description"> </string>
+
+    <string name="pref_communication_sms_phone_number_title">Phone number</string>
+    <string name="pref_communication_sms_phone_number_description">Contact phone number where all notifications will be send and from which will be accepted commands.</string>
+
+    <string name="pref_communication_sms_message_types_title">Sms types</string>
+    <string name="pref_communication_sms_message_types_description">Sets which messages are allowed to send or receive via SMS</string>
+
+    <string-array name="pref_communication_sms_messages">
+        <item>Alarm send util switch</item>
+        <item>Tracker send util switch</item>
+        <item>send alarm</item>
+        <item>send alarm location</item>
+        <item>send battery notification</item>
+        <item>command util switch</item>
+        <item>command send status</item>
+        <item>command send location</item>
+    </string-array>
+
+    <string-array name="pref_communication_sms_messages_values">
+        <item>Alarm_UtilSwitch_send</item>
+        <item>Tracker_UtilSwitch_send</item>
+        <item>Alarm_send</item>
+        <item>AlarmLocation_send</item>
+        <item>BatteryWarn_send</item>
+
+        <item>UtilsSwitch_recv</item>
+        <item>Status_recv</item>
+        <item>Location_recv</item>
+    </string-array>
+
+
 </resources>

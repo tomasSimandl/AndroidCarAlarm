@@ -40,7 +40,7 @@
 
 
     <!-- Indicates if messages can be send by default if there is no value in shared preferences. -->
-    <bool name="default_communication_is_message_allowed">true</bool> <!-- TODO change to false in production -->
+    <bool name="default_communication_is_message_allowed">true</bool>
 
     <!-- Indicates if sms communication provider is allowed. -->
     <bool name="default_communication_sms_is_allowed">true</bool>
