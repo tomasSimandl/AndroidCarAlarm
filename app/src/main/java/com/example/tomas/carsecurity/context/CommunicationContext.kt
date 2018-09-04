@@ -3,6 +3,7 @@ package com.example.tomas.carsecurity.context
 import android.content.Context
 import android.content.SharedPreferences
 import com.example.tomas.carsecurity.R
+import com.example.tomas.carsecurity.communication.SmsProvider
 
 /**
  * Context contains data which are used in communication package and they are stored in
@@ -11,21 +12,26 @@ import com.example.tomas.carsecurity.R
 class CommunicationContext(private val sharedPreferences: SharedPreferences, val context: Context) {
 
     /** Contains default setting of sending of messages. Value is taken from resources. */
-    private val defCanSendMessage :Boolean = context.resources.getBoolean(R.bool.default_communication_can_send_message)
+    private val defIsMsgAllowed :Boolean = context.resources.getBoolean(R.bool.default_communication_is_message_allowed)
 
-    private val defActiveProviders = context.resources.getStringArray(R.array.default_communication_active_providers).toHashSet()
+    fun isProviderAllowed(provider: String): Boolean{
 
+        val keysId = when(provider){
+            SmsProvider::class.java.simpleName -> arrayOf(R.string.key_communication_sms_is_allowed, R.bool.default_communication_sms_is_allowed)
+            else -> return false
+        }
 
-    fun canSendMessage(provider: String, util: String, msgType: String): Boolean{
-        return sharedPreferences.getBoolean("""communication_${provider}_${util}_${msgType}_can_send""", defCanSendMessage)
+        return sharedPreferences.getBoolean(context.resources.getString(keysId[0]), context.resources.getBoolean(keysId[1]))
     }
 
-    fun canSendMessage(provider: String, msgType: String): Boolean{
-        return sharedPreferences.getBoolean("""communication_${provider}_${msgType}_can_send""", defCanSendMessage)
-    }
+    fun isMessageAllowed(provider: String, vararg parameters: String): Boolean{
+        val stringSet = when(provider){
+            SmsProvider::class.java.simpleName -> sharedPreferences.getStringSet(context.resources.getString(R.string.key_communication_sms_allowed_message_types),null)
+            else -> return false
+        }
 
-    val activeProviders: Set<String>
-        get() = sharedPreferences.getStringSet(context.getString(R.string.key_communication_active_providers), defActiveProviders)
+        return stringSet?.contains(parameters.joinToString("_")) ?: defIsMsgAllowed
+    }
 
     /** Returns phone number of contact person. Return value from sharedPreferences or empty string. */
     val phoneNumber: String

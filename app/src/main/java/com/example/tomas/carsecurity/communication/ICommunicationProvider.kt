@@ -12,7 +12,7 @@ interface ICommunicationProvider {
 
     fun sendUtilSwitch(utilsEnum: UtilsEnum, enabled: Boolean): Boolean
     fun sendAlarm(): Boolean
-    fun sendLocation(location: Location): Boolean
+    fun sendLocation(location: Location, isAlarm: Boolean): Boolean
     fun sendBatteryWarn(capacity: Int): Boolean
     fun sendStatus(battery: Int, powerSaveMode: Boolean, utils: Map<UtilsEnum, Boolean>): Boolean
 }

@@ -40,12 +40,10 @@
 
 
     <!-- Indicates if messages can be send by default if there is no value in shared preferences. -->
-    <bool name="default_communication_can_send_message">true</bool> <!-- TODO change to false in production -->
+    <bool name="default_communication_is_message_allowed">true</bool> <!-- TODO change to false in production -->
 
-    <!-- List of active communication providers. Name must be equal to provider class name. -->
-    <string-array name="default_communication_active_providers">
-        <item>SmsProvider</item>
-    </string-array>
+    <!-- Indicates if sms communication provider is allowed. -->
+    <bool name="default_communication_sms_is_allowed">true</bool>
 
     <!-- Minimal acceptable distance between last and new location in Tracker. -->
     <integer name="default_tracker_ignore_distance">10</integer>

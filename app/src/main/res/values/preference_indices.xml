@@ -28,11 +28,7 @@
     <!--===================================== Communication =====================================-->
     <string name="key_communication_sms_is_allowed">communication_sms_is_allowed</string>
     <string name="key_communication_sms_phone_number">communication_sms_phone_number</string>
-    <string name="key_communication_allowed_message_types">communication_allowed_message_types</string>
-
-
-
-    <string name="key_communication_active_providers">communication_active_providers</string> <!-- TODO duplicate with key_communication_sms_is_allowed -->
+    <string name="key_communication_sms_allowed_message_types">communication_sms_allowed_message_types</string>
 
 
 </resources>

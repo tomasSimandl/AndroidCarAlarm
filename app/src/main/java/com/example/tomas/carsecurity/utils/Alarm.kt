@@ -40,7 +40,7 @@ class Alarm(context: MyContext, private val utilsHelper: UtilsHelper) : GeneralU
         Log.d(tag, """Location update: $location""")
 
         this.lastLocation = location
-        utilsHelper.communicationManager.sendLocation(location)
+        utilsHelper.communicationManager.sendLocation(location, true)
     }
 
     private fun onSensorUpdate(observable: GeneralObservable) {

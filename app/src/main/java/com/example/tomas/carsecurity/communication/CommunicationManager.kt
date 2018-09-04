@@ -11,12 +11,9 @@ class CommunicationManager(context: MyContext) {
     private val activeCommunicators: MutableSet<ICommunicationProvider> = HashSet()
 
     init {
-        for (provider in communicationContext.activeProviders){
-            when (provider) {
-                SmsProvider::class.java.simpleName -> activeCommunicators.add(SmsProvider(communicationContext))
 
-                "InternetProvider" -> UnsupportedOperationException("Not implemented")
-            }
+        if(communicationContext.isProviderAllowed(SmsProvider::class.java.simpleName)){
+            activeCommunicators.add(SmsProvider(communicationContext))
         }
     }
 
@@ -38,9 +35,9 @@ class CommunicationManager(context: MyContext) {
         }
     }
 
-    fun sendLocation(location: Location) {
+    fun sendLocation(location: Location, isAlarm: Boolean) {
         for (provider in activeCommunicators) {
-            provider.sendLocation(location)
+            provider.sendLocation(location, isAlarm)
         }
     }
 
