@@ -1,13 +1,14 @@
 package com.example.tomas.carsecurity
 
 import android.annotation.TargetApi
-import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceActivity
 import android.support.v14.preference.PreferenceFragment
+import android.view.MenuItem
 import com.example.tomas.carsecurity.preferenceFragments.MyPreferenceFragment
+
 
 class SettingsActivity : AppCompatPreferenceActivity() {
 
@@ -23,7 +24,18 @@ class SettingsActivity : AppCompatPreferenceActivity() {
      * Set up the [android.app.ActionBar], if the API is available.
      */
     private fun setupActionBar() {
+        actionBar?.setDisplayShowHomeEnabled(true)
         actionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onIsMultiPane(): Boolean {

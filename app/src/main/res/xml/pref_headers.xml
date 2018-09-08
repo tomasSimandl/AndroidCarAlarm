@@ -1,14 +1,17 @@
 <preference-headers xmlns:android="http://schemas.android.com/apk/res/android">
 
     <header
+        android:icon="@drawable/ic_developer_board_black_24dp"
         android:fragment="com.example.tomas.carsecurity.SettingsActivity$ToolsPreferenceFragment"
         android:title="@string/pref_header_tools" />
 
     <header
+        android:icon="@drawable/ic_extension_black_24dp"
         android:fragment="com.example.tomas.carsecurity.SettingsActivity$SensorsPreferenceFragment"
         android:title="@string/pref_header_sensors" />
 
     <header
+        android:icon="@drawable/ic_swap_horiz_black_24dp"
         android:fragment="com.example.tomas.carsecurity.SettingsActivity$CommunicationPreferenceFragment"
         android:title="@string/pref_header_communication" />
 
