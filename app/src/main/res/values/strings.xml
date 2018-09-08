@@ -133,4 +133,13 @@
     </string-array>
 
 
+
+
+
+
+    <string name="navigation_panel_open">Open navigation panel</string>
+    <string name="navigation_panel_close">Close navigation panel</string>
+    <string name="nav_image_description">Car security application icon</string>
+
+    <string name="menu_settings_title">Settings</string>
 </resources>
