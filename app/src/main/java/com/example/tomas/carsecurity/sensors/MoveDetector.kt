@@ -1,13 +1,19 @@
 package com.example.tomas.carsecurity.sensors
 
+import android.Manifest
 import android.content.Context
+import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Handler
+import android.support.v4.content.ContextCompat
 import android.util.Log
+import com.example.tomas.carsecurity.CheckCodes
 import com.example.tomas.carsecurity.GeneralObservable
+import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.context.MoveDetectorContext
 import com.example.tomas.carsecurity.context.MyContext
 
@@ -50,6 +56,18 @@ class MoveDetector(private val context: MyContext) : GeneralObservable(), Sensor
         }
     }
 
+    companion object {
+        fun check(context: Context, sharedPreferences: SharedPreferences): Byte {
+            return if (!context.packageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_ACCELEROMETER)) {
+                CheckCodes.hardwareNotSupported
+            } else if (!sharedPreferences.getBoolean(context.getString(R.string.key_sensor_move_is_allowed), context.resources.getBoolean(R.bool.default_util_is_move_detector_available))) {
+                CheckCodes.notAllowed
+            } else {
+                CheckCodes.success
+            }
+        }
+    }
+
     /**
      * Method stop listening incoming data from accelerometer sensor. When now ones listening system
      * automatically turn off accelerometer sensor.
@@ -67,7 +85,7 @@ class MoveDetector(private val context: MyContext) : GeneralObservable(), Sensor
      * Method activate accelerometer sensor.
      */
     override fun enable() {
-        if(!enabled) {
+        if(!enabled && sensor != null && check(context.appContext, context.sharedPreferences) == CheckCodes.success) {
             manager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL, Handler(context.mainServiceThreadLooper))
             enabled = true
             Log.d(tag, "Detector is enabled")

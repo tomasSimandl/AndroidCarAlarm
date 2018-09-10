@@ -25,4 +25,11 @@ class BroadcastSender(private val context: Context) {
         }
     }
 
+    fun showMessage(msg: String) {
+        val intent = Intent(context.getString(R.string.utils_ui_update))
+
+        intent.putExtra(context.getString(R.string.key_show_message), msg)
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+    }
+
 }

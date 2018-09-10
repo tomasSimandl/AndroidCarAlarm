@@ -9,7 +9,7 @@ import com.example.tomas.carsecurity.utils.Alarm
  * Context contains data which are used in [Alarm] class and they are stored in
  * shared preferences or in resources.
  */
-class AlarmContext(private val sharedPreferences: SharedPreferences, private val context: Context) {
+class AlarmContext(val sharedPreferences: SharedPreferences, val context: Context) {
 
     /** Contains default interval between two detections in which alarm will be triggered. Value is taken from resources. */
     private val defAlertAlarmInterval :Int = context.resources.getInteger(R.integer.default_alarm_alert_interval)

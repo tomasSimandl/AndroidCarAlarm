@@ -1,11 +1,15 @@
 package com.example.tomas.carsecurity.sensors
 
 import android.Manifest
+import android.content.Context
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.media.MediaRecorder
 import android.support.v4.content.ContextCompat
 import android.util.Log
+import com.example.tomas.carsecurity.CheckCodes
 import com.example.tomas.carsecurity.GeneralObservable
+import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.context.SoundDetectorContext
 import java.io.IOException
@@ -30,16 +34,31 @@ class SoundDetector(private val context : MyContext) : GeneralObservable() {
 
     private lateinit var timer: Timer
 
+    companion object {
+        fun check(context: Context, sharedPreferences: SharedPreferences): Byte {
+            return if (!context.packageManager.hasSystemFeature(PackageManager.FEATURE_MICROPHONE)) {
+                CheckCodes.hardwareNotSupported
+            } else if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                CheckCodes.permissionDenied
+            } else if (!sharedPreferences.getBoolean(context.getString(R.string.key_sensor_sound_is_allowed), context.resources.getBoolean(R.bool.default_util_is_sound_detector_available))) {
+                CheckCodes.notAllowed
+            } else {
+                CheckCodes.success
+            }
+        }
+    }
 
     /**
      * Method stop sound detector and stop recording audio from microphone.
      */
     override fun disable() {
-        if(::timer.isInitialized) timer.cancel()
-        enabled = false
-        recorder?.stop()
-        recorder?.release()
-        recorder = null
+        if(enabled) {
+            if (::timer.isInitialized) timer.cancel()
+            enabled = false
+            recorder?.stop()
+            recorder?.release()
+            recorder = null
+        }
         Log.d(tag, "Detector is disabled")
     }
 
@@ -50,27 +69,27 @@ class SoundDetector(private val context : MyContext) : GeneralObservable() {
      * It is possible that recording will not start.
      */
     override fun enable() {
-        if(enabled || ContextCompat.checkSelfPermission(context.appContext, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
-            return
+        if(!enabled && check(context.appContext, context.sharedPreferences) == CheckCodes.success) {
 
-        enabled = true
+            enabled = true
 
-        recorder = MediaRecorder()
-        recorder?.setAudioSource(MediaRecorder.AudioSource.MIC)
-        recorder?.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
-        recorder?.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
-        recorder?.setOutputFile("/dev/null")
-        try {
-            recorder?.prepare()
-        } catch (e: IOException){
-            recorder = null
-            enabled = false // TODO maybe can throw exception
-            Log.w(tag, "Detector can to be enabled.")
-            return
+            recorder = MediaRecorder()
+            recorder?.setAudioSource(MediaRecorder.AudioSource.MIC)
+            recorder?.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
+            recorder?.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
+            recorder?.setOutputFile("/dev/null")
+            try {
+                recorder?.prepare()
+            } catch (e: IOException) {
+                recorder = null
+                enabled = false // TODO maybe can throw exception
+                Log.w(tag, "Detector can to be enabled.")
+                return
+            }
+            recorder?.start()
+
+            initSoundChecker()
         }
-        recorder?.start()
-
-        initSoundChecker()
         Log.d(tag, "Detector is enabled.")
     }
 

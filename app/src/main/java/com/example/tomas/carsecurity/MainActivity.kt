@@ -6,11 +6,11 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import android.support.design.widget.NavigationView
-import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.MenuItem
@@ -29,12 +29,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             Log.d(tag, "BroadcastReceiver.onReceive was triggered.")
-            val utilName = intent.getStringExtra(getString(R.string.key_util_name))
-            val utilEnabled = intent.getBooleanExtra(getString(R.string.key_util_activated), false)
 
-            when (utilName) {
-                UtilsEnum.Alarm.name -> changeColor(actionAlarm, utilEnabled)
-                UtilsEnum.Tracker.name -> changeColor(actionTracker, utilEnabled)
+            if (intent.hasExtra(getString(R.string.key_show_message))) {
+
+                AlertDialog.Builder(this@MainActivity)
+                        .setMessage(intent.getStringExtra(getString(R.string.key_show_message)))
+                        .setTitle("Can not enable util") // TODO use strings from resources
+                        .create().show()
+
+            } else {
+                val utilName = intent.getStringExtra(getString(R.string.key_util_name))
+                val utilEnabled = intent.getBooleanExtra(getString(R.string.key_util_activated), false)
+
+                when (utilName) {
+                    UtilsEnum.Alarm.name -> changeColor(actionAlarm, utilEnabled)
+                    UtilsEnum.Tracker.name -> changeColor(actionTracker, utilEnabled)
+                }
             }
         }
     }
@@ -76,6 +86,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onPause() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
+
         super.onPause()
     }
 

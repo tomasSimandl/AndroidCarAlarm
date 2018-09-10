@@ -3,10 +3,14 @@ package com.example.tomas.carsecurity.utils
 import android.location.Location
 import com.example.tomas.carsecurity.storage.entity.Location as DbLocation
 import android.util.Log
+import com.example.tomas.carsecurity.CheckCodes
 import com.example.tomas.carsecurity.ObservableEnum
+import com.example.tomas.carsecurity.communication.SmsProvider
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.context.TrackerContext
 import com.example.tomas.carsecurity.sensors.LocationProvider
+import com.example.tomas.carsecurity.sensors.MoveDetector
+import com.example.tomas.carsecurity.sensors.SoundDetector
 import java.util.*
 
 class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelper) : GeneralUtil(utilsHelper) {
@@ -77,7 +81,7 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
     }
 
     override fun enable() {
-        if (!isEnabled){
+        if (!isEnabled && canRun()){
             isEnabled = true
             lastLocation = null
             utilsHelper.registerObserver(ObservableEnum.LocationProvider, this)
@@ -112,5 +116,27 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
 
     override fun isEnabled(): Boolean {
         return isEnabled
+    }
+
+    private fun canRun(): Boolean {
+
+        val locationCheck = LocationProvider.check(context.appContext , context.sharedPreferences)
+
+        val msg: String = when (locationCheck) {  // TODO use strings from resources
+            CheckCodes.hardwareNotSupported -> "Tracker needs to get device location for creating of log book but this device not support location access."
+            CheckCodes.permissionDenied -> "Tracker needs to get device location for creating of log book but application is not permitted to get device location."
+            CheckCodes.notAllowed -> "Tracker needs to get device location for creating of log book but sensor is disabled by user."
+            else -> {
+                    "" // TODO check for internet provider
+            }
+        }
+
+        return if (msg.isBlank()) {
+            true
+        } else {
+            setChanged()
+            notifyObservers(msg)
+            false
+        }
     }
 }

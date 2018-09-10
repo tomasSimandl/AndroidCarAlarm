@@ -1,9 +1,15 @@
 package com.example.tomas.carsecurity.communication
 
+import android.Manifest
+import android.content.Context
 import android.content.IntentFilter
+import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.location.Location
+import android.support.v4.content.ContextCompat
 import android.telephony.SmsManager
 import android.util.Log
+import com.example.tomas.carsecurity.CheckCodes
 import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.context.CommunicationContext
 import com.example.tomas.carsecurity.utils.UtilsEnum
@@ -17,8 +23,26 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
     private val smsBroadcastReceiver = SmsBroadcastReceiver(communicationContext)
 
     init {
-        val intentFilter = IntentFilter("android.provider.Telephony.SMS_RECEIVED")
-        communicationContext.context.registerReceiver(smsBroadcastReceiver, intentFilter)
+        if (check(communicationContext.context, communicationContext.sharedPreferences) == CheckCodes.success) {
+            val intentFilter = IntentFilter("android.provider.Telephony.SMS_RECEIVED")
+            communicationContext.context.registerReceiver(smsBroadcastReceiver, intentFilter)
+        }
+    }
+
+    companion object {
+        fun check(context: Context, sharedPreferences: SharedPreferences): Byte {
+            return if (!context.packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
+                CheckCodes.hardwareNotSupported
+            } else if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED
+                    || ContextCompat.checkSelfPermission(context, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED
+                    || ContextCompat.checkSelfPermission(context, Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED) {
+                CheckCodes.permissionDenied
+            } else if (!sharedPreferences.getBoolean(context.getString(R.string.key_communication_sms_is_allowed), context.resources.getBoolean(R.bool.default_communication_sms_is_allowed))) {
+                CheckCodes.notAllowed
+            } else {
+                CheckCodes.success
+            }
+        }
     }
 
     override fun destroy(){
@@ -27,6 +51,11 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
 
 
     override fun sendMessage(text: String): Boolean {
+        if (check(communicationContext.context, communicationContext.sharedPreferences) != CheckCodes.success){
+            Log.d(tag, "Can not send SMS. Permission not granted or unsupported hardware")
+            return false
+        }
+
         if(Strings.isEmptyOrWhitespace(communicationContext.phoneNumber) || Strings.isEmptyOrWhitespace(text)){
             Log.d(tag, "Empty phone number or text of message is empty")
             return false

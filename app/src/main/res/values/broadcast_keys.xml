@@ -3,6 +3,7 @@
 
     <string name="key_util_name">util.name</string>
     <string name="key_util_activated">util.activated</string>
+    <string name="key_show_message">show.message</string>
 
 
 </resources>

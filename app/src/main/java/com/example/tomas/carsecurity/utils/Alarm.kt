@@ -2,10 +2,14 @@ package com.example.tomas.carsecurity.utils
 
 import android.location.Location
 import android.util.Log
+import com.example.tomas.carsecurity.CheckCodes
 import com.example.tomas.carsecurity.GeneralObservable
+import com.example.tomas.carsecurity.communication.SmsProvider
 import com.example.tomas.carsecurity.context.AlarmContext
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.sensors.LocationProvider
+import com.example.tomas.carsecurity.sensors.MoveDetector
+import com.example.tomas.carsecurity.sensors.SoundDetector
 import java.util.*
 import com.example.tomas.carsecurity.ObservableEnum as OEnum
 
@@ -34,7 +38,6 @@ class Alarm(context: MyContext, private val utilsHelper: UtilsHelper) : GeneralU
             is GeneralObservable -> onSensorUpdate(observable)
         }
     }
-
 
     private fun onLocationUpdate(location: Location) {
         Log.d(tag, """Location update: $location""")
@@ -99,7 +102,7 @@ class Alarm(context: MyContext, private val utilsHelper: UtilsHelper) : GeneralU
     }
 
     override fun enable() {
-        if (!isEnabled) {
+        if (!isEnabled && canRun()) {
 
             isEnabled = true
             isAlarm = false
@@ -138,5 +141,34 @@ class Alarm(context: MyContext, private val utilsHelper: UtilsHelper) : GeneralU
 
     override fun isEnabled(): Boolean {
         return isEnabled
+    }
+
+    private fun canRun(): Boolean {
+
+        val smsCheck = SmsProvider.check(alarmContext.context, alarmContext.sharedPreferences)
+
+        val msg: String = when (smsCheck) {  // TODO use strings from resources
+            CheckCodes.hardwareNotSupported -> "Alarm needs to send SMS messages to warn car owner but their are not supported by this device."
+            CheckCodes.permissionDenied -> "Alarm needs to send SMS messages to warn car owner but application is not permitted to send SMS messages."
+            CheckCodes.notAllowed -> "Alarm needs to send SMS messages to warn car owner but their are disabled by user."
+            else -> {
+                val moveCheck = MoveDetector.check(alarmContext.context, alarmContext.sharedPreferences)
+                val soundCheck = SoundDetector.check(alarmContext.context, alarmContext.sharedPreferences)
+
+                if (moveCheck == CheckCodes.success || soundCheck == CheckCodes.success) {
+                    ""
+                } else {
+                    "Alarm needs at least one detection sensor. No sensor is available.\nMoves sensor:\n" + CheckCodes.toString(moveCheck) + "\nMicrophone:\n" + CheckCodes.toString(soundCheck)
+                }
+            }
+        }
+
+        return if (msg.isBlank()) {
+            true
+        } else {
+            setChanged()
+            notifyObservers(msg)
+            false
+        }
     }
 }

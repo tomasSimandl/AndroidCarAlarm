@@ -9,7 +9,7 @@ import com.example.tomas.carsecurity.communication.SmsProvider
  * Context contains data which are used in communication package and they are stored in
  * shared preferences or in resources.
  */
-class CommunicationContext(private val sharedPreferences: SharedPreferences, val context: Context) {
+class CommunicationContext(val sharedPreferences: SharedPreferences, val context: Context) {
 
     /** Contains default setting of sending of messages. Value is taken from resources. */
     private val defIsMsgAllowed :Boolean = context.resources.getBoolean(R.bool.default_communication_is_message_allowed)

@@ -33,14 +33,21 @@ class UtilsManager(private val context: MyContext, reload: Boolean): Observer, O
     }
 
     override fun update(observable: Observable, args: Any) {
-        if(observable is GeneralUtil && args is Boolean) {
+        if(observable is GeneralUtil) {
+            when (args) {
+                is Boolean -> {
+                    setChanged()
+                    notifyObservers(Pair(observable.thisUtilEnum, args))
 
-            setChanged()
-            notifyObservers(Pair(observable.thisUtilEnum, args))
-
-            if(!isAnyUtilEnabled()){
-                setChanged()
-                notifyObservers(MainService.Actions.ActionForegroundStop)
+                    if(!isAnyUtilEnabled()){
+                        setChanged()
+                        notifyObservers(MainService.Actions.ActionForegroundStop)
+                    }
+                }
+                is String -> {
+                    setChanged()
+                    notifyObservers(args)
+                }
             }
         }
     }

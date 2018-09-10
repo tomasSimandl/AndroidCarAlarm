@@ -46,6 +46,7 @@ class MainService : Service(), Observer {
                         }
                     }
                 is Actions -> processAction(Intent(args.name))
+                is String -> broadcastSender.showMessage(args)
             }
         }
     }
