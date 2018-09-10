@@ -4,16 +4,32 @@
 
     <!-- Permission for recording audio which is used for detecting high amplitude. -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
+
 
     <!-- Permission for getting accurate position of device -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-feature android:name="android.hardware.location" android:required="false" />
+
 
     <!-- Permission for sending and receiving SMS messages -->
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-feature android:name="android.hardware.telephony" android:required="false" />
+
+
+
+
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
+
+
+    <!--<uses-feature android:name="android.hardware.bluetooth" android:required="false" />-->
+    <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="false" />
+    <!--<uses-feature android:name="android.hardware.wifi" android:required="false" />-->
+
 
     <application
         android:allowBackup="true"
@@ -45,8 +61,6 @@
         <service
             android:name=".MainService"
             android:description="@string/service_description" />
-
-
 
     </application>
 
