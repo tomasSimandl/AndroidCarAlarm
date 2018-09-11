@@ -1,33 +1,42 @@
 package com.example.tomas.carsecurity
 
+import android.Manifest
 import android.annotation.TargetApi
+import android.content.Context
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceActivity
 import android.support.v14.preference.PreferenceFragment
 import android.view.MenuItem
+import com.example.tomas.carsecurity.communication.SmsProvider
 import com.example.tomas.carsecurity.preferenceFragments.MyPreferenceFragment
+import com.example.tomas.carsecurity.sensors.LocationProvider
+import com.example.tomas.carsecurity.sensors.MoveDetector
+import com.example.tomas.carsecurity.sensors.SoundDetector
+import com.example.tomas.carsecurity.utils.Alarm
+import com.example.tomas.carsecurity.utils.Tracker
 
 
 class SettingsActivity : AppCompatPreferenceActivity() {
 
+    private val sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+
+    /**
+     * Set up the action bar if action bar is used.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setupActionBar()
 
-//        val sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key),Context.MODE_PRIVATE)
+        actionBar?.setDisplayShowHomeEnabled(true)
+        actionBar?.setDisplayHomeAsUpEnabled(true)
 //        sharedPreferences.edit().clear().apply()
     }
 
     /**
-     * Set up the [android.app.ActionBar], if the API is available.
+     * Handle back arrow click in action bar
      */
-    private fun setupActionBar() {
-        actionBar?.setDisplayShowHomeEnabled(true)
-        actionBar?.setDisplayHomeAsUpEnabled(true)
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
@@ -38,19 +47,23 @@ class SettingsActivity : AppCompatPreferenceActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    /**
+     * Return if preferences should be displayed in multi panel view.
+     */
     override fun onIsMultiPane(): Boolean {
         return resources.configuration.screenLayout and Configuration.SCREENLAYOUT_SIZE_MASK >= Configuration.SCREENLAYOUT_SIZE_XLARGE
     }
 
-
+    /**
+     * Load preference headers.
+     */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     override fun onBuildHeaders(target: List<PreferenceActivity.Header>) {
         loadHeadersFromResource(R.xml.pref_headers, target)
     }
 
     /**
-     * This method stops fragment injection in malicious applications.
-     * Make sure to deny any unknown fragments here.
+     * Method check if input fragment name is valid fragment which is allowed in this activity.
      */
     override fun isValidFragment(fragmentName: String): Boolean {
         return PreferenceFragment::class.java.name == fragmentName
@@ -59,37 +72,82 @@ class SettingsActivity : AppCompatPreferenceActivity() {
                 || CommunicationPreferenceFragment::class.java.name == fragmentName
     }
 
+    /**
+     * Method handle result of permission request.
+     */
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>?, grantResults: IntArray?) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if ((grantResults!!.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+
+            if (requestCode == R.string.key_sensor_sound_is_allowed
+                    || requestCode == R.string.key_sensor_location_is_allowed
+                    || requestCode == R.string.key_communication_sms_is_allowed) {
+
+                sharedPreferences.edit().putBoolean(getString(requestCode), true).apply()
+            }
+        }
+    }
 
 
-
-
-
-
-
-
+    /**
+     * Class is used for preference screen for Tools/Utils
+     */
     class ToolsPreferenceFragment : MyPreferenceFragment() {
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             super.onCreatePreferences(savedInstanceState, rootKey)
 
             addPreferencesFromResource(R.xml.pref_tools)
+
+            registerPreferenceCheck(R.string.key_tool_alarm_is_allowed, Alarm)
+            registerPreferenceCheck(R.string.key_tool_tracker_is_allowed, Tracker)
         }
     }
 
-
+    /**
+     * Class is used for preference screen for Sensors
+     */
     class SensorsPreferenceFragment : MyPreferenceFragment() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             super.onCreatePreferences(savedInstanceState, rootKey)
 
             addPreferencesFromResource(R.xml.pref_sensors)
+
+            registerPreferenceCheck(
+                    R.string.key_sensor_sound_is_allowed,
+                    SoundDetector,
+                    "For using of sound sensor application need a permission. Next dialog will be asking for needed permission.",
+                    arrayOf(Manifest.permission.RECORD_AUDIO))
+
+            registerPreferenceCheck(
+                    R.string.key_sensor_move_is_allowed,
+                    MoveDetector,
+                    "",
+                    arrayOf()) // no permissions needed
+
+            registerPreferenceCheck(
+                    R.string.key_sensor_location_is_allowed,
+                    LocationProvider,
+                    "For getting device location application needs a permission. Next dialog will be asking for needed permission.",
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION))
         }
     }
 
+    /**
+     * Class is used for preference screen for Communication
+     */
     class CommunicationPreferenceFragment : MyPreferenceFragment() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             super.onCreatePreferences(savedInstanceState, rootKey)
 
             addPreferencesFromResource(R.xml.pref_communication)
+
+            registerPreferenceCheck(
+                    R.string.key_communication_sms_is_allowed,
+                    SmsProvider,
+                    "For sending and receiving sms messages application needs permission. Next dialog will be asking for needed permission.",
+                    arrayOf(Manifest.permission.SEND_SMS, Manifest.permission.READ_SMS, Manifest.permission.RECEIVE_SMS))
         }
     }
 }

@@ -12,6 +12,7 @@ import android.os.Handler
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import com.example.tomas.carsecurity.CheckCodes
+import com.example.tomas.carsecurity.CheckObjByte
 import com.example.tomas.carsecurity.GeneralObservable
 import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.context.MoveDetectorContext
@@ -56,8 +57,8 @@ class MoveDetector(private val context: MyContext) : GeneralObservable(), Sensor
         }
     }
 
-    companion object {
-        fun check(context: Context, sharedPreferences: SharedPreferences): Byte {
+    companion object Check: CheckObjByte {
+        override fun check(context: Context, sharedPreferences: SharedPreferences): Byte {
             return if (!context.packageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_ACCELEROMETER)) {
                 CheckCodes.hardwareNotSupported
             } else if (!sharedPreferences.getBoolean(context.getString(R.string.key_sensor_move_is_allowed), context.resources.getBoolean(R.bool.default_util_is_move_detector_available))) {

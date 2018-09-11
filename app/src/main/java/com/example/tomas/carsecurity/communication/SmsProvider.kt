@@ -10,6 +10,7 @@ import android.support.v4.content.ContextCompat
 import android.telephony.SmsManager
 import android.util.Log
 import com.example.tomas.carsecurity.CheckCodes
+import com.example.tomas.carsecurity.CheckObjByte
 import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.context.CommunicationContext
 import com.example.tomas.carsecurity.utils.UtilsEnum
@@ -29,8 +30,8 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
         }
     }
 
-    companion object {
-        fun check(context: Context, sharedPreferences: SharedPreferences): Byte {
+    companion object Check: CheckObjByte {
+        override fun check(context: Context, sharedPreferences: SharedPreferences): Byte {
             return if (!context.packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
                 CheckCodes.hardwareNotSupported
             } else if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED

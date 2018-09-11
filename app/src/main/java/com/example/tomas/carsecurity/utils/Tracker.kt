@@ -1,16 +1,16 @@
 package com.example.tomas.carsecurity.utils
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.location.Location
 import com.example.tomas.carsecurity.storage.entity.Location as DbLocation
 import android.util.Log
 import com.example.tomas.carsecurity.CheckCodes
 import com.example.tomas.carsecurity.ObservableEnum
-import com.example.tomas.carsecurity.communication.SmsProvider
+import com.example.tomas.carsecurity.CheckObjString
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.context.TrackerContext
 import com.example.tomas.carsecurity.sensors.LocationProvider
-import com.example.tomas.carsecurity.sensors.MoveDetector
-import com.example.tomas.carsecurity.sensors.SoundDetector
 import java.util.*
 
 class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelper) : GeneralUtil(utilsHelper) {
@@ -24,6 +24,21 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
     private lateinit var timer: Timer
 
     override val thisUtilEnum: UtilsEnum = UtilsEnum.Tracker
+
+    companion object Check : CheckObjString {
+        override fun check(context: Context, sharedPreferences: SharedPreferences): String {
+            val locationCheck = LocationProvider.check(context , sharedPreferences)
+
+            return when (locationCheck) {  // TODO use strings from resources
+                CheckCodes.hardwareNotSupported -> "Tracker needs to get device location for creating of log book but this device not support location access."
+                CheckCodes.permissionDenied -> "Tracker needs to get device location for creating of log book but application is not permitted to get device location."
+                CheckCodes.notAllowed -> "Tracker needs to get device location for creating of log book but sensor is disabled by user."
+                else -> {
+                    "" // TODO check for internet provider
+                }
+            }
+        }
+    }
 
     override fun action(observable: Observable, args: Any?) {
         if (!isEnabled) return
@@ -120,16 +135,7 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
 
     private fun canRun(): Boolean {
 
-        val locationCheck = LocationProvider.check(context.appContext , context.sharedPreferences)
-
-        val msg: String = when (locationCheck) {  // TODO use strings from resources
-            CheckCodes.hardwareNotSupported -> "Tracker needs to get device location for creating of log book but this device not support location access."
-            CheckCodes.permissionDenied -> "Tracker needs to get device location for creating of log book but application is not permitted to get device location."
-            CheckCodes.notAllowed -> "Tracker needs to get device location for creating of log book but sensor is disabled by user."
-            else -> {
-                    "" // TODO check for internet provider
-            }
-        }
+        val msg = check(context.appContext , context.sharedPreferences)
 
         return if (msg.isBlank()) {
             true

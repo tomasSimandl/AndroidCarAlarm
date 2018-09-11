@@ -1,8 +1,11 @@
 package com.example.tomas.carsecurity.utils
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.location.Location
 import android.util.Log
 import com.example.tomas.carsecurity.CheckCodes
+import com.example.tomas.carsecurity.CheckObjString
 import com.example.tomas.carsecurity.GeneralObservable
 import com.example.tomas.carsecurity.communication.SmsProvider
 import com.example.tomas.carsecurity.context.AlarmContext
@@ -28,6 +31,30 @@ class Alarm(context: MyContext, private val utilsHelper: UtilsHelper) : GeneralU
     private var timer: Timer? = null
 
     override val thisUtilEnum: UtilsEnum = UtilsEnum.Alarm
+
+
+    companion object Check: CheckObjString {
+        override fun check(context: Context, sharedPreferences: SharedPreferences): String {
+
+            val smsCheck = SmsProvider.check(context, sharedPreferences)
+
+            return when (smsCheck) {  // TODO use strings from resources
+                CheckCodes.hardwareNotSupported -> "Alarm needs to send SMS messages to warn car owner but their are not supported by this device."
+                CheckCodes.permissionDenied -> "Alarm needs to send SMS messages to warn car owner but application is not permitted to send SMS messages."
+                CheckCodes.notAllowed -> "Alarm needs to send SMS messages to warn car owner but their are disabled by user."
+                else -> {
+                    val moveCheck = MoveDetector.check(context, sharedPreferences)
+                    val soundCheck = SoundDetector.check(context, sharedPreferences)
+
+                    if (moveCheck == CheckCodes.success || soundCheck == CheckCodes.success) {
+                        ""
+                    } else {
+                        "Alarm needs at least one detection sensor. No sensor is available.\nMoves sensor:\n" + CheckCodes.toString(moveCheck) + "\nMicrophone:\n" + CheckCodes.toString(soundCheck)
+                    }
+                }
+            }
+        }
+    }
 
 
     override fun action(observable: Observable, args: Any?) {
@@ -144,24 +171,7 @@ class Alarm(context: MyContext, private val utilsHelper: UtilsHelper) : GeneralU
     }
 
     private fun canRun(): Boolean {
-
-        val smsCheck = SmsProvider.check(alarmContext.context, alarmContext.sharedPreferences)
-
-        val msg: String = when (smsCheck) {  // TODO use strings from resources
-            CheckCodes.hardwareNotSupported -> "Alarm needs to send SMS messages to warn car owner but their are not supported by this device."
-            CheckCodes.permissionDenied -> "Alarm needs to send SMS messages to warn car owner but application is not permitted to send SMS messages."
-            CheckCodes.notAllowed -> "Alarm needs to send SMS messages to warn car owner but their are disabled by user."
-            else -> {
-                val moveCheck = MoveDetector.check(alarmContext.context, alarmContext.sharedPreferences)
-                val soundCheck = SoundDetector.check(alarmContext.context, alarmContext.sharedPreferences)
-
-                if (moveCheck == CheckCodes.success || soundCheck == CheckCodes.success) {
-                    ""
-                } else {
-                    "Alarm needs at least one detection sensor. No sensor is available.\nMoves sensor:\n" + CheckCodes.toString(moveCheck) + "\nMicrophone:\n" + CheckCodes.toString(soundCheck)
-                }
-            }
-        }
+        val msg = check(alarmContext.context, alarmContext.sharedPreferences)
 
         return if (msg.isBlank()) {
             true

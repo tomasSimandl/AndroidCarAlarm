@@ -142,4 +142,19 @@
     <string name="nav_image_description">Car security application icon</string>
 
     <string name="menu_settings_title">Settings</string>
+
+
+
+
+
+
+
+
+
+
+    <!-- Permission messages to user -->
+    <string name="msg_hw_not_supported">This util need %s which is not supported by this device.</string>
+    <string name="msg_not_permitted">Using of %s is not permitted by user.</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
 </resources>

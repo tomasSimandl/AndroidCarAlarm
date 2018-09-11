@@ -8,6 +8,7 @@ import android.media.MediaRecorder
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import com.example.tomas.carsecurity.CheckCodes
+import com.example.tomas.carsecurity.CheckObjByte
 import com.example.tomas.carsecurity.GeneralObservable
 import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.context.MyContext
@@ -34,8 +35,8 @@ class SoundDetector(private val context : MyContext) : GeneralObservable() {
 
     private lateinit var timer: Timer
 
-    companion object {
-        fun check(context: Context, sharedPreferences: SharedPreferences): Byte {
+    companion object Check: CheckObjByte {
+        override fun check(context: Context, sharedPreferences: SharedPreferences): Byte {
             return if (!context.packageManager.hasSystemFeature(PackageManager.FEATURE_MICROPHONE)) {
                 CheckCodes.hardwareNotSupported
             } else if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
