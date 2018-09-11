@@ -21,8 +21,6 @@ import com.example.tomas.carsecurity.utils.Tracker
 
 class SettingsActivity : AppCompatPreferenceActivity() {
 
-    private val sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-
     /**
      * Set up the action bar if action bar is used.
      */
@@ -84,6 +82,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
                     || requestCode == R.string.key_sensor_location_is_allowed
                     || requestCode == R.string.key_communication_sms_is_allowed) {
 
+                val sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
                 sharedPreferences.edit().putBoolean(getString(requestCode), true).apply()
             }
         }
