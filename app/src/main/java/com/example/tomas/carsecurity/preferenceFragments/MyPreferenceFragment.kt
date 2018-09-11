@@ -51,6 +51,34 @@ open class MyPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
         preferenceScreen.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
     }
 
+    /**
+     * Method check if preference given by [prefKey] can be set to true by calling method check of
+     * second parameter. If preference can be true value is taken from shared preferences or is
+     * used default value given by [defValue]. Otherwise is preference set to false.
+     *
+     * @param prefKey preference key. Must be [SwitchPreference]
+     * @param defValue default value which is used only when preference is not set but preference can be true
+     * @param checkObj for correct usage must be [CheckObjByte] or [CheckObjString]
+     */
+    protected fun setValueToPreference(prefKey: Int, defValue: Boolean, checkObj: Any) {
+        val preference = findPreference(getString(prefKey))
+
+        if (preference is SwitchPreference) {
+
+            val canBeTrue = when (checkObj) {
+                is CheckObjString -> checkObj.check(activity, preferenceManager.sharedPreferences).isEmpty()
+                is CheckObjByte -> checkObj.check(activity, preferenceScreen.sharedPreferences) == CheckCodes.success
+                else -> false
+            }
+
+            preference.isChecked = if (canBeTrue) {
+                preferenceScreen.sharedPreferences.getBoolean(getString(prefKey), defValue)
+            } else {
+                false
+            }
+        }
+    }
+
 
     /**
      * Method find preference by given [prefKey] and register
@@ -58,7 +86,7 @@ open class MyPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
      * of preference is true, check method of [checkObj] is called and according to result is shown
      * message or value is changed to true.
      *
-     * @param prefKey preference key
+     * @param prefKey preference key. Must be [SwitchPreference]
      * @param checkObj Class which is associated with preference key
      */
     protected fun registerPreferenceCheck(prefKey: Int, checkObj: CheckObjString){
@@ -82,7 +110,7 @@ open class MyPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
      * of preference is true, check method of [checkObj] is called and according to result is shown
      * message, permission request or value is changed to true.
      *
-     * @param prefKey preference key
+     * @param prefKey preference key. Must be [SwitchPreference]
      * @param checkObj Class which is associated with preference key
      * @param permMsg message which is describing why permission is needed
      * @param permissions array of requested permissions

@@ -8,7 +8,9 @@ import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceActivity
+import android.preference.PreferenceScreen
 import android.support.v14.preference.PreferenceFragment
+import android.support.v14.preference.SwitchPreference
 import android.view.MenuItem
 import com.example.tomas.carsecurity.communication.SmsProvider
 import com.example.tomas.carsecurity.preferenceFragments.MyPreferenceFragment
@@ -99,8 +101,19 @@ class SettingsActivity : AppCompatPreferenceActivity() {
 
             addPreferencesFromResource(R.xml.pref_tools)
 
+            // ALARM - preference check listener + set value
             registerPreferenceCheck(R.string.key_tool_alarm_is_allowed, Alarm)
+            setValueToPreference(
+                    R.string.key_tool_alarm_is_allowed,
+                    resources.getBoolean(R.bool.default_alarm_is_allowed),
+                    Alarm)
+
+            // TRACKER - preference check listener + set value
             registerPreferenceCheck(R.string.key_tool_tracker_is_allowed, Tracker)
+            setValueToPreference(
+                    R.string.key_tool_tracker_is_allowed,
+                    resources.getBoolean(R.bool.default_tracker_is_allowed),
+                    Tracker)
         }
     }
 
@@ -113,23 +126,38 @@ class SettingsActivity : AppCompatPreferenceActivity() {
 
             addPreferencesFromResource(R.xml.pref_sensors)
 
+            // SOUND - preference check listener + set value
             registerPreferenceCheck(
                     R.string.key_sensor_sound_is_allowed,
                     SoundDetector,
                     "For using of sound sensor application need a permission. Next dialog will be asking for needed permission.",
                     arrayOf(Manifest.permission.RECORD_AUDIO))
+            setValueToPreference(
+                    R.string.key_sensor_sound_is_allowed,
+                    resources.getBoolean(R.bool.default_util_is_sound_detector_available),
+                    SoundDetector)
 
+            // MOVE - preference check listener + set value
             registerPreferenceCheck(
                     R.string.key_sensor_move_is_allowed,
                     MoveDetector,
                     "",
                     arrayOf()) // no permissions needed
+            setValueToPreference(
+                    R.string.key_sensor_move_is_allowed,
+                    resources.getBoolean(R.bool.default_util_is_move_detector_available),
+                    MoveDetector)
 
+            // LOCATION - preference check listener + set value
             registerPreferenceCheck(
                     R.string.key_sensor_location_is_allowed,
                     LocationProvider,
                     "For getting device location application needs a permission. Next dialog will be asking for needed permission.",
                     arrayOf(Manifest.permission.ACCESS_FINE_LOCATION))
+            setValueToPreference(
+                    R.string.key_sensor_location_is_allowed,
+                    resources.getBoolean(R.bool.default_util_is_location_provider_available),
+                    LocationProvider)
         }
     }
 
@@ -142,11 +170,16 @@ class SettingsActivity : AppCompatPreferenceActivity() {
 
             addPreferencesFromResource(R.xml.pref_communication)
 
+            // SMS - preference check listener + set value
             registerPreferenceCheck(
                     R.string.key_communication_sms_is_allowed,
                     SmsProvider,
                     "For sending and receiving sms messages application needs permission. Next dialog will be asking for needed permission.",
                     arrayOf(Manifest.permission.SEND_SMS, Manifest.permission.READ_SMS, Manifest.permission.RECEIVE_SMS))
+            setValueToPreference(
+                    R.string.key_communication_sms_is_allowed,
+                    resources.getBoolean(R.bool.default_communication_sms_is_allowed),
+                    SmsProvider)
         }
     }
 }
