@@ -12,10 +12,10 @@ class BroadcastSender(private val context: Context) {
 
     fun informUI(utilEnum: UtilsEnum, enabled: Boolean) {
         Log.d(tag, """Sending information about util to UI. Util: ${utilEnum.name} is ${if(enabled) "enabled" else "disabled"}.""")
-        val intent = Intent(context.getString(R.string.utils_ui_update))
+        val intent = Intent(MainActivity.BroadcastKeys.BroadcastUpdateUI.name)
 
-        intent.putExtra(context.getString(R.string.key_util_name), utilEnum.name)
-        intent.putExtra(context.getString(R.string.key_util_activated), enabled)
+        intent.putExtra(MainActivity.BroadcastKeys.KeyUtilName.name, utilEnum.name)
+        intent.putExtra(MainActivity.BroadcastKeys.KeyUtilActivated.name, enabled)
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
     }
 
@@ -26,9 +26,9 @@ class BroadcastSender(private val context: Context) {
     }
 
     fun showMessage(msg: String) {
-        val intent = Intent(context.getString(R.string.utils_ui_update))
+        val intent = Intent(MainActivity.BroadcastKeys.BroadcastUpdateUI.name)
 
-        intent.putExtra(context.getString(R.string.key_show_message), msg)
+        intent.putExtra(MainActivity.BroadcastKeys.KeyShowMessage.name, msg)
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
     }
 

@@ -21,6 +21,10 @@ import kotlinx.android.synthetic.main.content_main.*
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, SharedPreferences.OnSharedPreferenceChangeListener  {
 
+    enum class BroadcastKeys{
+        BroadcastUpdateUI, KeyShowMessage, KeyUtilName, KeyUtilActivated
+    }
+
     private val tag = "MainActivity"
 
     private lateinit var utilsContext: UtilsContext
@@ -29,16 +33,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         override fun onReceive(context: Context, intent: Intent) {
             Log.d(tag, "BroadcastReceiver.onReceive was triggered.")
 
-            if (intent.hasExtra(getString(R.string.key_show_message))) {
+            if (intent.hasExtra(BroadcastKeys.KeyShowMessage.name)) {
 
                 AlertDialog.Builder(this@MainActivity)
-                        .setMessage(intent.getStringExtra(getString(R.string.key_show_message)))
+                        .setMessage(intent.getStringExtra(BroadcastKeys.KeyShowMessage.name))
                         .setTitle("Can not enable util") // TODO use strings from resources
                         .create().show()
 
             } else {
-                val utilName = intent.getStringExtra(getString(R.string.key_util_name))
-                val utilEnabled = intent.getBooleanExtra(getString(R.string.key_util_activated), false)
+                val utilName = intent.getStringExtra(BroadcastKeys.KeyUtilName.name)
+                val utilEnabled = intent.getBooleanExtra(BroadcastKeys.KeyUtilActivated.name, false)
 
                 when (utilName) {
                     UtilsEnum.Alarm.name -> changeColor(actionAlarm, utilEnabled)
@@ -79,7 +83,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onResume()
 
         val broadcastManager = LocalBroadcastManager.getInstance(this)
-        broadcastManager.registerReceiver(receiver, IntentFilter(getString(R.string.utils_ui_update)))
+        broadcastManager.registerReceiver(receiver, IntentFilter(BroadcastKeys.BroadcastUpdateUI.name))
 
         sendIntent(MainService.Actions.ActionStatusUI.name)
 
