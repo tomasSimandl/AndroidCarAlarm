@@ -1,9 +1,0 @@
-<resources>
-    <string name="utils_ui_update">broadcast.UPDATE_UI</string>
-
-    <string name="key_util_name">util.name</string>
-    <string name="key_util_activated">util.activated</string>
-    <string name="key_show_message">show.message</string>
-
-
-</resources>

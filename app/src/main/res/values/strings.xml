@@ -1,35 +1,23 @@
 <resources>
-    <string name="app_name">Car Security</string>
+
 
     <string name="notification_description">Application is running in background</string>
-
-    <string name="preference_file_key">SharedPreference</string>
-
-    <string name="foreground_channel_name">ForegroundServiceChannel</string>
-
     <string name="foreground_channel_description">Notification channel of foreground service</string>
-
-    <string name="chanel_id">foregroundChannelId</string>
-
     <string name="service_description">Service contains all logic of application.</string>
 
+
+    <!-- =========================== STRINGS RELATED TO MAIN ACTIVITY =========================== -->
     <string name="alarm_button_text">Alarm</string>
-
     <string name="tracker_button_text">Tracker</string>
+
+
+    <!-- ============================= STRINGS RELATED TO SETTINGS ============================= -->
     <string name="title_activity_settings">Settings</string>
-
-
-
-
-
-
-    <!-- Strings related to Settings -->
-
     <string name="pref_header_sensors">Sensors</string>
     <string name="pref_header_tools">Tools</string>
     <string name="pref_header_communication">Communication</string>
 
-    <!-- Tools Alarm settings -->
+    <!-- ================================ Tools Alarm settings ================================= -->
     <string name="pref_tools_alarm_group_name">Alarm</string>
 
     <string name="pref_tools_alarm_switch_title">Allow Alarm</string>
@@ -44,8 +32,7 @@
     <string name="pref_tools_alarm_send_location_interval_title">Sms location interval</string>
     <string name="pref_tools_alarm_send_location_interval_description">How often will be send sms with car location when alarm is triggered. Used only when send sms on alarm is enabled.</string>
 
-
-    <!-- Tools Tracker settings -->
+    <!-- =============================== Tools Tracker settings ================================ -->
     <string name="pref_tools_tracker_group_name">Tracker</string>
 
     <string name="pref_tools_tracker_switch_title">Allow Tracker</string>
@@ -57,7 +44,7 @@
     <string name="pref_tools_tracker_ignore_distance_title">Not moving distance</string>
     <string name="pref_tools_tracker_ignore_distance_description">Minimal distance between last and actual position which is accepted (elimination of error when car is not moving).</string>
 
-    <!-- Sensors Move settings -->
+    <!-- ================================ Sensors Move settings ================================ -->
     <string name="pref_sensors_move_group_name">Move sensor</string>
 
     <string name="pref_sensors_move_switch_title">Allow Move sensor</string>
@@ -66,7 +53,7 @@
     <string name="pref_sensors_move_sensitivity_title">Sensor sensitivity</string>
     <string name="pref_sensors_move_sensitivity_description">Low value means high sensitivity.</string>
 
-    <!-- Sensors Sound settings -->
+    <!-- ================================ Sensors Sound settings =============================== -->
     <string name="pref_sensors_sound_group_name">Sound sensor</string>
 
     <string name="pref_sensors_sound_switch_title">Allow Sound sensor</string>
@@ -78,12 +65,12 @@
     <string name="pref_sensors_sound_interval_title">Measure interval</string>
     <string name="pref_sensors_sound_interval_description">Interval how often are check sensor data (High interval save battery).</string>
 
-    <!-- Sensors Location settings -->
+    <!-- ============================== Sensors Location settings ============================== -->
     <string name="pref_sensors_location_group_name">Location sensor</string>
 
     <string name="pref_sensors_location_switch_title">Allow Location sensor</string>
     <string name="pref_sensors_location_switch_description"> </string>
-    
+
     <string name="pref_sensors_location_update_interval_title">Location update interval</string>
     <string name="pref_sensors_location_update_interval_description">How often is stored actual location (Long interval save battery).</string>
 
@@ -93,14 +80,8 @@
         <item>Balanced power accuracy (±100m)</item>
         <item>Low power (±10km)</item>
     </string-array>
-    <string-array name="pref_sensors_location_accuracy_list_values">
-        <item>100</item>
-        <item>102</item>
-        <item>104</item>
-    </string-array>
 
-
-    <!-- Communication sms settings -->
+    <!-- ============================== Communication sms settings ============================= -->
     <string name="pref_communication_sms_group_name">SMS</string>
 
     <string name="pref_communication_sms_switch_title">Allow sms communication</string>
@@ -123,23 +104,9 @@
         <item>command send location</item>
     </string-array>
 
-    <string-array name="pref_communication_sms_messages_values">
-        <item>Alarm_UtilSwitch_send</item>
-        <item>Tracker_UtilSwitch_send</item>
-        <item>Alarm_send</item>
-        <item>AlarmLocation_send</item>
-        <item>BatteryWarn_send</item>
-
-        <item>UtilSwitch_recv</item>
-        <item>Status_recv</item>
-        <item>Location_recv</item>
-    </string-array>
 
 
-
-
-
-
+    <!-- ============================ STRINGS RELATED TO SIDE PANEL ============================ -->
     <string name="navigation_panel_open">Open navigation panel</string>
     <string name="navigation_panel_close">Close navigation panel</string>
     <string name="nav_image_description">Car security application icon</string>
@@ -147,18 +114,22 @@
     <string name="menu_settings_title">Settings</string>
 
 
+    <!-- =============================== STRINGS OF SMS MESSAGES =============================== -->
+    <string name="sms_util_enabled">%s is enabled</string>
+    <string name="sms_util_disabled">%s is disabled</string>
+    <string name="sms_alarm">Alarm was triggered at: %s.</string>
+    <string name="sms_location">Actual car location is lat: %1$s, long: %2$s https://www.google.com/maps/search/\?api=1&amp;query=%1$s,%2$s</string>
+    <string name="sms_battery_warn">Battery capacity is low: %d %%</string>
+    <string name="sms_info_battery">Battery capacity is %d %%</string>
+    <string name="sms_info_power_save_mode_on">Power save mode: ON </string>
+    <string name="sms_info_power_save_mode_off">Power save mode: OFF </string>
 
 
-
-
-
-
-
-
-    <!-- Permission messages to user -->
-    <string name="msg_hw_not_supported">This util need %s which is not supported by this device.</string>
-    <string name="msg_not_permitted">Using of %s is not permitted by user.</string>
+    <!-- ==================== STRINGS OF INFORMATIVE DIALOGS IN APPLICATION ==================== -->
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
-    <string name="empty" />
+
+    <string name="msg_hw_not_supported">This util need %s which is not supported by this device.</string>
+    <string name="msg_not_permitted">Using of %s is not permitted by user.</string>
+
 </resources>

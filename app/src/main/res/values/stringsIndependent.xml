@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ======================================================================================= -->
+    <!-- ====== This resources are the same across all localizations please do not change ====== -->
+    <!-- ======================================================================================= -->
+
+    <string name="app_name">Car Security</string>
+    <string name="preference_file_key">SharedPreference</string>
+    <string name="foreground_channel_name">ForegroundServiceChannel</string>
+    <string name="chanel_id">foregroundChannelId</string>
+    <string name="empty" />
+
+    <!-- Values of location accuracy list which is in sensor preference screen -->
+    <string-array name="pref_sensors_location_accuracy_list_values">
+        <item>100</item>
+        <item>102</item>
+        <item>104</item>
+    </string-array>
+
+    <!-- Values of messages types which is used in communication preference screen -->
+    <string-array name="pref_communication_sms_messages_values">
+        <item>Alarm_UtilSwitch_send</item>
+        <item>Tracker_UtilSwitch_send</item>
+        <item>Alarm_send</item>
+        <item>AlarmLocation_send</item>
+        <item>BatteryWarn_send</item>
+
+        <item>UtilSwitch_recv</item>
+        <item>Status_recv</item>
+        <item>Location_recv</item>
+    </string-array>
+
+</resources>
