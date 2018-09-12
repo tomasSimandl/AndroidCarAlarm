@@ -2,68 +2,57 @@
 <resources>
     <!-- CAN BE CHANGED WITH USER SETTING WHICH IS STORED IN SHARED PREFERENCES -->
 
-    <!-- Maximal value of amplitude which not invoke alarm -->
-    <integer name="default_max_ok_amplitude">15000</integer>
-
+    <!--======================================== Sensors ========================================-->
+    <!-- Indicates if sound detector can be used. -->
+    <bool name="default_sensor_sound_is_allowed">true</bool>
     <!-- How often is control last measured amplitude in SoundDetector (in seconds) -->
-    <integer name="default_sound_detector_interval">1</integer>
-
-    <!-- Maximal euclidean distance between two last measurement which not trigger alarm -->
-    <integer name="default_move_sensor_sensitivity">20</integer>
-
-    <!-- Interval in which application receive location updates. -->
-    <integer name="default_location_update_interval">3</integer>
-
-    <!-- Fastest interval in which application receive location updates. -->
-    <integer name="default_max_location_update_interval">1000</integer>
-
-    <!-- Priority constant of LocationProvider. Determines location sensor accuracy. -->
-    <string name="default_location_accuracy_priority">100</string> <!-- INTEGER --> <!--LocationProvider.PRIORITY_HIGH_ACCURACY-->
-
-    <!-- Interval before alarm will be triggered after detection. -->
-    <integer name="default_alarm_alert_interval">15</integer>
-
-    <!-- Interval before alarm will be activated after alarm activation. -->
-    <integer name="default_alarm_start_interval">30</integer>
-
-    <!-- Indicates if is alarm system allowed by user to use. -->
-    <bool name="default_alarm_is_allowed">true</bool>
-
-    <!-- Interval how often location will be send when alarm is triggered -->
-    <integer name="default_alarm_send_location_interval">60</integer>
-
-    <!-- Indicates if location provider can be used. -->
-    <bool name="default_util_is_location_provider_available">true</bool>
+    <integer name="default_sensor_sound_interval">1</integer>
+    <!-- Maximal value of amplitude which not invoke alarm -->
+    <integer name="default_sensor_sound_max_ok_amplitude">15000</integer>
 
     <!-- Indicates if move detector can be used. -->
-    <bool name="default_util_is_move_detector_available">true</bool>
+    <bool name="default_sensor_move_is_allowed">true</bool>
+    <!-- Maximal euclidean distance between two last measurement which not trigger alarm -->
+    <integer name="default_sensor_move_sensitivity">20</integer>
 
-    <!-- Indicates if sound detector can be used. -->
-    <bool name="default_util_is_sound_detector_available">true</bool>
+    <!-- Indicates if location provider can be used. -->
+    <bool name="default_sensor_location_is_allowed">true</bool>
+    <!-- Interval in which application receive location updates. -->
+    <integer name="default_sensor_location_update_interval">3</integer>
+    <!-- Fastest interval in which application receive location updates. -->
+    <integer name="default_sensor_location_max_update_interval">1000</integer>
+    <!-- Priority constant of LocationProvider. Determines location sensor accuracy. -->
+    <string name="default_sensor_location_accuracy_priority">100</string> <!-- INTEGER --> <!--LocationProvider.PRIORITY_HIGH_ACCURACY-->
 
 
-    <!-- Indicates if messages can be send by default if there is no value in shared preferences. -->
-    <bool name="default_communication_is_message_allowed">true</bool>
-
-    <!-- Indicates if sms communication provider is allowed. -->
-    <bool name="default_communication_sms_is_allowed">true</bool>
-
-    <!-- Minimal acceptable distance between last and new location in Tracker. -->
-    <integer name="default_tracker_ignore_distance">10</integer>
-
-    <!-- Milliseconds after Tracker will be disabled when location is not changing. -->
-    <integer name="default_tracker_timeout">6</integer>
+    <!--========================================= Tools =========================================-->
+    <!-- Indicates if is alarm system allowed by user to use. -->
+    <bool name="default_tool_alarm_is_allowed">true</bool>
+    <!-- Interval before alarm will be triggered after detection. -->
+    <integer name="default_tool_alarm_alert_interval">15</integer>
+    <!-- Interval before alarm will be activated after alarm activation. -->
+    <integer name="default_tool_alarm_start_interval">30</integer>
+    <!-- Interval how often location will be send when alarm is triggered -->
+    <integer name="default_tool_alarm_send_location_interval">60</integer>
 
     <!-- Indicates if is tracker system allowed by user to use/ -->
-    <bool name="default_tracker_is_allowed">true</bool>
+    <bool name="default_tool_tracker_is_allowed">true</bool>
+    <!-- Minimal acceptable distance between last and new location in Tracker. -->
+    <integer name="default_tool_tracker_ignore_distance">10</integer>
+    <!-- Milliseconds after Tracker will be disabled when location is not changing. -->
+    <integer name="default_tool_tracker_timeout">6</integer>
 
 
+    <!--===================================== Communication =====================================-->
+    <!-- Indicates if sms communication provider is allowed. -->
+    <bool name="default_communication_sms_is_allowed">true</bool>
+    <!-- Indicates if messages can be send by default if there is no value in shared preferences. -->
+    <bool name="default_communication_is_message_allowed">true</bool>
 
 
     <!-- CAN NOT CHANGE WITH VALUE FROM SHARED PREFERENCES -->
 
     <!-- Dimensions of measured data from accelerometer -->
-    <integer name="default_move_sensor_dimensions">3</integer>
-
+    <integer name="default_sensor_move_dimensions">3</integer>
 
 </resources>

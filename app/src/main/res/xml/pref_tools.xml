@@ -4,7 +4,7 @@
     <PreferenceCategory android:key="alarm_category" android:title="@string/pref_tools_alarm_group_name">
 
         <SwitchPreference
-            android:defaultValue="@bool/default_alarm_is_allowed"
+            android:defaultValue="@bool/default_tool_alarm_is_allowed"
             android:key="@string/key_tool_alarm_is_allowed"
             android:title="@string/pref_tools_alarm_switch_title"
             android:contentDescription="@string/pref_tools_alarm_switch_description"/>
@@ -14,7 +14,7 @@
             android:title="@string/pref_tools_alarm_start_interval_title"
             android:summary="@string/pref_tools_alarm_start_interval_description"
             android:dependency="@string/key_tool_alarm_is_allowed"
-            android:defaultValue="@integer/default_alarm_start_interval"
+            android:defaultValue="@integer/default_tool_alarm_start_interval"
 
             sample:msbp_minValue="0"
             sample:msbp_maxValue="120"
@@ -27,7 +27,7 @@
             android:title="@string/pref_tools_alarm_alert_interval_title"
             android:summary="@string/pref_tools_alarm_alert_interval_description"
             android:dependency="@string/key_tool_alarm_is_allowed"
-            android:defaultValue="@integer/default_alarm_alert_interval"
+            android:defaultValue="@integer/default_tool_alarm_alert_interval"
 
             sample:msbp_minValue="0"
             sample:msbp_maxValue="60"
@@ -40,7 +40,7 @@
             android:title="@string/pref_tools_alarm_send_location_interval_title"
             android:summary="@string/pref_tools_alarm_send_location_interval_description"
             android:dependency="@string/key_tool_alarm_is_allowed"
-            android:defaultValue="@integer/default_alarm_send_location_interval"
+            android:defaultValue="@integer/default_tool_alarm_send_location_interval"
 
             sample:msbp_minValue="60"
             sample:msbp_maxValue="600"
@@ -54,7 +54,7 @@
     <PreferenceCategory android:key="tracker_category" android:title="@string/pref_tools_tracker_group_name">
 
         <SwitchPreference
-            android:defaultValue="@bool/default_tracker_is_allowed"
+            android:defaultValue="@bool/default_tool_tracker_is_allowed"
             android:key="@string/key_tool_tracker_is_allowed"
             android:title="@string/pref_tools_tracker_switch_title"
             android:contentDescription="@string/pref_tools_tracker_switch_description"/>
@@ -64,7 +64,7 @@
             android:title="@string/pref_tools_tracker_ignore_distance_title"
             android:summary="@string/pref_tools_tracker_ignore_distance_description"
             android:dependency="@string/key_tool_tracker_is_allowed"
-            android:defaultValue="@integer/default_tracker_ignore_distance"
+            android:defaultValue="@integer/default_tool_tracker_ignore_distance"
 
             sample:msbp_minValue="0"
             sample:msbp_maxValue="20"
@@ -77,7 +77,7 @@
             android:title="@string/pref_tools_tracker_timeout_title"
             android:summary="@string/pref_tools_tracker_timeout_description"
             android:dependency="@string/key_tool_tracker_is_allowed"
-            android:defaultValue="@integer/default_tracker_timeout"
+            android:defaultValue="@integer/default_tool_tracker_timeout"
 
             sample:msbp_minValue="5"
             sample:msbp_maxValue="300"

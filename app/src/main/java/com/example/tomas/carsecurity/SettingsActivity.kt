@@ -104,14 +104,14 @@ class SettingsActivity : AppCompatPreferenceActivity() {
             registerPreferenceCheck(R.string.key_tool_alarm_is_allowed, Alarm)
             setValueToPreference(
                     R.string.key_tool_alarm_is_allowed,
-                    resources.getBoolean(R.bool.default_alarm_is_allowed),
+                    resources.getBoolean(R.bool.default_tool_alarm_is_allowed),
                     Alarm)
 
             // TRACKER - preference check listener + set value
             registerPreferenceCheck(R.string.key_tool_tracker_is_allowed, Tracker)
             setValueToPreference(
                     R.string.key_tool_tracker_is_allowed,
-                    resources.getBoolean(R.bool.default_tracker_is_allowed),
+                    resources.getBoolean(R.bool.default_tool_tracker_is_allowed),
                     Tracker)
         }
     }
@@ -133,7 +133,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
                     arrayOf(Manifest.permission.RECORD_AUDIO))
             setValueToPreference(
                     R.string.key_sensor_sound_is_allowed,
-                    resources.getBoolean(R.bool.default_util_is_sound_detector_available),
+                    resources.getBoolean(R.bool.default_sensor_sound_is_allowed),
                     SoundDetector)
 
             // MOVE - preference check listener + set value
@@ -144,7 +144,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
                     arrayOf()) // no permissions needed
             setValueToPreference(
                     R.string.key_sensor_move_is_allowed,
-                    resources.getBoolean(R.bool.default_util_is_move_detector_available),
+                    resources.getBoolean(R.bool.default_sensor_move_is_allowed),
                     MoveDetector)
 
             // LOCATION - preference check listener + set value
@@ -155,7 +155,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
                     arrayOf(Manifest.permission.ACCESS_FINE_LOCATION))
             setValueToPreference(
                     R.string.key_sensor_location_is_allowed,
-                    resources.getBoolean(R.bool.default_util_is_location_provider_available),
+                    resources.getBoolean(R.bool.default_sensor_location_is_allowed),
                     LocationProvider)
         }
     }

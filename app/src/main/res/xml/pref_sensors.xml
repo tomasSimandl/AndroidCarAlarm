@@ -4,7 +4,7 @@
     <!-- MOVE SENSOR -->
     <PreferenceCategory android:key="move_category" android:title="@string/pref_sensors_move_group_name">
         <SwitchPreference
-            android:defaultValue="@bool/default_util_is_move_detector_available"
+            android:defaultValue="@bool/default_sensor_move_is_allowed"
             android:key="@string/key_sensor_move_is_allowed"
             android:title="@string/pref_sensors_move_switch_title"
             android:contentDescription="@string/pref_sensors_move_switch_description"/>
@@ -14,7 +14,7 @@
             android:title="@string/pref_sensors_move_sensitivity_title"
             android:summary="@string/pref_sensors_move_sensitivity_description"
             android:dependency="@string/key_sensor_move_is_allowed"
-            android:defaultValue="@integer/default_move_sensor_sensitivity"
+            android:defaultValue="@integer/default_sensor_move_sensitivity"
 
             sample:msbp_minValue="1"
             sample:msbp_maxValue="500"
@@ -26,7 +26,7 @@
     <!-- SOUND SENSOR -->
     <PreferenceCategory android:key="sound_category" android:title="@string/pref_sensors_sound_group_name">
         <SwitchPreference
-            android:defaultValue="@bool/default_util_is_sound_detector_available"
+            android:defaultValue="@bool/default_sensor_sound_is_allowed"
             android:key="@string/key_sensor_sound_is_allowed"
             android:title="@string/pref_sensors_sound_switch_title"
             android:contentDescription="@string/pref_sensors_sound_switch_description"/>
@@ -36,7 +36,7 @@
             android:title="@string/pref_sensors_sound_max_amplitude_title"
             android:summary="@string/pref_sensors_sound_max_amplitude_description"
             android:dependency="@string/key_sensor_sound_is_allowed"
-            android:defaultValue="@integer/default_max_ok_amplitude"
+            android:defaultValue="@integer/default_sensor_sound_max_ok_amplitude"
 
             sample:msbp_minValue="1000"
             sample:msbp_maxValue="30000"
@@ -49,7 +49,7 @@
             android:title="@string/pref_sensors_sound_interval_title"
             android:summary="@string/pref_sensors_sound_interval_description"
             android:dependency="@string/key_sensor_sound_is_allowed"
-            android:defaultValue="@integer/default_sound_detector_interval"
+            android:defaultValue="@integer/default_sensor_sound_interval"
 
             sample:msbp_minValue="1"
             sample:msbp_maxValue="60"
@@ -61,7 +61,7 @@
     <!-- LOCATION SENSOR -->
     <PreferenceCategory android:key="location_category" android:title="@string/pref_sensors_location_group_name">
         <SwitchPreference
-            android:defaultValue="@bool/default_util_is_location_provider_available"
+            android:defaultValue="@bool/default_sensor_location_is_allowed"
             android:key="@string/key_sensor_location_is_allowed"
             android:title="@string/pref_sensors_location_switch_title"
             android:contentDescription="@string/pref_sensors_location_switch_description"/>
@@ -71,7 +71,7 @@
             android:title="@string/pref_sensors_location_update_interval_title"
             android:summary="@string/pref_sensors_location_update_interval_description"
             android:dependency="@string/key_sensor_location_is_allowed"
-            android:defaultValue="@integer/default_location_update_interval"
+            android:defaultValue="@integer/default_sensor_location_update_interval"
 
             sample:msbp_minValue="1"
             sample:msbp_maxValue="30"
@@ -84,7 +84,7 @@
             android:key="@string/key_sensor_location_accuracy_priority"
             android:entries="@array/pref_sensors_location_accuracy_list"
             android:entryValues="@array/pref_sensors_location_accuracy_list_values"
-            android:defaultValue="@string/default_location_accuracy_priority"
+            android:defaultValue="@string/default_sensor_location_accuracy_priority"
             android:dialogTitle="@string/pref_sensors_location_accuracy_title"
             android:dependency="@string/key_sensor_location_is_allowed" />
 
