@@ -7,6 +7,7 @@ import com.example.tomas.carsecurity.CheckCodes
 import com.example.tomas.carsecurity.CheckObjString
 import com.example.tomas.carsecurity.ObservableEnum
 import com.example.tomas.carsecurity.context.MyContext
+import com.example.tomas.carsecurity.context.UtilsContext
 import com.example.tomas.carsecurity.sensors.LocationProvider
 import java.util.*
 import com.example.tomas.carsecurity.storage.entity.Location as DbLocation
@@ -24,6 +25,11 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
 
     companion object Check : CheckObjString {
         override fun check(context: Context): String {
+
+            if(!UtilsContext(context).isTrackerAllowed){
+                return "Tracker is disabled by user."
+            }
+
             val locationCheck = LocationProvider.check(context)
 
             return when (locationCheck) {  // TODO use strings from resources

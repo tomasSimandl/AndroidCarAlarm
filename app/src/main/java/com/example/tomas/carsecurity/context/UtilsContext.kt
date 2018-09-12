@@ -12,6 +12,10 @@ class UtilsContext(appContext: Context): BaseContext(appContext) {
 
     // ======================================= TRACKER UTIL ========================================
 
+    /** Returns if tracker is allowed by user */
+    val isTrackerAllowed
+        get() = getBoolean(R.string.key_tool_tracker_is_allowed, R.bool.default_tracker_is_allowed)
+
     /** Returns new location ignore distance in meters. Value is taken from shared preferences or it is used default value. */
     val ignoreDistance
         get() = getInt(R.string.key_tool_tracker_ignore_distance, R.integer.default_tracker_ignore_distance)
@@ -22,6 +26,10 @@ class UtilsContext(appContext: Context): BaseContext(appContext) {
 
 
     // ======================================== ALARM UTIL =========================================
+
+    /** Returns if alarm is allowed by user */
+    val isAlarmAllowed
+        get() = getBoolean(R.string.key_tool_alarm_is_allowed, R.bool.default_alarm_is_allowed)
 
     /**
      * Returns default interval between two detections in which alarm will be triggered.

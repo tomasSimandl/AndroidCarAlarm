@@ -1,9 +1,6 @@
 package com.example.tomas.carsecurity
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.content.ContextCompat
@@ -15,16 +12,18 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.MenuItem
 import android.widget.Button
+import com.example.tomas.carsecurity.context.UtilsContext
 import com.example.tomas.carsecurity.utils.UtilsEnum
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
 
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener  {
-
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, SharedPreferences.OnSharedPreferenceChangeListener  {
 
     private val tag = "MainActivity"
+
+    private lateinit var utilsContext: UtilsContext
 
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -51,6 +50,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        utilsContext = UtilsContext(applicationContext)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
@@ -82,10 +82,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         broadcastManager.registerReceiver(receiver, IntentFilter(getString(R.string.utils_ui_update)))
 
         sendIntent(MainService.Actions.ActionStatusUI.name)
+
+        setVisibility(actionAlarm, utilsContext.isAlarmAllowed)
+        setVisibility(actionTracker, utilsContext.isTrackerAllowed)
+        utilsContext.registerOnPreferenceChanged(this)
     }
 
     override fun onPause() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
+        utilsContext.unregisterOnPreferenceChanged(this)
 
         super.onPause()
     }
@@ -107,6 +112,21 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
+    }
+
+    override fun onSharedPreferenceChanged(p0: SharedPreferences?, key: String?) {
+        when (key){
+            getString(R.string.key_tool_alarm_is_allowed) -> setVisibility(actionAlarm, utilsContext.isAlarmAllowed)
+            getString(R.string.key_tool_tracker_is_allowed) -> setVisibility(actionTracker, utilsContext.isTrackerAllowed)
+        }
+    }
+
+    private fun setVisibility(button: Button, visible: Boolean) {
+        button.visibility = if(visible){
+            Button.VISIBLE
+        } else {
+            Button.GONE
+        }
     }
 
     private fun openSettings() {

@@ -8,6 +8,7 @@ import com.example.tomas.carsecurity.CheckObjString
 import com.example.tomas.carsecurity.GeneralObservable
 import com.example.tomas.carsecurity.communication.SmsProvider
 import com.example.tomas.carsecurity.context.MyContext
+import com.example.tomas.carsecurity.context.UtilsContext
 import com.example.tomas.carsecurity.sensors.LocationProvider
 import com.example.tomas.carsecurity.sensors.MoveDetector
 import com.example.tomas.carsecurity.sensors.SoundDetector
@@ -31,6 +32,10 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
 
     companion object Check: CheckObjString {
         override fun check(context: Context): String {
+
+            if(!UtilsContext(context).isAlarmAllowed){
+                return "Alarm is disabled by user."
+            }
 
             val smsCheck = SmsProvider.check(context)
 
