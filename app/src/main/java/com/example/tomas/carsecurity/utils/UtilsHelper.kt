@@ -6,7 +6,6 @@ import com.example.tomas.carsecurity.ObservableEnum
 import com.example.tomas.carsecurity.WorkerThread
 import com.example.tomas.carsecurity.communication.CommunicationManager
 import com.example.tomas.carsecurity.context.MyContext
-import com.example.tomas.carsecurity.context.UtilsContext
 
 class UtilsHelper (private val context: MyContext) {
 
@@ -16,7 +15,6 @@ class UtilsHelper (private val context: MyContext) {
     private val utilsMap: MutableMap<GeneralUtil, MutableSet<ObservableEnum>> = HashMap()
 
     private val workerThread = WorkerThread("UtilsThread")
-    private val utilsContext = UtilsContext(context.sharedPreferences, context.appContext)
     val communicationManager = CommunicationManager(context)
 
     init {
@@ -39,7 +37,7 @@ class UtilsHelper (private val context: MyContext) {
 
         Log.d(tag, """Registering observer $util to observable $observableEnum""")
 
-        if(!observableEnum.isAvailable(utilsContext)){
+        if(!observableEnum.isAvailable(context.sensorContext)){
             Log.d(tag, "Observable is not available.")
             return false // observable is not available (disabled by users setting)
         }

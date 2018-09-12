@@ -2,7 +2,7 @@ package com.example.tomas.carsecurity
 
 import android.util.Log
 import com.example.tomas.carsecurity.context.MyContext
-import com.example.tomas.carsecurity.context.UtilsContext
+import com.example.tomas.carsecurity.context.SensorContext
 
 enum class ObservableEnum {
     MoveDetector, SoundDetector, LocationProvider;
@@ -20,11 +20,11 @@ enum class ObservableEnum {
         }
     }
 
-    fun isAvailable(context: UtilsContext): Boolean {
+    fun isAvailable(context: SensorContext): Boolean {
         return when (this){
-            MoveDetector -> context.isMoveDetector
-            SoundDetector -> context.isSoundDetector
-            LocationProvider -> context.isLocationProvider
+            MoveDetector -> context.isMoveAllowed
+            SoundDetector -> context.isSoundAllowed
+            LocationProvider -> context.isLocationAllowed
         }
     }
 }

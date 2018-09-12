@@ -2,23 +2,20 @@ package com.example.tomas.carsecurity.sensors
 
 import android.Manifest
 import android.content.Context
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import com.example.tomas.carsecurity.CheckCodes
 import com.example.tomas.carsecurity.CheckObjByte
 import com.example.tomas.carsecurity.GeneralObservable
-import com.example.tomas.carsecurity.context.LocationProviderContext
 import com.example.tomas.carsecurity.context.MyContext
+import com.example.tomas.carsecurity.context.SensorContext
 import com.google.android.gms.location.*
-import com.example.tomas.carsecurity.R
 
 class LocationProvider(private val context: MyContext) : GeneralObservable() {
 
     private val tag = "sensors.Location"
 
-    private val locationProviderContext: LocationProviderContext = LocationProviderContext(context.sharedPreferences, context.appContext)
     private var fusedLocationClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context.appContext)
 
     private val locationCallback: LocationCallback
@@ -36,12 +33,12 @@ class LocationProvider(private val context: MyContext) : GeneralObservable() {
     }
 
     companion object Check: CheckObjByte {
-        override fun check(context: Context, sharedPreferences: SharedPreferences): Byte {
+        override fun check(context: Context): Byte {
             return if (!context.packageManager.hasSystemFeature(PackageManager.FEATURE_LOCATION)) {
                 CheckCodes.hardwareNotSupported
             } else if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 CheckCodes.permissionDenied
-            } else if (!sharedPreferences.getBoolean(context.getString(R.string.key_sensor_location_is_allowed), context.resources.getBoolean(R.bool.default_util_is_location_provider_available))) {
+            } else if (!SensorContext(context).isLocationAllowed) {
                 CheckCodes.notAllowed
             } else {
                 CheckCodes.success
@@ -50,12 +47,12 @@ class LocationProvider(private val context: MyContext) : GeneralObservable() {
     }
 
     override fun enable() {
-        if (!enabled && check(context.appContext, context.sharedPreferences) == CheckCodes.success) {
+        if (!enabled && check(context.appContext) == CheckCodes.success) {
 
             val locationRequest = LocationRequest().apply {
-                interval = locationProviderContext.updateInterval.toLong()
-                fastestInterval = locationProviderContext.maxUpdateInterval.toLong()
-                priority = locationProviderContext.accuracyPriority
+                interval = context.sensorContext.updateInterval.toLong()
+                fastestInterval = context.sensorContext.maxUpdateInterval.toLong()
+                priority = context.sensorContext.accuracyPriority
             }
 
             try {

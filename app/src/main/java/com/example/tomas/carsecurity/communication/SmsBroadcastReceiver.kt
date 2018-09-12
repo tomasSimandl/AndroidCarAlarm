@@ -94,10 +94,10 @@ class SmsBroadcastReceiver(private val communicationContext: CommunicationContex
         try {
             val util = UtilsEnum.valueOf(smsBody)
 
-            val intent = Intent(communicationContext.context, MainService::class.java)
+            val intent = Intent(communicationContext.appContext, MainService::class.java)
             intent.action = if(activate) MainService.Actions.ActionActivateUtil.name else MainService.Actions.ActionDeactivateUtil.name
             intent.putExtra("util", util)
-            communicationContext.context.startService(intent)
+            communicationContext.appContext.startService(intent)
 
             Log.d(tag, "Intent was sent.")
 
@@ -107,8 +107,8 @@ class SmsBroadcastReceiver(private val communicationContext: CommunicationContex
     }
 
     private fun sendIntent(action: String){
-        val intent = Intent(communicationContext.context, MainService::class.java)
+        val intent = Intent(communicationContext.appContext, MainService::class.java)
         intent.action = action
-        communicationContext.context.startService(intent)
+        communicationContext.appContext.startService(intent)
     }
 }

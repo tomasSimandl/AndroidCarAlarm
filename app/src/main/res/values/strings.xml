@@ -157,4 +157,5 @@
     <string name="msg_not_permitted">Using of %s is not permitted by user.</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="empty" />
 </resources>

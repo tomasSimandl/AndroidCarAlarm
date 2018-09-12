@@ -5,7 +5,11 @@ import com.example.tomas.carsecurity.utils.UtilsEnum
 
 interface ICommunicationProvider {
 
+    // initialization status can be changed only via methods initialize and destroy called
+    // from [CommunicationManager]
+    fun initialize(): Boolean
     fun destroy()
+    fun isInitialize(): Boolean
 
     fun sendMessage(text: String): Boolean
 

@@ -1,23 +1,20 @@
 package com.example.tomas.carsecurity.utils
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.location.Location
-import com.example.tomas.carsecurity.storage.entity.Location as DbLocation
 import android.util.Log
 import com.example.tomas.carsecurity.CheckCodes
-import com.example.tomas.carsecurity.ObservableEnum
 import com.example.tomas.carsecurity.CheckObjString
+import com.example.tomas.carsecurity.ObservableEnum
 import com.example.tomas.carsecurity.context.MyContext
-import com.example.tomas.carsecurity.context.TrackerContext
 import com.example.tomas.carsecurity.sensors.LocationProvider
 import java.util.*
+import com.example.tomas.carsecurity.storage.entity.Location as DbLocation
 
 class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelper) : GeneralUtil(utilsHelper) {
 
     private val tag = "utils.Tracker"
 
-    private val trackerContext = TrackerContext(context.sharedPreferences, context.appContext)
     private var lastLocation: Location? = null
     private var isEnabled = false
 
@@ -26,8 +23,8 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
     override val thisUtilEnum: UtilsEnum = UtilsEnum.Tracker
 
     companion object Check : CheckObjString {
-        override fun check(context: Context, sharedPreferences: SharedPreferences): String {
-            val locationCheck = LocationProvider.check(context , sharedPreferences)
+        override fun check(context: Context): String {
+            val locationCheck = LocationProvider.check(context)
 
             return when (locationCheck) {  // TODO use strings from resources
                 CheckCodes.hardwareNotSupported -> "Tracker needs to get device location for creating of log book but this device not support location access."
@@ -57,11 +54,11 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
             return
         }
 
-        if (location.distanceTo(lastLocation) > trackerContext.ignoreDistance) {
+        if (location.distanceTo(lastLocation) > context.utilsContext.ignoreDistance) {
             lastLocation = location
             context.database.locationDao().insert(DbLocation(location))
 
-        } else if (location.time - lastLocation!!.time > trackerContext.timeout) {
+        } else if (location.time - lastLocation!!.time > context.utilsContext.timeout) {
             Log.d(tag, "Time not moving time interval passed. Tracker will be stopped.")
             disable()
         }
@@ -135,7 +132,7 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
 
     private fun canRun(): Boolean {
 
-        val msg = check(context.appContext , context.sharedPreferences)
+        val msg = check(context.appContext)
 
         return if (msg.isBlank()) {
             true

@@ -9,12 +9,10 @@ import java.util.*
 
 class MyContext(val appContext: Context, val mainServiceThreadLooper: Looper) : Observable() {
 
-    /** Contains private shared preferences which are shared across application. */
-    val sharedPreferences = appContext.getSharedPreferences(
-            appContext.getString(R.string.preference_file_key),
-            Context.MODE_PRIVATE)
-
     val database = Room.inMemoryDatabaseBuilder(appContext, AppDatabase::class.java).build()
+
+    val sensorContext = SensorContext(appContext)
+    val utilsContext = UtilsContext(appContext)
 
     fun updateContext(){
         setChanged()

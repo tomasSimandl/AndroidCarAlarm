@@ -66,8 +66,8 @@ open class MyPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
         if (preference is SwitchPreference) {
 
             val canBeTrue = when (checkObj) {
-                is CheckObjString -> checkObj.check(activity, preferenceManager.sharedPreferences).isEmpty()
-                is CheckObjByte -> checkObj.check(activity, preferenceScreen.sharedPreferences) == CheckCodes.success
+                is CheckObjString -> checkObj.check(activity).isEmpty()
+                is CheckObjByte -> checkObj.check(activity) == CheckCodes.success
                 else -> false
             }
 
@@ -93,7 +93,7 @@ open class MyPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
 
         findPreference(getString(prefKey))?.setOnPreferenceChangeListener { _: Preference, value: Any ->
             if (value == true) {
-                val msg = checkObj.check(activity, preferenceScreen.sharedPreferences)
+                val msg = checkObj.check(activity)
 
                 if (msg.isNotBlank()) {
                     showMessage(msg, "Can not allow util", DialogInterface.OnClickListener { _, _ -> }, null) // TODO use strings from resources
@@ -120,7 +120,7 @@ open class MyPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
         findPreference(getString(prefKey))?.setOnPreferenceChangeListener { _: Preference, value: Any ->
             if (value == true) {
 
-                val checkCode = checkObj.check(activity, preferenceScreen.sharedPreferences)
+                val checkCode = checkObj.check(activity)
 
                 when (checkCode) {
                     CheckCodes.hardwareNotSupported -> showMessage("Sensor is not supported by device.", "Can not allow sensor", DialogInterface.OnClickListener { _, _ ->  }, null) // TODO use strings from resources

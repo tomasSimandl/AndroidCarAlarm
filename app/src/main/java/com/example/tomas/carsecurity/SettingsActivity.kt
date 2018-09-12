@@ -8,9 +8,7 @@ import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceActivity
-import android.preference.PreferenceScreen
 import android.support.v14.preference.PreferenceFragment
-import android.support.v14.preference.SwitchPreference
 import android.view.MenuItem
 import com.example.tomas.carsecurity.communication.SmsProvider
 import com.example.tomas.carsecurity.preferenceFragments.MyPreferenceFragment

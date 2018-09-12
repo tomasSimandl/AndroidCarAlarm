@@ -1,7 +1,6 @@
 package com.example.tomas.carsecurity.utils
 
 import android.util.Log
-import com.example.tomas.carsecurity.BroadcastSender
 import com.example.tomas.carsecurity.MainService
 import com.example.tomas.carsecurity.context.MyContext
 import java.util.*

@@ -22,23 +22,17 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
     private val tag = "SmsProvider"
     private val smsManager = SmsManager.getDefault()
     private val smsBroadcastReceiver = SmsBroadcastReceiver(communicationContext)
-
-    init {
-        if (check(communicationContext.context, communicationContext.sharedPreferences) == CheckCodes.success) {
-            val intentFilter = IntentFilter("android.provider.Telephony.SMS_RECEIVED")
-            communicationContext.context.registerReceiver(smsBroadcastReceiver, intentFilter)
-        }
-    }
+    private var isInitialize = false
 
     companion object Check: CheckObjByte {
-        override fun check(context: Context, sharedPreferences: SharedPreferences): Byte {
+        override fun check(context: Context): Byte {
             return if (!context.packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
                 CheckCodes.hardwareNotSupported
             } else if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED
                     || ContextCompat.checkSelfPermission(context, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED
                     || ContextCompat.checkSelfPermission(context, Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED) {
                 CheckCodes.permissionDenied
-            } else if (!sharedPreferences.getBoolean(context.getString(R.string.key_communication_sms_is_allowed), context.resources.getBoolean(R.bool.default_communication_sms_is_allowed))) {
+            } else if (!CommunicationContext(context).isProviderAllowed(SmsProvider::class.java.name)) {
                 CheckCodes.notAllowed
             } else {
                 CheckCodes.success
@@ -46,13 +40,31 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
         }
     }
 
+    override fun initialize(): Boolean{
+        if (check(communicationContext.appContext) == CheckCodes.success) {
+            val intentFilter = IntentFilter("android.provider.Telephony.SMS_RECEIVED")
+            communicationContext.appContext.registerReceiver(smsBroadcastReceiver, intentFilter)
+            isInitialize = true
+            return true
+        }
+        isInitialize = false
+        return false
+    }
+
     override fun destroy(){
-        communicationContext.context.unregisterReceiver(smsBroadcastReceiver)
+        if (isInitialize) {
+            communicationContext.appContext.unregisterReceiver(smsBroadcastReceiver)
+            isInitialize = false
+        }
+    }
+
+    override fun isInitialize(): Boolean {
+        return isInitialize
     }
 
 
     override fun sendMessage(text: String): Boolean {
-        if (check(communicationContext.context, communicationContext.sharedPreferences) != CheckCodes.success){
+        if (check(communicationContext.appContext) != CheckCodes.success){
             Log.d(tag, "Can not send SMS. Permission not granted or unsupported hardware")
             return false
         }
@@ -79,9 +91,9 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
         return if(communicationContext.isMessageAllowed(this.javaClass.name, utilsEnum.name, MessageType.UtilSwitch.name, "send")){
 
             val text = if(enabled)
-                communicationContext.context.getString(R.string.sms_util_enabled, utilsEnum.name)
+                communicationContext.appContext.getString(R.string.sms_util_enabled, utilsEnum.name)
             else
-                communicationContext.context.getString(R.string.sms_util_disabled, utilsEnum.name)
+                communicationContext.appContext.getString(R.string.sms_util_disabled, utilsEnum.name)
 
             Log.d(tag, """Sending sms util switch message of util: ${utilsEnum.name}""")
             sendMessage(text)
@@ -96,7 +108,7 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
 
         return if(communicationContext.isMessageAllowed(this.javaClass.name, MessageType.Alarm.name, "send")){
             Log.d(tag, "Sending alarm sms message.")
-            sendMessage(communicationContext.context.getString(R.string.sms_alarm, Calendar.getInstance().time.toString()))
+            sendMessage(communicationContext.appContext.getString(R.string.sms_alarm, Calendar.getInstance().time.toString()))
         } else {
             Log.d(tag, "Sms message for alarm is not allowed.")
             false
@@ -106,7 +118,7 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
     override fun sendLocation(location: Location, isAlarm: Boolean): Boolean {
         return if(communicationContext.isMessageAllowed(this.javaClass.name, if(isAlarm)MessageType.AlarmLocation.name else MessageType.Location.name, "send")){
             Log.d(tag, "Sending sms message with actual device location.")
-            sendMessage(communicationContext.context.getString(R.string.sms_location, location.latitude.toString(), location.longitude.toString()))
+            sendMessage(communicationContext.appContext.getString(R.string.sms_location, location.latitude.toString(), location.longitude.toString()))
         } else {
             Log.d(tag, "Sms message with location is not allowed.")
             false
@@ -116,7 +128,7 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
     override fun sendBatteryWarn(capacity: Int): Boolean {
         return if(communicationContext.isMessageAllowed(this.javaClass.name, MessageType.BatteryWarn.name, "send")){
             Log.d(tag, "Sending battery warning sms message.")
-            sendMessage(communicationContext.context.getString(R.string.sms_battery_warn, capacity))
+            sendMessage(communicationContext.appContext.getString(R.string.sms_battery_warn, capacity))
         } else {
             Log.d(tag, "Battery warning sms message is not allowed.")
             false
@@ -126,16 +138,16 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
     override fun sendStatus(battery: Int, powerSaveMode: Boolean, utils: Map<UtilsEnum, Boolean>): Boolean {
         return if(communicationContext.isMessageAllowed(this.javaClass.name, MessageType.Status.name, "recv")){
 
-            val batteryInfo = communicationContext.context.getString(R.string.sms_info_battery, battery)
+            val batteryInfo = communicationContext.appContext.getString(R.string.sms_info_battery, battery)
             val powerSaveModeResource = if(powerSaveMode) R.string.sms_info_power_save_mode_on else R.string.sms_info_power_save_mode_off
-            val powerSaveModeInfo = communicationContext.context.getString(powerSaveModeResource)
+            val powerSaveModeInfo = communicationContext.appContext.getString(powerSaveModeResource)
             var utilsInfo = ""
             for(util in utils.keys){
 
                 val utilResource = if(utils[util] == true) R.string.sms_util_enabled else R.string.sms_util_disabled
 
                 utilsInfo += "\n"
-                utilsInfo += communicationContext.context.getString(utilResource, util.name)
+                utilsInfo += communicationContext.appContext.getString(utilResource, util.name)
             }
 
             Log.d(tag, "Sending sms status message.")

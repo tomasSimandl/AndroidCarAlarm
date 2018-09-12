@@ -1,14 +1,12 @@
 package com.example.tomas.carsecurity.utils
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.location.Location
 import android.util.Log
 import com.example.tomas.carsecurity.CheckCodes
 import com.example.tomas.carsecurity.CheckObjString
 import com.example.tomas.carsecurity.GeneralObservable
 import com.example.tomas.carsecurity.communication.SmsProvider
-import com.example.tomas.carsecurity.context.AlarmContext
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.sensors.LocationProvider
 import com.example.tomas.carsecurity.sensors.MoveDetector
@@ -16,9 +14,7 @@ import com.example.tomas.carsecurity.sensors.SoundDetector
 import java.util.*
 import com.example.tomas.carsecurity.ObservableEnum as OEnum
 
-class Alarm(context: MyContext, private val utilsHelper: UtilsHelper) : GeneralUtil(utilsHelper) {
-
-    private val alarmContext = AlarmContext(context.sharedPreferences, context.appContext)
+class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper) : GeneralUtil(utilsHelper) {
 
     private val tag = "utils.Alarm"
 
@@ -34,17 +30,17 @@ class Alarm(context: MyContext, private val utilsHelper: UtilsHelper) : GeneralU
 
 
     companion object Check: CheckObjString {
-        override fun check(context: Context, sharedPreferences: SharedPreferences): String {
+        override fun check(context: Context): String {
 
-            val smsCheck = SmsProvider.check(context, sharedPreferences)
+            val smsCheck = SmsProvider.check(context)
 
             return when (smsCheck) {  // TODO use strings from resources
                 CheckCodes.hardwareNotSupported -> "Alarm needs to send SMS messages to warn car owner but their are not supported by this device."
                 CheckCodes.permissionDenied -> "Alarm needs to send SMS messages to warn car owner but application is not permitted to send SMS messages."
                 CheckCodes.notAllowed -> "Alarm needs to send SMS messages to warn car owner but their are disabled by user."
                 else -> {
-                    val moveCheck = MoveDetector.check(context, sharedPreferences)
-                    val soundCheck = SoundDetector.check(context, sharedPreferences)
+                    val moveCheck = MoveDetector.check(context)
+                    val soundCheck = SoundDetector.check(context)
 
                     if (moveCheck == CheckCodes.success || soundCheck == CheckCodes.success) {
                         ""
@@ -85,7 +81,7 @@ class Alarm(context: MyContext, private val utilsHelper: UtilsHelper) : GeneralU
         }
 
         // detections are ignored because start alarm interval did not passed.
-        if (currentTime - systemEnabledTime < alarmContext.startAlarmInterval) {
+        if (currentTime - systemEnabledTime < context.utilsContext.startAlarmInterval) {
             Log.d(tag, "Alarm is waiting for activation")
             return
         }
@@ -106,7 +102,7 @@ class Alarm(context: MyContext, private val utilsHelper: UtilsHelper) : GeneralU
                 }
             }
             timer = Timer("TimerThread")
-            timer!!.schedule(timerTask, alarmContext.alertAlarmInterval.toLong())
+            timer!!.schedule(timerTask, context.utilsContext.alertAlarmInterval.toLong())
         }
     }
 
@@ -171,7 +167,7 @@ class Alarm(context: MyContext, private val utilsHelper: UtilsHelper) : GeneralU
     }
 
     private fun canRun(): Boolean {
-        val msg = check(alarmContext.context, alarmContext.sharedPreferences)
+        val msg = check(context.appContext)
 
         return if (msg.isBlank()) {
             true
