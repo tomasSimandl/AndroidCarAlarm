@@ -22,7 +22,7 @@ class UtilsContext(appContext: Context): BaseContext(appContext) {
 
     /** Returns not moving timeout in milliseconds. Value is taken from shared preferences or it is used default value. */
     val timeout
-        get() = getInt(R.string.key_tool_tracker_timeout, R.integer.default_tracker_timeout)
+        get() = getInt(R.string.key_tool_tracker_timeout, R.integer.default_tracker_timeout) * 1000
 
 
     // ======================================== ALARM UTIL =========================================
@@ -32,18 +32,18 @@ class UtilsContext(appContext: Context): BaseContext(appContext) {
         get() = getBoolean(R.string.key_tool_alarm_is_allowed, R.bool.default_alarm_is_allowed)
 
     /**
-     * Returns default interval between two detections in which alarm will be triggered.
+     * Returns interval between two detections in which alarm will be triggered.
      * Value is taken from shared preferences or it is used default value.
      */
     val alertAlarmInterval
-        get() = getInt(R.string.key_tool_alarm_alert_interval, R.integer.default_alarm_alert_interval)
+        get() = getInt(R.string.key_tool_alarm_alert_interval, R.integer.default_alarm_alert_interval) * 1000
 
     /**
-     * Returns default interval for which is detection ignored after alarm activation.
+     * Returns interval for which is detection ignored after alarm activation.
      * Value is taken from shared preferences or it is used default value.
      */
     val startAlarmInterval
-        get() = getInt(R.string.key_tool_alarm_start_interval, R.integer.default_alarm_start_interval)
+        get() = getInt(R.string.key_tool_alarm_start_interval, R.integer.default_alarm_start_interval) * 1000
 }
 
 

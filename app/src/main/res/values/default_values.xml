@@ -5,14 +5,14 @@
     <!-- Maximal value of amplitude which not invoke alarm -->
     <integer name="default_max_ok_amplitude">15000</integer>
 
-    <!-- How often is control last measured amplitude in SoundDetector (in milliseconds) -->
-    <integer name="default_sound_detector_interval">1000</integer>
+    <!-- How often is control last measured amplitude in SoundDetector (in seconds) -->
+    <integer name="default_sound_detector_interval">1</integer>
 
     <!-- Maximal euclidean distance between two last measurement which not trigger alarm -->
     <integer name="default_move_sensor_sensitivity">20</integer>
 
     <!-- Interval in which application receive location updates. -->
-    <integer name="default_location_update_interval">3000</integer>
+    <integer name="default_location_update_interval">3</integer>
 
     <!-- Fastest interval in which application receive location updates. -->
     <integer name="default_max_location_update_interval">1000</integer>
@@ -21,12 +21,12 @@
     <string name="default_location_accuracy_priority">100</string> <!-- INTEGER --> <!--LocationProvider.PRIORITY_HIGH_ACCURACY-->
 
     <!-- Interval before alarm will be triggered after detection. -->
-    <integer name="default_alarm_alert_interval">15000</integer>
+    <integer name="default_alarm_alert_interval">15</integer>
 
     <!-- Interval before alarm will be activated after alarm activation. -->
-    <integer name="default_alarm_start_interval">30000</integer>
+    <integer name="default_alarm_start_interval">30</integer>
 
-    <!-- Indicates if is alarm system allowed by user to use/ -->
+    <!-- Indicates if is alarm system allowed by user to use. -->
     <bool name="default_alarm_is_allowed">true</bool>
 
     <!-- Indicates if location provider can be used. -->
@@ -49,7 +49,7 @@
     <integer name="default_tracker_ignore_distance">10</integer>
 
     <!-- Milliseconds after Tracker will be disabled when location is not changing. -->
-    <integer name="default_tracker_timeout">6000</integer>
+    <integer name="default_tracker_timeout">6</integer>
 
     <!-- Indicates if is tracker system allowed by user to use/ -->
     <bool name="default_tracker_is_allowed">true</bool>
@@ -61,9 +61,6 @@
 
     <!-- Dimensions of measured data from accelerometer -->
     <integer name="default_move_sensor_dimensions">3</integer>
-
-
-
 
 
 </resources>

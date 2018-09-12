@@ -35,7 +35,7 @@ class SensorContext(appContext: Context) : BaseContext(appContext) {
 
     /** Return measure interval from shared preferences or use default value */
     val measureInterval: Int
-        get() = getInt(R.string.key_sensor_sound_interval, R.integer.default_sound_detector_interval)
+        get() = getInt(R.string.key_sensor_sound_interval, R.integer.default_sound_detector_interval) * 1000
 
 
     // ====================================== LOCATION SENSOR ======================================
@@ -46,7 +46,7 @@ class SensorContext(appContext: Context) : BaseContext(appContext) {
 
     /** Returns interval for location updates. Value is taken from shared preferences or it is used default value. */
     val updateInterval
-        get() = getInt(R.string.key_sensor_location_update_interval, R.integer.default_location_update_interval)
+        get() = getInt(R.string.key_sensor_location_update_interval, R.integer.default_location_update_interval) * 1000
 
     /** Returns maximal interval for location updates. Value is taken from shared preferences or it is used default value. */
     val maxUpdateInterval

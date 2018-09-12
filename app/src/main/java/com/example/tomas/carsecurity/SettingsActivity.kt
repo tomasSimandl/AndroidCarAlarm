@@ -29,6 +29,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
 
         actionBar?.setDisplayShowHomeEnabled(true)
         actionBar?.setDisplayHomeAsUpEnabled(true)
+//        val sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
 //        sharedPreferences.edit().clear().apply()
     }
 

@@ -17,9 +17,9 @@
             android:defaultValue="@integer/default_alarm_start_interval"
 
             sample:msbp_minValue="0"
-            sample:msbp_maxValue="120000"
-            sample:msbp_interval="1000"
-            sample:msbp_measurementUnit="ms"
+            sample:msbp_maxValue="120"
+            sample:msbp_interval="10"
+            sample:msbp_measurementUnit="s"
             sample:msbp_dialogEnabled="false"/>
 
         <com.pavelsikun.seekbarpreference.SeekBarPreferenceCompat
@@ -30,9 +30,9 @@
             android:defaultValue="@integer/default_alarm_alert_interval"
 
             sample:msbp_minValue="0"
-            sample:msbp_maxValue="60000"
-            sample:msbp_interval="1000"
-            sample:msbp_measurementUnit="ms"
+            sample:msbp_maxValue="60"
+            sample:msbp_interval="5"
+            sample:msbp_measurementUnit="s"
             sample:msbp_dialogEnabled="false"/>
 
     </PreferenceCategory>

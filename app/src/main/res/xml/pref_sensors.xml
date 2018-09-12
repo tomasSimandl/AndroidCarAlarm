@@ -51,10 +51,10 @@
             android:dependency="@string/key_sensor_sound_is_allowed"
             android:defaultValue="@integer/default_sound_detector_interval"
 
-            sample:msbp_minValue="1000"
-            sample:msbp_maxValue="60000"
-            sample:msbp_interval="1000"
-            sample:msbp_measurementUnit="ms"
+            sample:msbp_minValue="1"
+            sample:msbp_maxValue="60"
+            sample:msbp_interval="1"
+            sample:msbp_measurementUnit="s"
             sample:msbp_dialogEnabled="false"/>
     </PreferenceCategory>
 
@@ -73,10 +73,10 @@
             android:dependency="@string/key_sensor_location_is_allowed"
             android:defaultValue="@integer/default_location_update_interval"
 
-            sample:msbp_minValue="1000"
-            sample:msbp_maxValue="20000"
-            sample:msbp_interval="1000"
-            sample:msbp_measurementUnit="ms"
+            sample:msbp_minValue="1"
+            sample:msbp_maxValue="30"
+            sample:msbp_interval="1"
+            sample:msbp_measurementUnit="s"
             sample:msbp_dialogEnabled="false"/>
 
         <ListPreference
