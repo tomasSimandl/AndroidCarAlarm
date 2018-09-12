@@ -2,10 +2,12 @@ package com.example.tomas.carsecurity.utils
 
 import android.content.Context
 import android.location.Location
+import android.media.MediaPlayer
 import android.util.Log
 import com.example.tomas.carsecurity.CheckCodes
 import com.example.tomas.carsecurity.CheckObjString
 import com.example.tomas.carsecurity.GeneralObservable
+import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.communication.MessageType
 import com.example.tomas.carsecurity.communication.SmsProvider
 import com.example.tomas.carsecurity.context.CommunicationContext
@@ -29,6 +31,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
     private var lastLocation: Location? = null
     private var timer: Timer? = null
     private var sendSmsTimer: Timer? = null
+    private var mediaPlayer: MediaPlayer? = null
 
     override val thisUtilEnum: UtilsEnum = UtilsEnum.Alarm
 
@@ -115,9 +118,17 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
     private fun onAlarm() {
         Log.d(tag, "Alarm was activated.")
 
+        // send alarm to communication providers
         utilsHelper.communicationManager.sendAlarm()
-        // TODO notify observers (Siren, ...) WARNING - notifyObservers is used in enable/disable
 
+        // start siren
+        if (context.utilsContext.isSirenAllow) {
+            mediaPlayer = MediaPlayer.create(context.appContext, R.raw.car_alarm)
+            mediaPlayer?.isLooping = true
+            mediaPlayer?.start()
+        }
+
+        // start send location loop
         if (CommunicationContext(context.appContext).isMessageAllowed(SmsProvider::class.java.name, MessageType.AlarmLocation.name, "send")) {
 
             utilsHelper.registerObserver(OEnum.LocationProvider, this)
@@ -156,6 +167,10 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
 
     override fun disable() {
         if (isEnabled) {
+
+            mediaPlayer?.stop()
+            mediaPlayer?.release()
+            mediaPlayer = null
 
             utilsHelper.unregisterAllObservables(this)
             timer?.cancel()

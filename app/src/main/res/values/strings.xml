@@ -32,6 +32,9 @@
     <string name="pref_tools_alarm_send_location_interval_title">Sms location interval</string>
     <string name="pref_tools_alarm_send_location_interval_description">How often will be send sms with car location when alarm is triggered. Used only when send sms on alarm is enabled.</string>
 
+    <string name="pref_tools_alarm_siren_is_allow_title">Siren</string>
+    <string name="pref_tools_alarm_siren_is_allow_description">Enable or disable siren sound on trigger alarm. Is recommended to use only with external siren.</string>
+
     <!-- =============================== Tools Tracker settings ================================ -->
     <string name="pref_tools_tracker_group_name">Tracker</string>
 

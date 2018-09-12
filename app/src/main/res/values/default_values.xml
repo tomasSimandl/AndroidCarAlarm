@@ -34,6 +34,8 @@
     <integer name="default_tool_alarm_start_interval">30</integer>
     <!-- Interval how often location will be send when alarm is triggered -->
     <integer name="default_tool_alarm_send_location_interval">60</integer>
+    <!-- Indicates if siren is allowed -->
+    <bool name="default_tool_alarm_siren_is_allow">false</bool>
 
     <!-- Indicates if is tracker system allowed by user to use/ -->
     <bool name="default_tool_tracker_is_allowed">true</bool>
