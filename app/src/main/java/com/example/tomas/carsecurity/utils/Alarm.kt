@@ -6,7 +6,9 @@ import android.util.Log
 import com.example.tomas.carsecurity.CheckCodes
 import com.example.tomas.carsecurity.CheckObjString
 import com.example.tomas.carsecurity.GeneralObservable
+import com.example.tomas.carsecurity.communication.MessageType
 import com.example.tomas.carsecurity.communication.SmsProvider
+import com.example.tomas.carsecurity.context.CommunicationContext
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.context.UtilsContext
 import com.example.tomas.carsecurity.sensors.LocationProvider
@@ -26,6 +28,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
     private var systemEnabledTime = -1L
     private var lastLocation: Location? = null
     private var timer: Timer? = null
+    private var sendSmsTimer: Timer? = null
 
     override val thisUtilEnum: UtilsEnum = UtilsEnum.Alarm
 
@@ -69,9 +72,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
 
     private fun onLocationUpdate(location: Location) {
         Log.d(tag, """Location update: $location""")
-
         this.lastLocation = location
-        utilsHelper.communicationManager.sendLocation(location, true)
     }
 
     private fun onSensorUpdate(observable: GeneralObservable) {
@@ -116,17 +117,21 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
 
         utilsHelper.communicationManager.sendAlarm()
         // TODO notify observers (Siren, ...) WARNING - notifyObservers is used in enable/disable
-        // TODO send messages
-        // TODO get actual location
-        // TODO send actual location in loop
 
-        utilsHelper.registerObserver(OEnum.LocationProvider, this) // TODO dynamically register and unregister to save battery.
+        if (CommunicationContext(context.appContext).isMessageAllowed(SmsProvider::class.java.name, MessageType.AlarmLocation.name, "send")) {
 
-//        while(isAlarm){
-//            if(lastLocation != null){
-//                utilsHelper.registerObserver(OEnum.LocationProvider, this)
-//            }
-//        }
+            utilsHelper.registerObserver(OEnum.LocationProvider, this)
+
+            val sendSmsTask = object: TimerTask() {
+                override fun run() {
+                    if (lastLocation != null) {
+                        utilsHelper.communicationManager.sendLocation(lastLocation!!, true)
+                    }
+                }
+            }
+            sendSmsTimer = Timer("SendSmsTimer")
+            sendSmsTimer!!.schedule(sendSmsTask, context.utilsContext.sendLocationInterval.toLong(), context.utilsContext.sendLocationInterval.toLong())
+        }
     }
 
     override fun enable() {
@@ -154,6 +159,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
 
             utilsHelper.unregisterAllObservables(this)
             timer?.cancel()
+            sendSmsTimer?.cancel()
             isEnabled = false
             lastLocation = null
             systemEnabledTime = -1L
