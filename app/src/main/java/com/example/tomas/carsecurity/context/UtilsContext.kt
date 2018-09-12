@@ -44,6 +44,12 @@ class UtilsContext(appContext: Context): BaseContext(appContext) {
      */
     val startAlarmInterval
         get() = getInt(R.string.key_tool_alarm_start_interval, R.integer.default_alarm_start_interval) * 1000
+
+    /**
+     * Returns interval in which will be send position sms messages to user when alarm is triggered.
+     */
+    val sendLocationInterval
+        get() = getInt(R.string.key_tool_alarm_send_location_interval, R.integer.default_alarm_send_location_interval) * 1000
 }
 
 

@@ -29,6 +29,9 @@
     <!-- Indicates if is alarm system allowed by user to use. -->
     <bool name="default_alarm_is_allowed">true</bool>
 
+    <!-- Interval how often location will be send when alarm is triggered -->
+    <integer name="default_alarm_send_location_interval">60</integer>
+
     <!-- Indicates if location provider can be used. -->
     <bool name="default_util_is_location_provider_available">true</bool>
 

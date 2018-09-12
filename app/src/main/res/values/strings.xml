@@ -41,6 +41,9 @@
     <string name="pref_tools_alarm_alert_interval_title">Alert interval</string>
     <string name="pref_tools_alarm_alert_interval_description">Interval before alarm is triggered after any detection.</string>
 
+    <string name="pref_tools_alarm_send_location_interval_title">Sms location interval</string>
+    <string name="pref_tools_alarm_send_location_interval_description">How often will be send sms with car location when alarm is triggered. Used only when send sms on alarm is enabled.</string>
+
 
     <!-- Tools Tracker settings -->
     <string name="pref_tools_tracker_group_name">Tracker</string>
