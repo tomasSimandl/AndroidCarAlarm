@@ -9,6 +9,7 @@ import android.support.v14.preference.PreferenceFragment
 import android.support.v14.preference.SwitchPreference
 import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AlertDialog
+import android.support.v7.preference.CheckBoxPreference
 import android.support.v7.preference.Preference
 import com.example.tomas.carsecurity.*
 
@@ -29,7 +30,10 @@ open class MyPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
      */
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
         val pref = findPreference(key)
+        // used because compiler can not recognise that boot have isChecked attribute
         if (pref is SwitchPreference) {
+            pref.isChecked = sharedPreferences.getBoolean(key, false)
+        } else if (pref is CheckBoxPreference) {
             pref.isChecked = sharedPreferences.getBoolean(key, false)
         }
     }
@@ -63,7 +67,7 @@ open class MyPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
     protected fun setValueToPreference(prefKey: Int, defValue: Boolean, checkObj: Any) {
         val preference = findPreference(getString(prefKey))
 
-        if (preference is SwitchPreference) {
+        if (preference is SwitchPreference || preference is CheckBoxPreference) {
 
             val canBeTrue = when (checkObj) {
                 is CheckObjString -> checkObj.check(activity).isEmpty()
@@ -71,10 +75,17 @@ open class MyPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
                 else -> false
             }
 
-            preference.isChecked = if (canBeTrue) {
+            val value = if (canBeTrue) {
                 preferenceScreen.sharedPreferences.getBoolean(getString(prefKey), defValue)
             } else {
                 false
+            }
+
+            // used because compiler can not recognise that boot have isChecked attribute
+            if (preference is SwitchPreference) {
+                preference.isChecked = value
+            } else if (preference is CheckBoxPreference) {
+                preference.isChecked = value
             }
         }
     }

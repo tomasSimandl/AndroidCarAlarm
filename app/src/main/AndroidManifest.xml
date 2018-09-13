@@ -18,7 +18,7 @@
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-feature android:name="android.hardware.telephony" android:required="false" />
 
-
+    <uses-permission android:name="android.permission.CALL_PHONE" />
 
 
     <uses-permission android:name="android.permission.BLUETOOTH" />

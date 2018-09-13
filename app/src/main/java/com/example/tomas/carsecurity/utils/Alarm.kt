@@ -4,10 +4,7 @@ import android.content.Context
 import android.location.Location
 import android.media.MediaPlayer
 import android.util.Log
-import com.example.tomas.carsecurity.CheckCodes
-import com.example.tomas.carsecurity.CheckObjString
-import com.example.tomas.carsecurity.GeneralObservable
-import com.example.tomas.carsecurity.R
+import com.example.tomas.carsecurity.*
 import com.example.tomas.carsecurity.communication.MessageType
 import com.example.tomas.carsecurity.communication.SmsProvider
 import com.example.tomas.carsecurity.context.CommunicationContext
@@ -121,12 +118,17 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
         // send alarm to communication providers
         utilsHelper.communicationManager.sendAlarm()
 
+        if(context.utilsContext.isCallAllow) {
+            CallProvider(context.appContext).createCall()
+        }
+
         // start siren
         if (context.utilsContext.isSirenAllow) {
             mediaPlayer = MediaPlayer.create(context.appContext, R.raw.car_alarm)
             mediaPlayer?.isLooping = true
             mediaPlayer?.start()
         }
+
 
         // start send location loop
         if (CommunicationContext(context.appContext).isMessageAllowed(SmsProvider::class.java.name, MessageType.AlarmLocation.name, "send")) {

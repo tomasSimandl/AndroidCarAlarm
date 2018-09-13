@@ -81,7 +81,8 @@ class SettingsActivity : AppCompatPreferenceActivity() {
 
             if (requestCode == R.string.key_sensor_sound_is_allowed
                     || requestCode == R.string.key_sensor_location_is_allowed
-                    || requestCode == R.string.key_communication_sms_is_allowed) {
+                    || requestCode == R.string.key_communication_sms_is_allowed
+                    || requestCode == R.string.key_tool_alarm_is_call_allowed) {
 
                 val sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
                 sharedPreferences.edit().putBoolean(getString(requestCode), true).apply()
@@ -106,6 +107,19 @@ class SettingsActivity : AppCompatPreferenceActivity() {
                     R.string.key_tool_alarm_is_allowed,
                     resources.getBoolean(R.bool.default_tool_alarm_is_allowed),
                     Alarm)
+
+            // CALL PROVIDER - preference check listener + set value
+            registerPreferenceCheck(
+                    R.string.key_tool_alarm_is_call_allowed,
+                    CallProvider,
+                    "For creating of automatic calls application need permission.", // TODO use string preference
+                    arrayOf(Manifest.permission.CALL_PHONE))
+            setValueToPreference(
+                    R.string.key_tool_alarm_is_call_allowed,
+                    resources.getBoolean(R.bool.default_tool_alarm_is_call_allowed),
+                    CallProvider
+            )
+
 
             // TRACKER - preference check listener + set value
             registerPreferenceCheck(R.string.key_tool_tracker_is_allowed, Tracker)

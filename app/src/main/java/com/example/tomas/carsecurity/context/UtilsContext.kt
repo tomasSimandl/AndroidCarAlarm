@@ -52,7 +52,10 @@ class UtilsContext(appContext: Context): BaseContext(appContext) {
         get() = getInt(R.string.key_tool_alarm_send_location_interval, R.integer.default_tool_alarm_send_location_interval) * 1000
 
     val isSirenAllow
-        get() = getBoolean(R.string.key_tool_alarm_siren_is_allow, R.bool.default_tool_alarm_siren_is_allow)
+        get() = getBoolean(R.string.key_tool_alarm_siren_is_allowed, R.bool.default_tool_alarm_siren_is_allowed)
+
+    val isCallAllow
+        get() = getBoolean(R.string.key_tool_alarm_is_call_allowed, R.bool.default_tool_alarm_is_call_allowed)
 }
 
 

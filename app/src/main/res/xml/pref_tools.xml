@@ -49,11 +49,18 @@
             sample:msbp_dialogEnabled="false"/>
 
         <CheckBoxPreference
-            android:key="@string/key_tool_alarm_siren_is_allow"
-            android:title="@string/pref_tools_alarm_siren_is_allow_title"
-            android:summary="@string/pref_tools_alarm_siren_is_allow_description"
+            android:key="@string/key_tool_alarm_is_call_allowed"
+            android:title="@string/pref_tool_alarm_is_call_allowed_title"
+            android:summary="@string/pref_tool_alarm_is_call_allowed_description"
             android:dependency="@string/key_tool_alarm_is_allowed"
-            android:defaultValue="@bool/default_tool_alarm_siren_is_allow" />
+            android:defaultValue="@bool/default_tool_alarm_is_call_allowed" />
+
+        <CheckBoxPreference
+            android:key="@string/key_tool_alarm_siren_is_allowed"
+            android:title="@string/pref_tools_alarm_siren_is_allowed_title"
+            android:summary="@string/pref_tools_alarm_siren_is_allowed_description"
+            android:dependency="@string/key_tool_alarm_is_allowed"
+            android:defaultValue="@bool/default_tool_alarm_siren_is_allowed" />
 
     </PreferenceCategory>
 
