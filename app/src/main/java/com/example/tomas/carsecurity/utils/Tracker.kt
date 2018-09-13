@@ -115,7 +115,7 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
         utilsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, true)
     }
 
-    override fun disable() {
+    override fun disable(force: Boolean) {
         if(isEnabled) {
             isEnabled = false
             utilsHelper.unregisterAllObservables(this)

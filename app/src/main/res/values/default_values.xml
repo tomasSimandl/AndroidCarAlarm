@@ -24,6 +24,8 @@
     <!-- Priority constant of LocationProvider. Determines location sensor accuracy. -->
     <string name="default_sensor_location_accuracy_priority">100</string> <!-- INTEGER --> <!--LocationProvider.PRIORITY_HIGH_ACCURACY-->
 
+    <bool name="default_sensor_battery_is_allowed">true</bool>
+
 
     <!--========================================= Tools =========================================-->
     <!-- Indicates if is alarm system allowed by user to use. -->

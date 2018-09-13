@@ -5,7 +5,7 @@ import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.context.SensorContext
 
 enum class ObservableEnum {
-    MoveDetector, SoundDetector, LocationProvider;
+    MoveDetector, SoundDetector, LocationProvider, BatteryDetector;
 
     private val tag = "ObservableEnum"
 
@@ -17,6 +17,7 @@ enum class ObservableEnum {
             MoveDetector -> com.example.tomas.carsecurity.sensors.MoveDetector(context)
             SoundDetector -> com.example.tomas.carsecurity.sensors.SoundDetector(context)
             LocationProvider -> com.example.tomas.carsecurity.sensors.LocationProvider(context)
+            BatteryDetector -> com.example.tomas.carsecurity.sensors.BatteryDetector(context)
         }
     }
 
@@ -25,6 +26,7 @@ enum class ObservableEnum {
             MoveDetector -> context.isMoveAllowed
             SoundDetector -> context.isSoundAllowed
             LocationProvider -> context.isLocationAllowed
+            BatteryDetector -> context.isBatteryAllowed
         }
     }
 }

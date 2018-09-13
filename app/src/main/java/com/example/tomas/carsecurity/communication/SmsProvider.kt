@@ -135,6 +135,26 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
         }
     }
 
+    override fun sendPowerConnected(capacity: Int): Boolean {
+        return if(communicationContext.isMessageAllowed(this.javaClass.name, MessageType.PowerConnected.name, "send")){
+            Log.d(tag, "Sending power connected warning sms message.")
+            sendMessage(communicationContext.appContext.getString(R.string.sms_power_connected, capacity))
+        } else {
+            Log.d(tag, "Power connected warning sms message is not allowed.")
+            false
+        }
+    }
+
+    override fun sendPowerDisconnected(capacity: Int): Boolean {
+        return if(communicationContext.isMessageAllowed(this.javaClass.name, MessageType.PowerDisconnected.name, "send")){
+            Log.d(tag, "Sending power disconnected warning sms message.")
+            sendMessage(communicationContext.appContext.getString(R.string.sms_power_disconnected, capacity))
+        } else {
+            Log.d(tag, "Power disconnected warning sms message is not allowed.")
+            false
+        }
+    }
+
     override fun sendStatus(battery: Int, powerSaveMode: Boolean, utils: Map<UtilsEnum, Boolean>): Boolean {
         return if(communicationContext.isMessageAllowed(this.javaClass.name, MessageType.Status.name, "recv")){
 

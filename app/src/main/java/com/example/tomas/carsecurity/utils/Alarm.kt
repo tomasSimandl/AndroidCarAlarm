@@ -167,7 +167,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
         utilsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, true)
     }
 
-    override fun disable() {
+    override fun disable(force: Boolean) {
         if (isEnabled) {
 
             mediaPlayer?.stop()

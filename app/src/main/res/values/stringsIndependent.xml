@@ -24,6 +24,8 @@
         <item>Alarm_send</item>
         <item>AlarmLocation_send</item>
         <item>BatteryWarn_send</item>
+        <item>PowerConnected_send</item>
+        <item>PowerDisconnected_send</item>
 
         <item>UtilSwitch_recv</item>
         <item>Status_recv</item>

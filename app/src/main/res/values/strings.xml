@@ -103,12 +103,14 @@
     <string-array name="pref_communication_sms_messages">
         <item>Alarm send util switch</item>
         <item>Tracker send util switch</item>
-        <item>send alarm</item>
-        <item>send alarm location</item>
-        <item>send battery notification</item>
-        <item>command util switch</item>
-        <item>command send status</item>
-        <item>command send location</item>
+        <item>Send alarm</item>
+        <item>Send alarm location</item>
+        <item>Send battery notification</item>
+        <item>Send power connected</item>
+        <item>Send power disconnected</item>
+        <item>Command util switch</item>
+        <item>Command send status</item>
+        <item>Command send location</item>
     </string-array>
 
 
@@ -128,6 +130,8 @@
     <string name="sms_location">Actual car location is lat: %1$s, long: %2$s https://www.google.com/maps/search/\?api=1&amp;query=%1$s,%2$s</string>
     <string name="sms_battery_warn">Battery capacity is low: %d %%</string>
     <string name="sms_info_battery">Battery capacity is %d %%</string>
+    <string name="sms_power_connected">Power is connected. Battery level is %d %%</string>
+    <string name="sms_power_disconnected">Power is disconnected! Battery level is %d %%</string>
     <string name="sms_info_power_save_mode_on">Power save mode: ON </string>
     <string name="sms_info_power_save_mode_off">Power save mode: OFF </string>
 

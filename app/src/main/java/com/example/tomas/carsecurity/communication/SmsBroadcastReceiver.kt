@@ -45,6 +45,7 @@ class SmsBroadcastReceiver(private val communicationContext: CommunicationContex
                         var message: SmsMessage
 
                         for (i in pdus.indices) {
+                            @Suppress("DEPRECATION")
                             message = SmsMessage.createFromPdu(pdus[i] as ByteArray) // Deprecated in API 23 (i use it only on api < 19)
 
                             smsBody += message.messageBody

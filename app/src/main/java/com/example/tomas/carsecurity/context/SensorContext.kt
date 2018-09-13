@@ -55,4 +55,10 @@ class SensorContext(appContext: Context) : BaseContext(appContext) {
     /** Returns priority of accuracy requests. Value is taken from shared preferences or it is used default value. */
     val accuracyPriority: Int
         get() = Integer.valueOf(getString(R.string.key_sensor_location_accuracy_priority, R.string.default_sensor_location_accuracy_priority))
+
+
+    // ====================================== BATTERY SENSOR =======================================
+
+    val isBatteryAllowed: Boolean
+        get() = getBoolean(R.string.key_sensor_battery_is_allowed, R.bool.default_sensor_battery_is_allowed)
 }

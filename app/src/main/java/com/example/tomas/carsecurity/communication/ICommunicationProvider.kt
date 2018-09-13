@@ -18,5 +18,7 @@ interface ICommunicationProvider {
     fun sendAlarm(): Boolean
     fun sendLocation(location: Location, isAlarm: Boolean): Boolean
     fun sendBatteryWarn(capacity: Int): Boolean
+    fun sendPowerConnected(capacity: Int): Boolean
+    fun sendPowerDisconnected(capacity: Int): Boolean
     fun sendStatus(battery: Int, powerSaveMode: Boolean, utils: Map<UtilsEnum, Boolean>): Boolean
 }

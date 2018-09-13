@@ -78,6 +78,18 @@ class CommunicationManager(context: MyContext): SharedPreferences.OnSharedPrefer
         }
     }
 
+    fun sendPowerConnected(capacity: Int) {
+        for (provider in activeCommunicators) {
+            provider.sendPowerConnected(capacity)
+        }
+    }
+
+    fun sendPowerDisconnected(capacity: Int) {
+        for (provider in activeCommunicators) {
+            provider.sendPowerDisconnected(capacity)
+        }
+    }
+
     fun sendStatus(battery: Int, powerSaveMode: Boolean, utils: Map<UtilsEnum, Boolean>){
         for (provider in activeCommunicators) {
             provider.sendStatus(battery, powerSaveMode, utils)

@@ -14,9 +14,15 @@ class UtilsManager(private val context: MyContext, reload: Boolean): Observer, O
     private val utilsMap: MutableMap<UtilsEnum, GeneralUtil> = HashMap()
 
     init {
+        activateDefaultUtils()
+
         if (reload) {
             // TODO use reload for loading from ServiceState
         }
+    }
+
+    private fun activateDefaultUtils(){
+        activateUtil(UtilsEnum.Battery)
     }
 
     fun destroy(){
@@ -24,7 +30,7 @@ class UtilsManager(private val context: MyContext, reload: Boolean): Observer, O
 
         for(util in utilsMap.values){
             util.deleteObservers()
-            if(util.isEnabled()) util.disable()
+            if(util.isEnabled()) util.disable(true)
         }
 
         // destroy after all utils are disabled
