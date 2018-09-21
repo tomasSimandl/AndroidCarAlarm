@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.tomas.carsecurity.MainService
 import com.example.tomas.carsecurity.context.MyContext
 import java.util.*
+import kotlin.collections.HashMap
 
 class UtilsManager(private val context: MyContext, reload: Boolean): Observer, Observable() {
 
@@ -12,6 +13,9 @@ class UtilsManager(private val context: MyContext, reload: Boolean): Observer, O
     private val utilsHelper = UtilsHelper(context)
 
     private val utilsMap: MutableMap<UtilsEnum, GeneralUtil> = HashMap()
+
+    // Utils which are activate in all application runtime even if service is not foreground
+    private val defaultUtils = arrayOf(UtilsEnum.Battery)
 
     init {
         activateDefaultUtils()
@@ -22,7 +26,9 @@ class UtilsManager(private val context: MyContext, reload: Boolean): Observer, O
     }
 
     private fun activateDefaultUtils(){
-        activateUtil(UtilsEnum.Battery)
+        for (util in defaultUtils){
+            activateUtil(util)
+        }
     }
 
     fun destroy(){
@@ -78,7 +84,7 @@ class UtilsManager(private val context: MyContext, reload: Boolean): Observer, O
 
     fun isAnyUtilEnabled(): Boolean{
         for (util in utilsMap.values){
-            if(util.isEnabled()) return true
+            if(!defaultUtils.contains(util.thisUtilEnum) && util.isEnabled()) return true
         }
         return false
     }

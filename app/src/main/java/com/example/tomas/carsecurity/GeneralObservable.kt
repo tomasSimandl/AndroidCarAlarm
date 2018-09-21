@@ -13,20 +13,20 @@ abstract class GeneralObservable : Observable() {
     abstract fun canEnable(): Boolean
 
     /** Method is used for deactivating of detector. Method is automatically call when last listener is unregistered. */
-    protected abstract fun disable()
+    abstract fun disable()
     /** Method is used for activating detector. Method is automatically call when first listener is registered. */
-    protected abstract fun enable()
+    abstract fun enable()
     /** Method only returns if detector is enabled */
     abstract fun isEnable() :Boolean
 
     /**
      * Method is used for registration of all Observers.
-     * When first observer is registered. Method [enable] is automatically called.
+     * When sensor is not enabled method [enable] is automatically called.
      *
      * @param observer which will be registered.
     */
     override fun addObserver(observer: Observer) {
-        if(countObservers() == 0) enable()
+        if(!isEnable()) enable()
 
         super.addObserver(observer)
     }

@@ -134,6 +134,7 @@ open class MyPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
                 val checkCode = checkObj.check(activity)
 
                 when (checkCode) {
+                    CheckCodes.invalidParameters -> showMessage("Invalid parameters", "Can not allow", DialogInterface.OnClickListener { _, _ ->  }, null) // TODO use strings from resources
                     CheckCodes.hardwareNotSupported -> showMessage("Sensor is not supported by device.", "Can not allow sensor", DialogInterface.OnClickListener { _, _ ->  }, null) // TODO use strings from resources
                     CheckCodes.permissionDenied -> askForPermission(prefKey, permMsg, permissions)
                     else -> return@setOnPreferenceChangeListener true

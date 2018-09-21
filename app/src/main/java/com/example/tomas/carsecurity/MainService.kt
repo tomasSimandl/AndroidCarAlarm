@@ -43,6 +43,8 @@ class MainService : Service(), Observer {
                         broadcastSender.informUI(args.first as UtilsEnum, args.second as Boolean)
                         if(args.second == true){
                             startForeground()
+                        } else {
+                            tryStopForeground()
                         }
                     }
                 is Actions -> processAction(Intent(args.name))
@@ -103,6 +105,12 @@ class MainService : Service(), Observer {
         if (::context.isInitialized) context.destroy()
         if (::workerThread.isInitialized) workerThread.quit()
         if (::utilsManager.isInitialized) utilsManager.destroy()
+    }
+
+    private fun tryStopForeground() {
+        if (tasksInQueue.get() == 0 && !utilsManager.isAnyUtilEnabled()) {
+            stopForeground(true)
+        }
     }
 
     private fun stopService(safely: Boolean){

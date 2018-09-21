@@ -85,6 +85,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val broadcastManager = LocalBroadcastManager.getInstance(this)
         broadcastManager.registerReceiver(receiver, IntentFilter(BroadcastKeys.BroadcastUpdateUI.name))
 
+        changeColor(actionTracker, false)
+        changeColor(actionAlarm, false)
+
         sendIntent(MainService.Actions.ActionStatusUI.name)
 
         setVisibility(actionAlarm, utilsContext.isAlarmAllowed)

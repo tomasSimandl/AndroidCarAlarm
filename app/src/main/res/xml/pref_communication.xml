@@ -9,7 +9,6 @@
             android:contentDescription="@string/pref_communication_sms_switch_description"/>
 
         <EditTextPreference
-            android:dependency="@string/key_communication_sms_is_allowed"
             android:key="@string/key_communication_sms_phone_number"
             android:title="@string/pref_communication_sms_phone_number_title" />
 
