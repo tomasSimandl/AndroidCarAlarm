@@ -103,6 +103,7 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
     }
 
     override fun enable() {
+        assert(Thread.currentThread().name == "UtilsThread")
         if (!isEnabled && canRun()){
             isEnabled = true
             lastLocation = null
@@ -120,6 +121,7 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
     }
 
     override fun disable(force: Boolean) {
+        assert(Thread.currentThread().name == "UtilsThread")
         if(isEnabled) {
             isEnabled = false
             utilsHelper.unregisterAllObservables(this)

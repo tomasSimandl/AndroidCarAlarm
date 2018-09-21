@@ -151,6 +151,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
     }
 
     override fun enable() {
+        assert(Thread.currentThread().name == "UtilsThread")
         if (!isEnabled && canRun()) {
 
             isEnabled = true
@@ -171,6 +172,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
     }
 
     override fun disable(force: Boolean) {
+        assert(Thread.currentThread().name == "UtilsThread")
         if (isEnabled) {
 
             mediaPlayer?.stop()
