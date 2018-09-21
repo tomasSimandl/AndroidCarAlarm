@@ -1,18 +1,20 @@
 package com.example.tomas.carsecurity.utils
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.location.Location
 import android.util.Log
 import com.example.tomas.carsecurity.CheckCodes
 import com.example.tomas.carsecurity.CheckObjString
 import com.example.tomas.carsecurity.ObservableEnum
+import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.context.UtilsContext
 import com.example.tomas.carsecurity.sensors.LocationProvider
 import java.util.*
 import com.example.tomas.carsecurity.storage.entity.Location as DbLocation
 
-class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelper) : GeneralUtil(utilsHelper) {
+class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelper) : GeneralUtil(utilsHelper), SharedPreferences.OnSharedPreferenceChangeListener {
 
     private val tag = "utils.Tracker"
 
@@ -45,6 +47,12 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
 
     override fun canEnable(): Boolean {
         return check(context.appContext, false).isEmpty()
+    }
+
+    override fun onSharedPreferenceChanged(p0: SharedPreferences?, key: String?) {
+        when (key) {
+            // todo restart timer
+        }
     }
 
     override fun action(observable: Observable, args: Any?) {
@@ -114,6 +122,8 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
             setChanged()
             notifyObservers(true)
 
+            context.utilsContext.registerOnPreferenceChanged(this)
+
             Log.d(tag, "Tracker system is enabled.")
         }
 
@@ -125,6 +135,9 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
         if(isEnabled) {
             isEnabled = false
             utilsHelper.unregisterAllObservables(this)
+
+            context.utilsContext.unregisterOnPreferenceChanged(this)
+
 
             if(::timer.isInitialized) timer.cancel()
             synchronize()

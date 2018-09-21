@@ -2,6 +2,7 @@ package com.example.tomas.carsecurity.sensors
 
 import android.Manifest
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.media.MediaRecorder
 import android.support.v4.content.ContextCompat
@@ -9,6 +10,7 @@ import android.util.Log
 import com.example.tomas.carsecurity.CheckCodes
 import com.example.tomas.carsecurity.CheckObjByte
 import com.example.tomas.carsecurity.GeneralObservable
+import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.context.SensorContext
 import java.io.IOException
@@ -20,7 +22,7 @@ import java.util.*
  *
  * @property  context which is used for getting global data and preferences.
  */
-class SoundDetector(private val context : MyContext) : GeneralObservable() {
+class SoundDetector(private val context : MyContext) : GeneralObservable(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     private val tag = "sensors.SoundDetector"
 
@@ -29,7 +31,23 @@ class SoundDetector(private val context : MyContext) : GeneralObservable() {
     /** Indicates when sound detector is enabled. */
     private var enabled = false
 
-    private lateinit var timer: Timer
+    private var timer: Timer? = null
+
+    private val timerTask = object : TimerTask() {
+        override fun run() {
+
+            Log.v(tag, "timer thread was triggered.")
+
+            val amplitude = recorder?.maxAmplitude ?: 0
+            if (amplitude > context.sensorContext.maxAmplitude) {
+                Log.d(tag,"""Max amplitude $amplitude is over limit ${context.sensorContext.maxAmplitude}""")
+
+                setChanged()
+                notifyObservers()
+                Log.d(tag, """Update - Thread: ${Thread.currentThread().name}""")
+            }
+        }
+    }
 
     companion object Check: CheckObjByte {
         override fun check(context: Context): Byte {
@@ -49,13 +67,25 @@ class SoundDetector(private val context : MyContext) : GeneralObservable() {
         return check(context.appContext) == CheckCodes.success
     }
 
+    override fun onSharedPreferenceChanged(p0: SharedPreferences?, key: String?) {
+        when (key) {
+            context.appContext.getString(R.string.key_sensor_sound_interval) ->
+                if (enabled && timer != null) {
+                    timer?.cancel()
+                    initSoundChecker()
+                }
+        }
+    }
+
     /**
      * Method stop sound detector and stop recording audio from microphone.
      */
     override fun disable() {
         if(enabled) {
-            if (::timer.isInitialized) timer.cancel()
             enabled = false
+            timer?.cancel()
+            timer = null
+            context.sensorContext.unregisterOnPreferenceChanged(this)
             recorder?.stop()
             recorder?.release()
             recorder = null
@@ -90,6 +120,7 @@ class SoundDetector(private val context : MyContext) : GeneralObservable() {
             recorder?.start()
 
             initSoundChecker()
+            context.sensorContext.registerOnPreferenceChanged(this)
         }
         Log.d(tag, "Detector is enabled.")
     }
@@ -113,23 +144,7 @@ class SoundDetector(private val context : MyContext) : GeneralObservable() {
      * state for maximal [SensorContext].measureInterval milliseconds before it ends.
      */
     private fun initSoundChecker(){
-
-        val timerTask = object : TimerTask() {
-            override fun run() {
-
-                Log.v(tag, "timer thread was triggered.")
-
-                val amplitude = recorder?.maxAmplitude ?: 0
-                if (amplitude > context.sensorContext.maxAmplitude) {
-                    Log.d(tag,"""Max amplitude $amplitude is over limit ${context.sensorContext.maxAmplitude}""")
-
-                    setChanged()
-                    notifyObservers()
-                    Log.d(tag, """Update - Thread: ${Thread.currentThread().name}""")
-                }
-            }
-        }
         timer = Timer("SoundDetectorThread")
-        timer.schedule( timerTask, context.sensorContext.measureInterval.toLong(), context.sensorContext.measureInterval.toLong())
+        timer?.schedule( timerTask, context.sensorContext.measureInterval.toLong(), context.sensorContext.measureInterval.toLong())
     }
 }
