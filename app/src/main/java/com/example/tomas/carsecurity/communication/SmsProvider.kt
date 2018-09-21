@@ -32,6 +32,8 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
                     || ContextCompat.checkSelfPermission(context, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED
                     || ContextCompat.checkSelfPermission(context, Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED) {
                 CheckCodes.permissionDenied
+            } else if (CommunicationContext(context).phoneNumber.isBlank()) {
+                CheckCodes.invalidParameters
             } else if (!CommunicationContext(context).isProviderAllowed(SmsProvider::class.java.name)) {
                 CheckCodes.notAllowed
             } else {

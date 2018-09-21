@@ -46,6 +46,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
                 CheckCodes.hardwareNotSupported -> "Alarm needs to send SMS messages to warn car owner but their are not supported by this device."
                 CheckCodes.permissionDenied -> "Alarm needs to send SMS messages to warn car owner but application is not permitted to send SMS messages."
                 CheckCodes.notAllowed -> "Alarm needs to send SMS messages to warn car owner but their are disabled by user."
+                CheckCodes.invalidParameters -> "Alarm needs to send SMS messages to warn car owner but contact number is not set."
                 else -> {
                     val moveCheck = MoveDetector.check(context)
                     val soundCheck = SoundDetector.check(context)
