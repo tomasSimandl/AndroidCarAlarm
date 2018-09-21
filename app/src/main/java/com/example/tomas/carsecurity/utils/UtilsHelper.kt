@@ -37,10 +37,10 @@ class UtilsHelper (private val context: MyContext) {
 
         Log.d(tag, """Registering observer $util to observable $observableEnum""")
 
-        if(!observableEnum.isAvailable(context.sensorContext)){
-            Log.d(tag, "Observable is not available.")
-            return false // observable is not available (disabled by users setting)
-        }
+            if (!observableEnum.isAvailable(context.appContext)) {
+                Log.d(tag, "Observable is not available.")
+                return false // observable is not available
+            }
 
         if(utilsMap[util]?.contains(observableEnum) == true){
             Log.d(tag, """Observer $util is already registered in $observableEnum""")
