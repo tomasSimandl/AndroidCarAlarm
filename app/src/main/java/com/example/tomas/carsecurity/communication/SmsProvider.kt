@@ -3,7 +3,6 @@ package com.example.tomas.carsecurity.communication
 import android.Manifest
 import android.content.Context
 import android.content.IntentFilter
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.Location
 import android.support.v4.content.ContextCompat

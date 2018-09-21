@@ -1,17 +1,16 @@
 package com.example.tomas.carsecurity
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.support.v4.content.ContextCompat
 import android.util.Log
-import com.example.tomas.carsecurity.context.CommunicationContext
+import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.context.UtilsContext
 
-class CallProvider (private val context: Context) {
+class CallProvider (private val context: MyContext) {
 
     private val tag = "CallProvider"
 
@@ -31,8 +30,8 @@ class CallProvider (private val context: Context) {
 
 
     fun createCall() {
-        if (check(context) == CheckCodes.success) {
-            val phoneNumber = CommunicationContext(context).phoneNumber
+        if (check(context.appContext) == CheckCodes.success) {
+            val phoneNumber = context.communicationContext.phoneNumber
 
             if (phoneNumber.isNotBlank()) {
                 Log.d(tag, "Calling to contact phone number.")
@@ -40,7 +39,7 @@ class CallProvider (private val context: Context) {
                     val intent = Intent(Intent.ACTION_CALL)
                     intent.data = Uri.fromParts("tel", phoneNumber, null)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    context.startActivity(intent)
+                    context.appContext.startActivity(intent)
                 } catch (e: Exception) {
                     Log.d(tag, """Can not make call: $e""")
                 } catch (e: SecurityException) { // used because compiler can not recognise that permission is checked by method check

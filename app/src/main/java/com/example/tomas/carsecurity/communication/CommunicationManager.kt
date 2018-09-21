@@ -3,27 +3,25 @@ package com.example.tomas.carsecurity.communication
 import android.content.SharedPreferences
 import android.location.Location
 import com.example.tomas.carsecurity.R
-import com.example.tomas.carsecurity.context.CommunicationContext
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.utils.UtilsEnum
 
-class CommunicationManager(context: MyContext): SharedPreferences.OnSharedPreferenceChangeListener {
+class CommunicationManager(private val context: MyContext): SharedPreferences.OnSharedPreferenceChangeListener {
 
-    private val communicationContext = CommunicationContext(context.appContext)
     private val activeCommunicators: MutableSet<ICommunicationProvider> = HashSet()
 
     init {
-        val provider = SmsProvider(communicationContext)
+        val provider = SmsProvider(context.communicationContext)
         if (provider.initialize()) {
             activeCommunicators.add(provider)
         }
-        communicationContext.registerOnPreferenceChanged(this)
+        context.communicationContext.registerOnPreferenceChanged(this)
     }
 
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
-
-        if (key == communicationContext.appContext.getString(R.string.key_communication_sms_is_allowed)) {
+        // TODO use all possible resources (phone number)
+        if (key == context.appContext.getString(R.string.key_communication_sms_is_allowed)) {
 
             val provider = activeCommunicators.find { it is SmsProvider }
 
@@ -31,7 +29,7 @@ class CommunicationManager(context: MyContext): SharedPreferences.OnSharedPrefer
                 // new value is true
                 if (provider == null) {
                     // provider is not registered yet
-                    val newProvider = SmsProvider(communicationContext)
+                    val newProvider = SmsProvider(context.communicationContext)
                     if (newProvider.initialize()) {
                         activeCommunicators.add(newProvider)
                     }
@@ -48,7 +46,7 @@ class CommunicationManager(context: MyContext): SharedPreferences.OnSharedPrefer
 
 
     fun destroy(){
-        communicationContext.unregisterOnPreferenceChanged(this)
+        context.communicationContext.unregisterOnPreferenceChanged(this)
         activeCommunicators.forEach { it.destroy() }
         activeCommunicators.clear()
     }

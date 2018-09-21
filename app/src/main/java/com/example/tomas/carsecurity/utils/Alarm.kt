@@ -7,7 +7,6 @@ import android.util.Log
 import com.example.tomas.carsecurity.*
 import com.example.tomas.carsecurity.communication.MessageType
 import com.example.tomas.carsecurity.communication.SmsProvider
-import com.example.tomas.carsecurity.context.CommunicationContext
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.context.UtilsContext
 import com.example.tomas.carsecurity.sensors.LocationProvider
@@ -120,7 +119,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
         utilsHelper.communicationManager.sendAlarm()
 
         if(context.utilsContext.isCallAllow) {
-            CallProvider(context.appContext).createCall()
+            CallProvider(context).createCall()
         }
 
         // start siren
@@ -132,7 +131,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
 
 
         // start send location loop
-        if (CommunicationContext(context.appContext).isMessageAllowed(SmsProvider::class.java.name, MessageType.AlarmLocation.name, "send")) {
+        if (context.communicationContext.isMessageAllowed(SmsProvider::class.java.name, MessageType.AlarmLocation.name, "send")) {
 
             utilsHelper.registerObserver(OEnum.LocationProvider, this)
 
