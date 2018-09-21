@@ -63,6 +63,10 @@ class MoveDetector(private val context: MyContext) : GeneralObservable(), Sensor
         }
     }
 
+    override fun canEnable(): Boolean {
+        return check(context.appContext) == CheckCodes.success
+    }
+
     /**
      * Method stop listening incoming data from accelerometer sensor. When now ones listening system
      * automatically turn off accelerometer sensor.

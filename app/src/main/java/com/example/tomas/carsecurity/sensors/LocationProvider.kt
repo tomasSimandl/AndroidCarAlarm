@@ -46,6 +46,10 @@ class LocationProvider(private val context: MyContext) : GeneralObservable() {
         }
     }
 
+    override fun canEnable(): Boolean {
+        return check(context.appContext) == CheckCodes.success
+    }
+
     override fun enable() {
         if (!enabled && check(context.appContext) == CheckCodes.success) {
 

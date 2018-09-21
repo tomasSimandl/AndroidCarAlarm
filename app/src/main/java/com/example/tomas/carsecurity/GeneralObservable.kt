@@ -10,7 +10,7 @@ import java.util.*
  */
 abstract class GeneralObservable : Observable() {
 
-
+    abstract fun canEnable(): Boolean
 
     /** Method is used for deactivating of detector. Method is automatically call when last listener is unregistered. */
     protected abstract fun disable()

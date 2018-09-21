@@ -70,7 +70,7 @@ open class MyPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
         if (preference is SwitchPreference || preference is CheckBoxPreference) {
 
             val canBeTrue = when (checkObj) {
-                is CheckObjString -> checkObj.check(activity).isEmpty()
+                is CheckObjString -> checkObj.check(activity, true).isEmpty()
                 is CheckObjByte -> checkObj.check(activity) == CheckCodes.success
                 else -> false
             }
@@ -104,7 +104,7 @@ open class MyPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
 
         findPreference(getString(prefKey))?.setOnPreferenceChangeListener { _: Preference, value: Any ->
             if (value == true) {
-                val msg = checkObj.check(activity)
+                val msg = checkObj.check(activity, true)
 
                 if (msg.isNotBlank()) {
                     showMessage(msg, "Can not allow util", DialogInterface.OnClickListener { _, _ -> }, null) // TODO use strings from resources

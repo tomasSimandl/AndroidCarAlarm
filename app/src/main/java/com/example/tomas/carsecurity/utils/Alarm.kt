@@ -33,9 +33,9 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
 
 
     companion object Check: CheckObjString {
-        override fun check(context: Context): String {
+        override fun check(context: Context, skipAllow: Boolean): String {
 
-            if(!UtilsContext(context).isAlarmAllowed){
+            if(!skipAllow && !UtilsContext(context).isAlarmAllowed){
                 return "Alarm is disabled by user."
             }
 
@@ -60,6 +60,9 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
         }
     }
 
+    override fun canEnable(): Boolean {
+        return check(context.appContext, false).isBlank()
+    }
 
     override fun action(observable: Observable, args: Any?) {
         if (!isEnabled) return
@@ -195,7 +198,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
     }
 
     private fun canRun(): Boolean {
-        val msg = check(context.appContext)
+        val msg = check(context.appContext, false)
 
         return if (msg.isBlank()) {
             true

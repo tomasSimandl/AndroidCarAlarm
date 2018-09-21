@@ -24,9 +24,9 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
     override val thisUtilEnum: UtilsEnum = UtilsEnum.Tracker
 
     companion object Check : CheckObjString {
-        override fun check(context: Context): String {
+        override fun check(context: Context, skipAllow: Boolean): String {
 
-            if(!UtilsContext(context).isTrackerAllowed){
+            if(!skipAllow && !UtilsContext(context).isTrackerAllowed){
                 return "Tracker is disabled by user."
             }
 
@@ -41,6 +41,10 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
                 }
             }
         }
+    }
+
+    override fun canEnable(): Boolean {
+        return check(context.appContext, false).isEmpty()
     }
 
     override fun action(observable: Observable, args: Any?) {
@@ -138,7 +142,7 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
 
     private fun canRun(): Boolean {
 
-        val msg = check(context.appContext)
+        val msg = check(context.appContext, false)
 
         return if (msg.isBlank()) {
             true

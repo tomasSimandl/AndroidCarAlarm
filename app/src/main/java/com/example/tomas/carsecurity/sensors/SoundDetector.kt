@@ -45,6 +45,10 @@ class SoundDetector(private val context : MyContext) : GeneralObservable() {
         }
     }
 
+    override fun canEnable(): Boolean {
+        return check(context.appContext) == CheckCodes.success
+    }
+
     /**
      * Method stop sound detector and stop recording audio from microphone.
      */

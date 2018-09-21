@@ -13,6 +13,9 @@ class BatteryManager (private val context: MyContext, private val utilsHelper: U
     private var enabled = false
     private var warnWasSend = false
 
+    override fun canEnable(): Boolean {
+        return true
+    }
 
     override fun action(observable: Observable, args: Any?) {
         if (observable is BatteryDetector) {
@@ -44,7 +47,6 @@ class BatteryManager (private val context: MyContext, private val utilsHelper: U
                 disablePowerSaveMode()
             }
         }
-
     }
 
     private fun batteryConnected(percent: Int, charging: Boolean) {

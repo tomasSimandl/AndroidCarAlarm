@@ -37,6 +37,10 @@ class BatteryDetector (private val context: MyContext): GeneralObservable() {
         }
     }
 
+    override fun canEnable(): Boolean {
+        return true
+    }
+
     private fun notifyObservers(action: String?, intent: Intent){
 
         if(action == null) return
