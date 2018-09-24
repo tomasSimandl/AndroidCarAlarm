@@ -9,6 +9,7 @@
     <!-- =========================== STRINGS RELATED TO MAIN ACTIVITY =========================== -->
     <string name="alarm_button_text">Alarm</string>
     <string name="tracker_button_text">Tracker</string>
+    <string name="power_save_mode_message">Power save mode active</string>
 
 
     <!-- ============================= STRINGS RELATED TO SETTINGS ============================= -->

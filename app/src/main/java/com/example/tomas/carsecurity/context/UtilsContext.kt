@@ -21,6 +21,9 @@ class UtilsContext(appContext: Context): BaseContext(appContext) {
         sharedPreferences.edit().putString(appContext.getString(R.string.key_tool_battery_mode), mode.name).apply()
     }
 
+    val isPowerSaveMode
+        get() = sharedPreferences.getString(appContext.getString(R.string.key_tool_battery_mode), "") == Mode.PowerSaveMode.name
+
 
     // ======================================= TRACKER UTIL ========================================
 

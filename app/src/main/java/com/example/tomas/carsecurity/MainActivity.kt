@@ -11,6 +11,7 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.MenuItem
+import android.view.View
 import android.widget.Button
 import com.example.tomas.carsecurity.context.UtilsContext
 import com.example.tomas.carsecurity.utils.UtilsEnum
@@ -92,6 +93,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         setVisibility(actionAlarm, utilsContext.isAlarmAllowed)
         setVisibility(actionTracker, utilsContext.isTrackerAllowed)
+        setVisibility(power_save_indication, utilsContext.isPowerSaveMode)
         utilsContext.registerOnPreferenceChanged(this)
     }
 
@@ -128,11 +130,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             getString(R.string.key_tool_battery_mode) -> {
                 setVisibility(actionAlarm, utilsContext.isAlarmAllowed)
                 setVisibility(actionTracker, utilsContext.isTrackerAllowed)
+                setVisibility(power_save_indication, utilsContext.isPowerSaveMode)
             }
         }
     }
 
-    private fun setVisibility(button: Button, visible: Boolean) {
+    private fun setVisibility(button: View, visible: Boolean) {
         button.visibility = if(visible){
             Button.VISIBLE
         } else {

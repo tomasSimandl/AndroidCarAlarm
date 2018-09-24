@@ -9,6 +9,15 @@
     android:orientation="vertical"
     tools:showIn="@layout/app_bar_main">
 
+    <TextView
+        android:id="@+id/power_save_indication"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:drawableLeft="@drawable/ic_battery_alert_green_24dp"
+        android:drawableStart="@drawable/ic_battery_alert_green_24dp"
+        android:text="@string/power_save_mode_message"/>
+
     <Button
         android:id="@+id/actionAlarm"
         android:layout_width="match_parent"
