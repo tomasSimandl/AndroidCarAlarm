@@ -5,20 +5,14 @@ import android.content.SharedPreferences
 import com.example.tomas.carsecurity.R
 
 
-open class BaseContext(val appContext: Context): SharedPreferences.OnSharedPreferenceChangeListener {
+open class BaseContext(val appContext: Context) {
 
     protected enum class Mode {
         Normal, PowerSaveMode
     }
 
-    protected var mode = Mode.Normal
-
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
-        when(key) {
-            appContext.getString(R.string.key_tool_battery_mode) ->
-                mode = Mode.valueOf(sharedPreferences.getString(appContext.getString(R.string.key_tool_battery_mode), Mode.Normal.name) ?: Mode.Normal.name)
-        }
-    }
+    protected val mode
+        get() = Mode.valueOf(sharedPreferences.getString(appContext.getString(R.string.key_tool_battery_mode), Mode.Normal.name) ?: Mode.Normal.name)
 
     /** Contains private shared preferences which are shared across application. */
     protected val sharedPreferences = appContext.getSharedPreferences(

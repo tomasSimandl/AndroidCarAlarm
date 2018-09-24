@@ -2,7 +2,6 @@ package com.example.tomas.carsecurity.utils
 
 import android.util.Log
 import com.example.tomas.carsecurity.ObservableEnum
-import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.sensors.BatteryDetector
 import java.util.*
@@ -37,8 +36,8 @@ class BatteryManager (private val context: MyContext, private val utilsHelper: U
         Log.d(tag, """Battery status changed. Capacity: $percent Charging: $charging""")
 
         if (percent <= 15) {// TODO const
-            utilsHelper.communicationManager.sendBatteryWarn(percent)
             if (!warnWasSend) {
+                utilsHelper.communicationManager.sendBatteryWarn(percent)
                 warnWasSend = true
                 context.utilsContext.enablePowerSaveMode()
             }

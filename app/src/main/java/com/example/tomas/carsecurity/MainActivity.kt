@@ -125,6 +125,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         when (key){
             getString(R.string.key_tool_alarm_is_allowed) -> setVisibility(actionAlarm, utilsContext.isAlarmAllowed)
             getString(R.string.key_tool_tracker_is_allowed) -> setVisibility(actionTracker, utilsContext.isTrackerAllowed)
+            getString(R.string.key_tool_battery_mode) -> {
+                setVisibility(actionAlarm, utilsContext.isAlarmAllowed)
+                setVisibility(actionTracker, utilsContext.isTrackerAllowed)
+            }
         }
     }
 
