@@ -40,12 +40,12 @@ class BatteryManager (private val context: MyContext, private val utilsHelper: U
             utilsHelper.communicationManager.sendBatteryWarn(percent)
             if (!warnWasSend) {
                 warnWasSend = true
-                enablePowerSaveMode()
+                context.utilsContext.enablePowerSaveMode()
             }
         } else {
             if (warnWasSend) {
                 warnWasSend = false
-                disablePowerSaveMode()
+                context.utilsContext.disablePowerSaveMode()
             }
         }
     }
@@ -58,18 +58,6 @@ class BatteryManager (private val context: MyContext, private val utilsHelper: U
     private fun batteryDisconnected(percent: Int, charging: Boolean) {
         Log.d(tag, """Battery power is disconnected. Capacity: $percent Charging: $charging""")
         utilsHelper.communicationManager.sendPowerDisconnected(percent)
-    }
-
-    private fun disablePowerSaveMode() {
-        context.utilsContext.getPrivateSharedPreferences().edit().putBoolean(
-                context.appContext.getString(R.string.key_battery_power_save_mode), false
-        ).apply() // TODO what to do when will be more than one mode
-    }
-
-    private fun enablePowerSaveMode() {
-        context.utilsContext.getPrivateSharedPreferences().edit().putBoolean(
-                context.appContext.getString(R.string.key_battery_power_save_mode), true
-        ).apply()
     }
 
 

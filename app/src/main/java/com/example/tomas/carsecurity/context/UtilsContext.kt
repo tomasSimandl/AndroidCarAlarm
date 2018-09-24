@@ -1,7 +1,6 @@
 package com.example.tomas.carsecurity.context
 
 import android.content.Context
-import android.content.SharedPreferences
 import com.example.tomas.carsecurity.R
 
 /**
@@ -10,8 +9,16 @@ import com.example.tomas.carsecurity.R
  */
 class UtilsContext(appContext: Context): BaseContext(appContext) {
 
-    fun getPrivateSharedPreferences(): SharedPreferences {
-        return sharedPreferences
+    fun enablePowerSaveMode(){
+        switchBatteryMode(Mode.PowerSaveMode)
+    }
+
+    fun disablePowerSaveMode(){
+        switchBatteryMode(Mode.Normal)
+    }
+
+    private fun switchBatteryMode(mode: Mode){
+        sharedPreferences.edit().putString(appContext.getString(R.string.key_tool_battery_mode), mode.name).apply()
     }
 
 
