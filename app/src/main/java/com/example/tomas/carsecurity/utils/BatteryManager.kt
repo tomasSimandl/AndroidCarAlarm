@@ -1,20 +1,28 @@
 package com.example.tomas.carsecurity.utils
 
+import android.content.SharedPreferences
 import android.util.Log
 import com.example.tomas.carsecurity.ObservableEnum
+import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.sensors.BatteryDetector
 import java.util.*
 
-class BatteryManager (private val context: MyContext, private val utilsHelper: UtilsHelper): GeneralUtil(utilsHelper) {
+class BatteryManager (private val context: MyContext, private val utilsHelper: UtilsHelper): GeneralUtil(utilsHelper), SharedPreferences.OnSharedPreferenceChangeListener {
 
     override val thisUtilEnum: UtilsEnum = UtilsEnum.Battery
     private val tag = "BatteryManager"
     private var enabled = false
-    private var warnWasSend = false
+    private var shouldBeSaveMode = false
 
     override fun canEnable(): Boolean {
         return true
+    }
+
+    override fun onSharedPreferenceChanged(p0: SharedPreferences?, key: String?) {
+        when(key) {
+            context.appContext.getString(R.string.key_tool_battery_mode_is_allowed) -> changePowerSaveMode()
+        }
     }
 
     override fun action(observable: Observable, args: Any?) {
@@ -35,17 +43,25 @@ class BatteryManager (private val context: MyContext, private val utilsHelper: U
     private fun batteryChanged(percent: Int, charging: Boolean) {
         Log.d(tag, """Battery status changed. Capacity: $percent Charging: $charging""")
 
-        if (percent <= 15) {// TODO const
-            if (!warnWasSend) {
+        if (percent <= context.utilsContext.batteryCriticalLevel) {
+            if (!shouldBeSaveMode) {
                 utilsHelper.communicationManager.sendBatteryWarn(percent)
-                warnWasSend = true
-                context.utilsContext.enablePowerSaveMode()
+                shouldBeSaveMode = true
+                changePowerSaveMode()
             }
         } else {
-            if (warnWasSend) {
-                warnWasSend = false
-                context.utilsContext.disablePowerSaveMode()
+            if (shouldBeSaveMode) {
+                shouldBeSaveMode = false
+                changePowerSaveMode()
             }
+        }
+    }
+
+    private fun changePowerSaveMode(){
+        if(context.utilsContext.isBatteryModeAllowed && shouldBeSaveMode) {
+            context.utilsContext.enablePowerSaveMode()
+        } else {
+            context.utilsContext.disablePowerSaveMode()
         }
     }
 
@@ -65,6 +81,7 @@ class BatteryManager (private val context: MyContext, private val utilsHelper: U
 
             enabled = true
             utilsHelper.registerObserver(ObservableEnum.BatteryDetector, this)
+            context.utilsContext.registerOnPreferenceChanged(this)
         }
     }
 
@@ -72,6 +89,7 @@ class BatteryManager (private val context: MyContext, private val utilsHelper: U
         if (force && enabled) {
 
             enabled = false
+            context.utilsContext.unregisterOnPreferenceChanged(this)
             utilsHelper.unregisterAllObservables(this)
         }
     }

@@ -15,4 +15,9 @@
         android:fragment="com.example.tomas.carsecurity.SettingsActivity$CommunicationPreferenceFragment"
         android:title="@string/pref_header_communication" />
 
+    <header
+        android:icon="@drawable/ic_battery_alert_green_24dp"
+        android:fragment="com.example.tomas.carsecurity.SettingsActivity$PowerSaveModePreferenceFragment"
+        android:title="@string/pref_header_power_save_mode" />
+
 </preference-headers>

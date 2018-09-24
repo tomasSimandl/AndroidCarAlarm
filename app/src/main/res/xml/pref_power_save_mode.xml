@@ -1,0 +1,22 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:sample="http://schemas.android.com/apk/res-auto">
+
+    <SwitchPreference
+        android:contentDescription="@string/pref_power_save_mode_switch_description"
+        android:defaultValue="@bool/default_tool_battery_mode_is_allowed"
+        android:key="@string/key_tool_battery_mode_is_allowed"
+        android:title="@string/pref_power_save_mode_switch_title" />
+
+    <com.pavelsikun.seekbarpreference.SeekBarPreferenceCompat
+        android:key="@string/key_tool_battery_critical_level"
+        android:title="@string/pref_tool_battery_critical_level_title"
+        android:summary="@string/pref_tool_battery_critical_level_description"
+        android:dependency="@string/key_tool_battery_mode_is_allowed"
+        android:defaultValue="@integer/default_tool_battery_critical_level"
+
+        sample:msbp_minValue="5"
+        sample:msbp_maxValue="90"
+        sample:msbp_interval="1"
+        sample:msbp_measurementUnit="%"
+        sample:msbp_dialogEnabled="false"/>
+</PreferenceScreen>

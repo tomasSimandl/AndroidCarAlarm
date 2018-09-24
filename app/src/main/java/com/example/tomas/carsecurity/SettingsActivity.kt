@@ -69,6 +69,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
                 || ToolsPreferenceFragment::class.java.name == fragmentName
                 || SensorsPreferenceFragment::class.java.name == fragmentName
                 || CommunicationPreferenceFragment::class.java.name == fragmentName
+                || PowerSaveModePreferenceFragment::class.java.name == fragmentName
     }
 
     /**
@@ -193,6 +194,17 @@ class SettingsActivity : AppCompatPreferenceActivity() {
                     R.string.key_communication_sms_is_allowed,
                     resources.getBoolean(R.bool.default_communication_sms_is_allowed),
                     SmsProvider)
+        }
+    }
+
+    /**
+     * Class is used for preference screen for power save mode
+     */
+    class PowerSaveModePreferenceFragment : MyPreferenceFragment() {
+        override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            super.onCreatePreferences(savedInstanceState, rootKey)
+
+            addPreferencesFromResource(R.xml.pref_power_save_mode)
         }
     }
 }

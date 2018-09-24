@@ -1,6 +1,5 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- MOVE SENSOR -->
     <PreferenceCategory android:key="sms_category" android:title="@string/pref_communication_sms_group_name">
         <SwitchPreference
             android:defaultValue="@bool/default_communication_sms_is_allowed"

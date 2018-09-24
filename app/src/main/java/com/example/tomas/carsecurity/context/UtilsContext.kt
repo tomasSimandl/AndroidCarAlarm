@@ -24,6 +24,11 @@ class UtilsContext(appContext: Context): BaseContext(appContext) {
     val isPowerSaveMode
         get() = sharedPreferences.getString(appContext.getString(R.string.key_tool_battery_mode), "") == Mode.PowerSaveMode.name
 
+    val isBatteryModeAllowed
+        get() = getBoolean(R.string.key_tool_battery_mode_is_allowed, R.bool.default_tool_battery_mode_is_allowed)
+
+    val batteryCriticalLevel
+        get() = getInt(R.string.key_tool_battery_critical_level, R.integer.default_tool_battery_critical_level)
 
     // ======================================= TRACKER UTIL ========================================
 

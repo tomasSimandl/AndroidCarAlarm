@@ -29,7 +29,9 @@
     <string name="key_tool_tracker_ignore_distance">tool_tracker_ignore_distance</string>
     <string name="key_tool_tracker_timeout">tool_tracker_timeout</string>
 
+    <string name="key_tool_battery_mode_is_allowed">tool_battery_mode_is_allowed</string>
     <string name="key_tool_battery_mode">tool_battery_mode</string>
+    <string name="key_tool_battery_critical_level">tool_battery_critical_level</string>
 
 
     <!--===================================== Communication =====================================-->

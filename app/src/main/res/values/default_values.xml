@@ -49,8 +49,12 @@
     <!-- Milliseconds after Tracker will be disabled when location is not changing. -->
     <integer name="default_tool_tracker_timeout">6</integer>
 
-    <!-- Indicates if which battery mode is enabled. -->
-    <bool name="default_battery_power_save_mode">false</bool>
+    <!-- Indicates if battery mode can be automatically changed -->
+    <bool name="default_tool_battery_mode_is_allowed">true</bool>
+    <!-- Indicates which battery mode is enabled. -->
+    <string name="default_tool_battery_power_save_mode">Normal</string>
+    <!-- Battery level when power save mode will be enabled -->
+    <integer name="default_tool_battery_critical_level">15</integer>
     <!-- Indicates if sound sensor is allowed in power save mode. -->
     <bool name="battery_save_mode_sensor_sound_is_allowed">false</bool>
     <!-- Indicates if Tracker is allowed in power save mode. -->

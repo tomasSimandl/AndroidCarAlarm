@@ -17,6 +17,7 @@
     <string name="pref_header_sensors">Sensors</string>
     <string name="pref_header_tools">Tools</string>
     <string name="pref_header_communication">Communication</string>
+    <string name="pref_header_power_save_mode">Power-save mode</string>
 
     <!-- ================================ Tools Alarm settings ================================= -->
     <string name="pref_tools_alarm_group_name">Alarm</string>
@@ -114,6 +115,12 @@
         <item>Command send location</item>
     </string-array>
 
+    <!-- =============================== Power-save mode settings ============================== -->
+    <string name="pref_power_save_mode_switch_title">Allow power save mode</string>
+    <string name="pref_power_save_mode_switch_description">Allows automatically switch to power save mode when battery level is critical. In power save mode will be disabled: sound sensor, tracker, alarm siren and send sms location alarm interval will increase.</string> <!-- TODO update -->
+
+    <string name="pref_tool_battery_critical_level_title">Critical level</string>
+    <string name="pref_tool_battery_critical_level_description">Battery level in which will be enable power save mode</string>
 
 
     <!-- ============================ STRINGS RELATED TO SIDE PANEL ============================ -->
