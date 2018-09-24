@@ -62,6 +62,9 @@ class UtilsContext(appContext: Context): BaseContext(appContext) {
             Mode.PowerSaveMode -> appContext.resources.getInteger(R.integer.battery_save_mode_tool_alarm_send_location_interval) * 1000
         }
 
+    val disableSendLocationInterval
+        get() = appContext.resources.getInteger(R.integer.default_tool_alarm_disable_send_location_interval)
+
 
     val isSirenAllow
         get() = when(mode) {

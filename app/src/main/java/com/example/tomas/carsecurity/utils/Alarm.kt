@@ -37,7 +37,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
             if (lastLocation != null) {
                 utilsHelper.communicationManager.sendLocation(lastLocation!!, true)
             }
-            // TODO only in power save mode
+
             utilsHelper.registerObserver(OEnum.LocationProvider, this@Alarm) // on location update can unregister listener
         }
     }
@@ -99,8 +99,8 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
     private fun onLocationUpdate(location: Location) {
         Log.d(tag, """Location update: $location""")
         this.lastLocation = location
-        if (context.utilsContext.sendLocationInterval.toLong() > 60) { // interval je vetsi nez X // TODO cons
-            utilsHelper.unregisterObservable(OEnum.LocationProvider, this) // TODO only in power save mode
+        if (context.utilsContext.sendLocationInterval > context.utilsContext.disableSendLocationInterval) { // 5 minutes
+            utilsHelper.unregisterObservable(OEnum.LocationProvider, this)
         }
     }
 
