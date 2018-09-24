@@ -77,6 +77,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
 
     override fun onSharedPreferenceChanged(p0: SharedPreferences?, key: String?) {
         when (key) {
+            context.appContext.getString(R.string.key_tool_battery_mode),
             context.appContext.getString(R.string.key_tool_alarm_send_location_interval) ->
                 if(isEnabled && isAlarm && sendSmsTimer != null){
                     sendSmsTimer?.cancel()

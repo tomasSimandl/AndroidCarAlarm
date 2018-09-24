@@ -2,6 +2,7 @@ package com.example.tomas.carsecurity.utils
 
 import android.util.Log
 import com.example.tomas.carsecurity.ObservableEnum
+import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.sensors.BatteryDetector
 import java.util.*
@@ -60,12 +61,17 @@ class BatteryManager (private val context: MyContext, private val utilsHelper: U
     }
 
     private fun disablePowerSaveMode() {
-        // TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        context.utilsContext.getPrivateSharedPreferences().edit().putBoolean(
+                context.appContext.getString(R.string.key_battery_power_save_mode), false
+        ).apply() // TODO what to do when will be more than one mode
     }
 
     private fun enablePowerSaveMode() {
-        // TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        context.utilsContext.getPrivateSharedPreferences().edit().putBoolean(
+                context.appContext.getString(R.string.key_battery_power_save_mode), true
+        ).apply()
     }
+
 
     override fun enable() {
         if (!enabled) {

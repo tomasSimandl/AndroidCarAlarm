@@ -29,10 +29,13 @@
     <string name="key_tool_tracker_ignore_distance">tool_tracker_ignore_distance</string>
     <string name="key_tool_tracker_timeout">tool_tracker_timeout</string>
 
+    <string name="key_tool_battery_mode">tool_battery_mode</string>
+
 
     <!--===================================== Communication =====================================-->
     <string name="key_communication_sms_is_allowed">communication_sms_is_allowed</string>
     <string name="key_communication_sms_phone_number">communication_sms_phone_number</string>
     <string name="key_communication_sms_allowed_message_types">communication_sms_allowed_message_types</string>
+
 
 </resources>

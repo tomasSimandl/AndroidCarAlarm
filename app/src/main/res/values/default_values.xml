@@ -57,6 +57,17 @@
     <bool name="default_communication_is_message_allowed">true</bool>
 
 
+
+
+
+    <bool name="default_battery_power_save_mode">false</bool>
+
+    <bool name="battery_save_mode_sensor_sound_is_allowed">false</bool>
+    <bool name="battery_save_mode_tool_tracker_is_allowed">false</bool>
+    <bool name="battery_save_mode_tool_alarm_siren_is_allowed">false</bool>
+    <integer name="battery_save_mode_tool_alarm_send_location_interval">1200</integer> <!-- [s] -->
+
+
     <!-- CAN NOT CHANGE WITH VALUE FROM SHARED PREFERENCES -->
 
     <!-- Dimensions of measured data from accelerometer -->
