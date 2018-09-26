@@ -113,7 +113,7 @@ class SoundDetector(private val context : MyContext) : GeneralObservable(), Shar
                 recorder?.prepare()
             } catch (e: IOException) {
                 recorder = null
-                enabled = false // TODO maybe can throw exception
+                enabled = false
                 Log.w(tag, "Detector can to be enabled.")
                 return
             }

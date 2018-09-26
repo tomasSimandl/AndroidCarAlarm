@@ -47,7 +47,7 @@ class MoveDetector(private val context: MyContext) : GeneralObservable(), Sensor
         sensor = manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
 
         if(sensor == null){
-            Log.e(tag, "No acceleration sensor in this device") // TODO return error to GUI
+            Log.e(tag, "No acceleration sensor in this device")
         }
     }
 
