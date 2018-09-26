@@ -22,6 +22,8 @@
     <!-- ================================ Tools Alarm settings ================================= -->
     <string name="pref_tools_alarm_group_name">Alarm</string>
 
+    <string name="pref_tool_alarm_telephony_permission_message">For creating of automatic calls application need permission. Next dialog will be asking for needed permission.</string>
+
     <string name="pref_tools_alarm_switch_title">Allow Alarm</string>
     <string name="pref_tools_alarm_switch_description">Allow use of alarm. Does not turn on Alarm system.</string>
 
@@ -65,6 +67,8 @@
     <!-- ================================ Sensors Sound settings =============================== -->
     <string name="pref_sensors_sound_group_name">Sound sensor</string>
 
+    <string name="pref_sensors_sound_audio_permission_message">For using of sound sensor application need a permission. Next dialog will be asking for needed permission.</string>
+
     <string name="pref_sensors_sound_switch_title">Allow Sound sensor</string>
     <string name="pref_sensors_sound_switch_description"> </string>
 
@@ -76,6 +80,8 @@
 
     <!-- ============================== Sensors Location settings ============================== -->
     <string name="pref_sensors_location_group_name">Location sensor</string>
+
+    <string name="pref_sensors_location_fine_location_permission_message">For getting device location application needs a permission. Next dialog will be asking for needed permission.</string>
 
     <string name="pref_sensors_location_switch_title">Allow Location sensor</string>
     <string name="pref_sensors_location_switch_description"> </string>
@@ -92,6 +98,8 @@
 
     <!-- ============================== Communication sms settings ============================= -->
     <string name="pref_communication_sms_group_name">SMS</string>
+
+    <string name="pref_communication_sms_permission_message">For sending and receiving sms messages application needs permission. Next dialog will be asking for needed permission.</string>
 
     <string name="pref_communication_sms_switch_title">Allow sms communication</string>
     <string name="pref_communication_sms_switch_description"> </string>
@@ -148,7 +156,28 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
 
-    <string name="msg_hw_not_supported">This util need %s which is not supported by this device.</string>
-    <string name="msg_not_permitted">Using of %s is not permitted by user.</string>
+    <string name="error_msg_title">Can not enable</string>
+    <string name="error_invalid_params">Invalid parameters. Please change related parameters first.</string>
+    <string name="error_hw_not_supported">Requirement hardware is not supported. Can not enable on this device.</string>
+
+
+    <string name="error_alarm_disabled">Alarm is disabled by user. Enable it in Tools settings.</string>
+    <string name="error_alarm_sms_not_supported">Alarm needs to send SMS messages to warn car owner but SMS messages are not supported by this device.</string>
+    <string name="error_alarm_sms_not_permitted">Alarm needs to send SMS messages to warn car owner but application is not permitted to send SMS messages. Please request for permissions in communication setting.</string>
+    <string name="error_alarm_sms_not_allowed">Alarm needs to send SMS messages to warn car owner but their are disabled by user. Enable Alarm in Tools setting.</string>
+    <string name="error_alarm_sms_invalid_params">Alarm needs to send SMS messages to warn car owner but contact number is not set. Set contact number in Communication setting.</string>
+    <string name="error_alarm_no_detector">Alarm needs at least one detection sensor. No sensor is available.\nMoves sensor:\n%s\nMicrophone:\n%s</string>
+
+    <string name="error_tracker_disabled">Tracker is disabled by user. Enable it in Tools settings.</string>
+    <string name="error_tracker_location_not_supported">Tracker needs to get device location for creating of log book but this device not support location access.</string>
+    <string name="error_tracker_location_not_permitted">Tracker needs to get device location for creating of log book but application is not permitted to get device location. Please request for permissions in communication setting.</string>
+    <string name="error_tracker_location_not_allowed">Tracker needs to get device location for creating of log book but sensor is disabled by user. Enable Alarm in Tools setting.</string>
+    <string name="error_tracker_location_invalid_params">Invalid parameters are set to invalid value please change it in setting.</string>
+
+    <string name="error_check_codes_hw_not_supported">hardware is not supported</string>
+    <string name="error_check_codes_not_permitted">hardware permission denied</string>
+    <string name="error_check_codes_not_allowed">disabled by user</string>
+    <string name="error_check_codes_invalid_params">invalid setting</string>
+    <string name="error_check_codes_success">OK</string>
 
 </resources>

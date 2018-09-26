@@ -107,7 +107,7 @@ open class MyPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
                 val msg = checkObj.check(activity, true)
 
                 if (msg.isNotBlank()) {
-                    showMessage(msg, "Can not allow util", DialogInterface.OnClickListener { _, _ -> }, null) // TODO use strings from resources
+                    showMessage(msg, getString(R.string.error_msg_title), DialogInterface.OnClickListener { _, _ -> }, null)
                     return@setOnPreferenceChangeListener false
                 }
             }
@@ -134,8 +134,8 @@ open class MyPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
                 val checkCode = checkObj.check(activity)
 
                 when (checkCode) {
-                    CheckCodes.invalidParameters -> showMessage("Invalid parameters", "Can not allow", DialogInterface.OnClickListener { _, _ ->  }, null) // TODO use strings from resources
-                    CheckCodes.hardwareNotSupported -> showMessage("Sensor is not supported by device.", "Can not allow sensor", DialogInterface.OnClickListener { _, _ ->  }, null) // TODO use strings from resources
+                    CheckCodes.invalidParameters -> showMessage(getString(R.string.error_invalid_params), getString(R.string.error_msg_title), DialogInterface.OnClickListener { _, _ ->  }, null)
+                    CheckCodes.hardwareNotSupported -> showMessage(getString(R.string.error_hw_not_supported), getString(R.string.error_msg_title), DialogInterface.OnClickListener { _, _ ->  }, null)
                     CheckCodes.permissionDenied -> askForPermission(prefKey, permMsg, permissions)
                     else -> return@setOnPreferenceChangeListener true
                 }

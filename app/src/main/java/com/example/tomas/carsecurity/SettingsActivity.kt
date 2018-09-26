@@ -113,7 +113,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
             registerPreferenceCheck(
                     R.string.key_tool_alarm_is_call_allowed,
                     CallProvider,
-                    "For creating of automatic calls application need permission.", // TODO use string preference
+                    getString(R.string.pref_tool_alarm_telephony_permission_message),
                     arrayOf(Manifest.permission.CALL_PHONE))
             setValueToPreference(
                     R.string.key_tool_alarm_is_call_allowed,
@@ -144,7 +144,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
             registerPreferenceCheck(
                     R.string.key_sensor_sound_is_allowed,
                     SoundDetector,
-                    "For using of sound sensor application need a permission. Next dialog will be asking for needed permission.",
+                    getString(R.string.pref_sensors_sound_audio_permission_message),
                     arrayOf(Manifest.permission.RECORD_AUDIO))
             setValueToPreference(
                     R.string.key_sensor_sound_is_allowed,
@@ -166,7 +166,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
             registerPreferenceCheck(
                     R.string.key_sensor_location_is_allowed,
                     LocationProvider,
-                    "For getting device location application needs a permission. Next dialog will be asking for needed permission.",
+                    getString(R.string.pref_sensors_location_fine_location_permission_message),
                     arrayOf(Manifest.permission.ACCESS_FINE_LOCATION))
             setValueToPreference(
                     R.string.key_sensor_location_is_allowed,
@@ -188,7 +188,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
             registerPreferenceCheck(
                     R.string.key_communication_sms_is_allowed,
                     SmsProvider,
-                    "For sending and receiving sms messages application needs permission. Next dialog will be asking for needed permission.",
+                    getString(R.string.pref_communication_sms_permission_message),
                     arrayOf(Manifest.permission.SEND_SMS, Manifest.permission.READ_SMS, Manifest.permission.RECEIVE_SMS))
             setValueToPreference(
                     R.string.key_communication_sms_is_allowed,

@@ -38,7 +38,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                 AlertDialog.Builder(this@MainActivity)
                         .setMessage(intent.getStringExtra(BroadcastKeys.KeyShowMessage.name))
-                        .setTitle("Can not enable util") // TODO use strings from resources
+                        .setTitle(R.string.error_msg_title)
+                        .setPositiveButton(R.string.ok, null)
                         .create().show()
 
             } else {

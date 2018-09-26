@@ -29,15 +29,16 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
         override fun check(context: Context, skipAllow: Boolean): String {
 
             if(!skipAllow && !UtilsContext(context).isTrackerAllowed){
-                return "Tracker is disabled by user."
+                return context.getString(R.string.error_tracker_disabled)
             }
 
             val locationCheck = LocationProvider.check(context)
 
-            return when (locationCheck) {  // TODO use strings from resources
-                CheckCodes.hardwareNotSupported -> "Tracker needs to get device location for creating of log book but this device not support location access."
-                CheckCodes.permissionDenied -> "Tracker needs to get device location for creating of log book but application is not permitted to get device location."
-                CheckCodes.notAllowed -> "Tracker needs to get device location for creating of log book but sensor is disabled by user."
+            return when (locationCheck) {
+                CheckCodes.hardwareNotSupported -> context.getString(R.string.error_tracker_location_not_supported)
+                CheckCodes.permissionDenied -> context.getString(R.string.error_tracker_location_not_permitted)
+                CheckCodes.notAllowed -> context.getString(R.string.error_tracker_location_not_allowed)
+                CheckCodes.invalidParameters -> context.getString(R.string.error_tracker_location_invalid_params)
                 else -> {
                     "" // TODO check for internet provider
                 }

@@ -42,21 +42,20 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
         }
     }
 
-
     companion object Check: CheckObjString {
         override fun check(context: Context, skipAllow: Boolean): String {
 
             if(!skipAllow && !UtilsContext(context).isAlarmAllowed){
-                return "Alarm is disabled by user."
+                return context.getString(R.string.error_alarm_disabled)
             }
 
             val smsCheck = SmsProvider.check(context)
 
-            return when (smsCheck) {  // TODO use strings from resources
-                CheckCodes.hardwareNotSupported -> "Alarm needs to send SMS messages to warn car owner but their are not supported by this device."
-                CheckCodes.permissionDenied -> "Alarm needs to send SMS messages to warn car owner but application is not permitted to send SMS messages."
-                CheckCodes.notAllowed -> "Alarm needs to send SMS messages to warn car owner but their are disabled by user."
-                CheckCodes.invalidParameters -> "Alarm needs to send SMS messages to warn car owner but contact number is not set."
+            return when (smsCheck) {
+                CheckCodes.hardwareNotSupported -> context.getString(R.string.error_alarm_sms_not_supported)
+                CheckCodes.permissionDenied -> context.getString(R.string.error_alarm_sms_not_permitted)
+                CheckCodes.notAllowed -> context.getString(R.string.error_alarm_sms_not_allowed)
+                CheckCodes.invalidParameters -> context.getString(R.string.error_alarm_sms_invalid_params)
                 else -> {
                     val moveCheck = MoveDetector.check(context)
                     val soundCheck = SoundDetector.check(context)
@@ -64,7 +63,9 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
                     if (moveCheck == CheckCodes.success || soundCheck == CheckCodes.success) {
                         ""
                     } else {
-                        "Alarm needs at least one detection sensor. No sensor is available.\nMoves sensor:\n" + CheckCodes.toString(moveCheck) + "\nMicrophone:\n" + CheckCodes.toString(soundCheck)
+                        context.getString(R.string.error_alarm_no_detector,
+                                CheckCodes.toString(moveCheck, context),
+                                CheckCodes.toString(soundCheck, context))
                     }
                 }
             }
