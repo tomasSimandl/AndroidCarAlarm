@@ -20,6 +20,7 @@ class CommunicationManager(private val context: MyContext): SharedPreferences.On
 
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
+        //  TODO warning - run in main thread
         // TODO use all possible resources (phone number)
         if (key == context.appContext.getString(R.string.key_communication_sms_is_allowed)) {
 

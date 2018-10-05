@@ -51,9 +51,12 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
     }
 
     override fun onSharedPreferenceChanged(p0: SharedPreferences?, key: String?) {
-        when (key) {
-            // todo restart timer
+        val task = Runnable {
+            when (key) {
+                // todo restart timer
+            }
         }
+        utilsHelper.runOnUtilThread(task)
     }
 
     override fun action(observable: Observable, args: Any?) {

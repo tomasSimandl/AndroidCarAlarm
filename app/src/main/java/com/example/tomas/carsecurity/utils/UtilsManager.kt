@@ -2,6 +2,7 @@ package com.example.tomas.carsecurity.utils
 
 import android.util.Log
 import com.example.tomas.carsecurity.MainService
+import com.example.tomas.carsecurity.WorkerThread
 import com.example.tomas.carsecurity.context.MyContext
 import java.util.*
 import kotlin.collections.HashMap
@@ -44,22 +45,33 @@ class UtilsManager(private val context: MyContext, reload: Boolean): Observer, O
     }
 
     override fun update(observable: Observable, args: Any) {
-        if(observable is GeneralUtil) {
-            when (args) {
-                is Boolean -> {
-                    setChanged()
-                    notifyObservers(Pair(observable.thisUtilEnum, args))
 
-                    if(!isAnyUtilEnabled()){
+        val task = Runnable {
+            assert(Thread.currentThread().name == "MainServiceThread")
+
+            if (observable is GeneralUtil) {
+                when (args) {
+                    is Boolean -> {
                         setChanged()
-                        notifyObservers(MainService.Actions.ActionForegroundStop)
+                        notifyObservers(Pair(observable.thisUtilEnum, args))
+
+                        if (!isAnyUtilEnabled()) {
+                            setChanged()
+                            notifyObservers(MainService.Actions.ActionForegroundStop)
+                        }
+                    }
+                    is String -> {
+                        setChanged()
+                        notifyObservers(args)
                     }
                 }
-                is String -> {
-                    setChanged()
-                    notifyObservers(args)
-                }
             }
+        }
+
+        if (Thread.currentThread() != context.mainServiceThreadLooper.thread) {
+            (context.mainServiceThreadLooper.thread as WorkerThread).postTask(task)
+        } else {
+            task.run()
         }
     }
 

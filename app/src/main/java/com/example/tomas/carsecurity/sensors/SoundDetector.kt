@@ -7,10 +7,7 @@ import android.content.pm.PackageManager
 import android.media.MediaRecorder
 import android.support.v4.content.ContextCompat
 import android.util.Log
-import com.example.tomas.carsecurity.CheckCodes
-import com.example.tomas.carsecurity.CheckObjByte
-import com.example.tomas.carsecurity.GeneralObservable
-import com.example.tomas.carsecurity.R
+import com.example.tomas.carsecurity.*
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.context.SensorContext
 import java.io.IOException
@@ -68,13 +65,16 @@ class SoundDetector(private val context : MyContext) : GeneralObservable(), Shar
     }
 
     override fun onSharedPreferenceChanged(p0: SharedPreferences?, key: String?) {
-        when (key) {
-            context.appContext.getString(R.string.key_sensor_sound_interval) ->
-                if (enabled && timer != null) {
-                    timer?.cancel()
-                    initSoundChecker()
-                }
+        val task = Runnable {
+            when (key) {
+                context.appContext.getString(R.string.key_sensor_sound_interval) ->
+                    if (enabled && timer != null) {
+                        timer?.cancel()
+                        initSoundChecker()
+                    }
+            }
         }
+        (context.mainServiceThreadLooper.thread as WorkerThread).postTask(task)
     }
 
     /**

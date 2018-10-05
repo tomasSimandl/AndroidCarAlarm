@@ -77,15 +77,18 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
     }
 
     override fun onSharedPreferenceChanged(p0: SharedPreferences?, key: String?) {
-        when (key) {
-            context.appContext.getString(R.string.key_tool_battery_mode),
-            context.appContext.getString(R.string.key_tool_alarm_send_location_interval) ->
-                if(isEnabled && isAlarm && sendSmsTimer != null){
-                    sendSmsTimer?.cancel()
-                    sendSmsTimer = Timer("SendSmsTimer")
-                    sendSmsTimer!!.schedule(sendSmsTask, context.utilsContext.sendLocationInterval.toLong(), context.utilsContext.sendLocationInterval.toLong())
-                }
+        val task = Runnable {
+            when (key) {
+                context.appContext.getString(R.string.key_tool_battery_mode),
+                context.appContext.getString(R.string.key_tool_alarm_send_location_interval) ->
+                    if(isEnabled && isAlarm && sendSmsTimer != null){
+                        sendSmsTimer?.cancel()
+                        sendSmsTimer = Timer("SendSmsTimer")
+                        sendSmsTimer!!.schedule(sendSmsTask, context.utilsContext.sendLocationInterval.toLong(), context.utilsContext.sendLocationInterval.toLong())
+                    }
+            }
         }
+        utilsHelper.runOnUtilThread(task)
     }
 
     override fun action(observable: Observable, args: Any?) {
@@ -100,7 +103,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
     private fun onLocationUpdate(location: Location) {
         Log.d(tag, """Location update: $location""")
         this.lastLocation = location
-        if (context.utilsContext.sendLocationInterval > context.utilsContext.disableSendLocationInterval) { // 5 minutes
+        if (context.utilsContext.sendLocationInterval > context.utilsContext.disableSendLocationInterval) {
             utilsHelper.unregisterObservable(OEnum.LocationProvider, this)
         }
     }

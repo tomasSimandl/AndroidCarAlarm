@@ -7,6 +7,7 @@ abstract class GeneralUtil(private val utilsHelper: UtilsHelper) : Observer, Obs
 
     abstract val thisUtilEnum: UtilsEnum
 
+    // UtilsThread
     abstract fun action(observable: Observable, args: Any?)
 
     override fun update(observable: Observable?, args: Any?) {
@@ -20,6 +21,7 @@ abstract class GeneralUtil(private val utilsHelper: UtilsHelper) : Observer, Obs
 
     abstract fun canEnable(): Boolean
 
+    //MainServiceThread
     abstract fun enable() // !! Can be call more than once
     abstract fun disable(force: Boolean = false) // !! Can be call more than once// Force can be used only when application is closing
     abstract fun isEnabled(): Boolean
