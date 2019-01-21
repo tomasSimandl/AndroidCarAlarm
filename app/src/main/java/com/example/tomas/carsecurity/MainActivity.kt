@@ -2,6 +2,7 @@ package com.example.tomas.carsecurity
 
 import android.content.*
 import android.os.Bundle
+import android.os.Handler
 import android.support.design.widget.NavigationView
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.LocalBroadcastManager
@@ -13,6 +14,7 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.Button
+import android.widget.ProgressBar
 import com.example.tomas.carsecurity.context.UtilsContext
 import com.example.tomas.carsecurity.utils.UtilsEnum
 import kotlinx.android.synthetic.main.activity_main.*
@@ -27,6 +29,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private val tag = "MainActivity"
+    private var isProgressRun = false
 
     private lateinit var utilsContext: UtilsContext
 
@@ -47,10 +50,44 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 val utilEnabled = intent.getBooleanExtra(BroadcastKeys.KeyUtilActivated.name, false)
 
                 when (utilName) {
-                    UtilsEnum.Alarm.name -> changeColor(actionAlarm, utilEnabled)
+                    UtilsEnum.Alarm.name -> {
+                        if(utilEnabled){
+                            runProgress(context)
+                        } else {
+                            progressBar.max = 0
+                        }
+                        changeColor(actionAlarm, utilEnabled)
+                    }
                     UtilsEnum.Tracker.name -> changeColor(actionTracker, utilEnabled)
                 }
             }
+        }
+    }
+
+    private fun runProgress(context: Context) {
+        progressBar.max = UtilsContext(context).startAlarmInterval / 1000
+        progressBar.progress = 0
+
+        if(!isProgressRun) {
+            isProgressRun = true
+            progressBar.visibility = ProgressBar.VISIBLE
+
+            val handler = Handler()
+
+            Thread(Runnable {
+                while (progressBar.max > progressBar.progress) {
+                    handler.post {
+                        progressBar.progress++
+                    }
+
+                    Thread.sleep(1000)
+                }
+
+                handler.post {
+                    progressBar.visibility = ProgressBar.GONE
+                    isProgressRun = false
+                }
+            }).start()
         }
     }
 
