@@ -49,25 +49,15 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
                 return context.getString(R.string.error_alarm_disabled)
             }
 
-            val smsCheck = SmsProvider.check(context)
+            val moveCheck = MoveDetector.check(context)
+            val soundCheck = SoundDetector.check(context)
 
-            return when (smsCheck) {
-                CheckCodes.hardwareNotSupported -> context.getString(R.string.error_alarm_sms_not_supported)
-                CheckCodes.permissionDenied -> context.getString(R.string.error_alarm_sms_not_permitted)
-                CheckCodes.notAllowed -> context.getString(R.string.error_alarm_sms_not_allowed)
-                CheckCodes.invalidParameters -> context.getString(R.string.error_alarm_sms_invalid_params)
-                else -> {
-                    val moveCheck = MoveDetector.check(context)
-                    val soundCheck = SoundDetector.check(context)
-
-                    if (moveCheck == CheckCodes.success || soundCheck == CheckCodes.success) {
-                        ""
-                    } else {
-                        context.getString(R.string.error_alarm_no_detector,
-                                CheckCodes.toString(moveCheck, context),
-                                CheckCodes.toString(soundCheck, context))
-                    }
-                }
+            return if (moveCheck == CheckCodes.success || soundCheck == CheckCodes.success) {
+                ""
+            } else {
+                context.getString(R.string.error_alarm_no_detector,
+                        CheckCodes.toString(moveCheck, context),
+                        CheckCodes.toString(soundCheck, context))
             }
         }
     }
