@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import android.util.Log
 import com.example.tomas.carsecurity.ObservableEnum
 import com.example.tomas.carsecurity.R
+import com.example.tomas.carsecurity.communication.MessageType
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.sensors.BatteryDetector
 import java.util.*
@@ -48,7 +49,7 @@ class BatteryManager (private val context: MyContext, private val utilsHelper: U
 
         if (percent <= context.utilsContext.batteryCriticalLevel) {
             if (!shouldBeSaveMode) {
-                utilsHelper.communicationManager.sendBatteryWarn(percent)
+                utilsHelper.communicationManager.sendEvent(MessageType.BatteryWarn, percent)
                 shouldBeSaveMode = true
                 changePowerSaveMode()
             }
@@ -70,12 +71,12 @@ class BatteryManager (private val context: MyContext, private val utilsHelper: U
 
     private fun batteryConnected(percent: Int, charging: Boolean) {
         Log.d(tag, """Battery power is connected. Capacity: $percent Charging: $charging""")
-        utilsHelper.communicationManager.sendPowerConnected(percent)
+        utilsHelper.communicationManager.sendEvent(MessageType.PowerConnected, percent)
     }
 
     private fun batteryDisconnected(percent: Int, charging: Boolean) {
         Log.d(tag, """Battery power is disconnected. Capacity: $percent Charging: $charging""")
-        utilsHelper.communicationManager.sendPowerDisconnected(percent)
+        utilsHelper.communicationManager.sendEvent(MessageType.PowerDisconnected, percent)
     }
 
 

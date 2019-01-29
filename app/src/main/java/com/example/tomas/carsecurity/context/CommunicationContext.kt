@@ -2,6 +2,7 @@ package com.example.tomas.carsecurity.context
 
 import android.content.Context
 import com.example.tomas.carsecurity.R
+import com.example.tomas.carsecurity.communication.network.NetworkProvider
 import com.example.tomas.carsecurity.communication.sms.SmsProvider
 
 /**
@@ -16,6 +17,7 @@ class CommunicationContext(appContext: Context): BaseContext(appContext) {
     fun isProviderAllowed(provider: String): Boolean{
         return when(provider){
             SmsProvider::class.java.name -> getBoolean(R.string.key_communication_sms_is_allowed, R.bool.default_communication_sms_is_allowed)
+            NetworkProvider::class.java.name -> getBoolean(R.string.key_communication_network_is_allowed, R.bool.default_communication_network_is_allowed)
             else -> false
         }
     }
@@ -23,6 +25,7 @@ class CommunicationContext(appContext: Context): BaseContext(appContext) {
     fun isMessageAllowed(provider: String, vararg parameters: String): Boolean{
         val stringSet = when(provider){
             SmsProvider::class.java.name -> getStringSet(R.string.key_communication_sms_allowed_message_types,null)
+            NetworkProvider::class.java.name -> getStringSet(R.string.key_communication_network_allowed_message_types,null)
             else -> return false
         }
         return stringSet?.contains(parameters.joinToString("_")) ?: defIsMsgAllowed
@@ -31,6 +34,10 @@ class CommunicationContext(appContext: Context): BaseContext(appContext) {
     /** Returns phone number of contact person. Return value from sharedPreferences or empty string. */
     val phoneNumber: String
         get() = getString(R.string.key_communication_sms_phone_number, R.string.empty)
+
+    /** Return url of server. Return value from sharedPreferences or empty string. */
+    val serverUrl: String
+        get() = getString(R.string.key_communication_network_server_url, R.string.empty)
 }
 
 
