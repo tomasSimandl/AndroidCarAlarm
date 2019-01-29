@@ -123,6 +123,26 @@
         <item>Command send location</item>
     </string-array>
 
+    <!-- ============================== Communication sms settings ============================= -->
+    <string name="pref_communication_network_group_name">Network</string>
+
+    <string name="pref_communication_network_permission_message">For communication with server application needs permission. Next dialog will be asking for needed permission.</string>
+
+    <string name="pref_communication_network_switch_title">Allow network communication</string>
+    <string name="pref_communication_network_switch_description"> </string>
+
+    <string name="pref_communication_network_server_url_title">Server url</string>
+    <string name="pref_communication_network_server_url_description">Url address of server on which can be store and manage settings and Tracker data.</string>
+
+    <string name="pref_communication_network_message_types_title">Additional communication</string>
+    <string name="pref_communication_network_message_types_description">Sets which additional messages are allowed for communication over network</string>
+
+    <string-array name="pref_communication_network_messages">
+        <item>Tool state changed</item>
+        <item>Alarm + Alarm position</item>
+        <item>Battery state changed</item>
+    </string-array>
+
     <!-- =============================== Power-save mode settings ============================== -->
     <string name="pref_power_save_mode_switch_title">Allow power save mode</string>
     <string name="pref_power_save_mode_switch_description">Allows automatically switch to power save mode when battery level is critical. In power save mode will be disabled: sound sensor, tracker, alarm siren and send sms location alarm interval will increase.</string> <!-- TODO update -->
@@ -151,6 +171,15 @@
     <string name="sms_info_power_save_mode_on">Power save mode: ON </string>
     <string name="sms_info_power_save_mode_off">Power save mode: OFF </string>
 
+    <!-- ============================= STRINGS OF NETWORK MESSAGES ============================= -->
+    <!--TODO rewrite string -->
+    <string name="network_util_enabled">%s is enabled</string>
+    <string name="network_util_disabled">%s is disabled</string>
+    <string name="network_alarm">Alarm was triggered at: %s.</string>
+    <string name="network_location">Actual car location is lat: %1$s, long: %2$s https://www.google.com/maps/search/\?api=1&amp;query=%1$s,%2$s</string>
+    <string name="network_battery_warn">Battery capacity is low: %d %%</string>
+    <string name="network_power_connected">Power is connected. Battery level is %d %%</string>
+    <string name="network_power_disconnected">Power is disconnected! Battery level is %d %%</string>
 
     <!-- ==================== STRINGS OF INFORMATIVE DIALOGS IN APPLICATION ==================== -->
     <string name="ok">OK</string>
@@ -159,7 +188,6 @@
     <string name="error_msg_title">Can not enable</string>
     <string name="error_invalid_params">Invalid parameters. Please change related parameters first.</string>
     <string name="error_hw_not_supported">Requirement hardware is not supported. Can not enable on this device.</string>
-
 
     <string name="error_alarm_disabled">Alarm is disabled by user. Enable it in Tools settings.</string>
     <string name="error_alarm_sms_not_supported">Alarm needs to send SMS messages to warn car owner but SMS messages are not supported by this device.</string>

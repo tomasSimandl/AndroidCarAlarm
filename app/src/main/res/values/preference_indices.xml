@@ -39,5 +39,7 @@
     <string name="key_communication_sms_phone_number">communication_sms_phone_number</string>
     <string name="key_communication_sms_allowed_message_types">communication_sms_allowed_message_types</string>
 
-
+    <string name="key_communication_network_is_allowed">communication_network_is_allowed</string>
+    <string name="key_communication_network_server_url">communication_network_server_url</string>
+    <string name="key_communication_network_allowed_message_types">communication_network_allowed_message_types</string>
 </resources>

@@ -20,4 +20,25 @@
             android:entryValues="@array/pref_communication_sms_messages_values"
             android:defaultValue="@array/pref_communication_sms_messages_values" />
     </PreferenceCategory>
+
+    <PreferenceCategory android:key="network_category" android:title="@string/pref_communication_network_group_name">
+        <SwitchPreference
+            android:defaultValue="@bool/default_communication_network_is_allowed"
+            android:key="@string/key_communication_network_is_allowed"
+            android:title="@string/pref_communication_network_switch_title"
+            android:contentDescription="@string/pref_communication_network_switch_description"/>
+
+        <EditTextPreference
+            android:key="@string/key_communication_network_server_url"
+            android:title="@string/pref_communication_network_server_url_title" />
+
+        <MultiSelectListPreference
+            android:key="@string/key_communication_network_allowed_message_types"
+            android:title="@string/pref_communication_network_message_types_title"
+            android:dialogTitle="@string/pref_communication_network_message_types_title"
+            android:dependency="@string/key_communication_network_is_allowed"
+            android:entries="@array/pref_communication_network_messages"
+            android:entryValues="@array/pref_communication_network_messages_values"
+            android:defaultValue="@array/pref_communication_network_messages_values" />
+    </PreferenceCategory>
 </PreferenceScreen>

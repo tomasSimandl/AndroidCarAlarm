@@ -31,5 +31,10 @@
         <item>Status_recv</item>
         <item>Location_recv</item>
     </string-array>
+    <string-array name="pref_communication_network_messages_values">
+        <item>Tool_State_Changed_send</item>
+        <item>Alarm_Position_send</item>
+        <item>Battery_State_Changed_send</item>
+    </string-array>
 
 </resources>

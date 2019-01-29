@@ -71,6 +71,8 @@
     <bool name="default_communication_sms_is_allowed">true</bool>
     <!-- Indicates if messages can be send by default if there is no value in shared preferences. -->
     <bool name="default_communication_is_message_allowed">true</bool>
+    <!-- Indicates if network communication provider is allowed. -->
+    <bool name="default_communication_network_is_allowed">true</bool>
 
 
     <!-- CAN NOT CHANGE WITH VALUE FROM SHARED PREFERENCES -->

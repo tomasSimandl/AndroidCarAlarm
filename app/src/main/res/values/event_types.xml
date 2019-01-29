@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="event_unknown">0</integer>
+    <integer name="event_util_switch_on">1</integer>
+    <integer name="event_util_switch_off">2</integer>
+    <integer name="event_alarm_on">3</integer>
+    <integer name="event_alarm_off">4</integer>
+    <integer name="event_battery">5</integer>
+    <integer name="event_power_connected">6</integer>
+    <integer name="event_power_disconnected">7</integer>
+</resources>

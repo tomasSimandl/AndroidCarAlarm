@@ -10,7 +10,8 @@ import android.os.Bundle
 import android.preference.PreferenceActivity
 import android.support.v14.preference.PreferenceFragment
 import android.view.MenuItem
-import com.example.tomas.carsecurity.communication.SmsProvider
+import com.example.tomas.carsecurity.communication.network.NetworkProvider
+import com.example.tomas.carsecurity.communication.sms.SmsProvider
 import com.example.tomas.carsecurity.preferenceFragments.MyPreferenceFragment
 import com.example.tomas.carsecurity.sensors.LocationProvider
 import com.example.tomas.carsecurity.sensors.MoveDetector
@@ -83,6 +84,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
             if (requestCode == R.string.key_sensor_sound_is_allowed
                     || requestCode == R.string.key_sensor_location_is_allowed
                     || requestCode == R.string.key_communication_sms_is_allowed
+                    || requestCode == R.string.key_communication_network_is_allowed
                     || requestCode == R.string.key_tool_alarm_is_call_allowed) {
 
                 val sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
@@ -194,6 +196,17 @@ class SettingsActivity : AppCompatPreferenceActivity() {
                     R.string.key_communication_sms_is_allowed,
                     resources.getBoolean(R.bool.default_communication_sms_is_allowed),
                     SmsProvider)
+
+            // Network - preference check listener + set value
+            registerPreferenceCheck(
+                    R.string.key_communication_network_is_allowed,
+                    NetworkProvider,
+                    getString(R.string.pref_communication_network_permission_message),
+                    arrayOf(Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE))
+            setValueToPreference(
+                    R.string.key_communication_network_is_allowed,
+                    resources.getBoolean(R.bool.default_communication_network_is_allowed),
+                    NetworkProvider)
         }
     }
 
