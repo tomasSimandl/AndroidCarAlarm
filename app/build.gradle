@@ -39,6 +39,11 @@ dependencies {
 
     implementation 'com.android.support:multidex:1.0.3'
 
+//  Retrofit - rest client
+    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
+
+//  ROOM - local database
     def room_version = "1.1.1"
     implementation "android.arch.persistence.room:runtime:$room_version"
     implementation 'com.android.support:support-vector-drawable:28.0.0'
@@ -48,10 +53,11 @@ dependencies {
     implementation "android.arch.persistence.room:guava:$room_version"
     testImplementation "android.arch.persistence.room:testing:$room_version"
 
-
+//  TEST dependencies
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
+//  Seek bar view
     implementation project(":seekbarpreference")
 }
