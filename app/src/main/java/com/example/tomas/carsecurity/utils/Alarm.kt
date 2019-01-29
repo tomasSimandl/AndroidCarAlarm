@@ -73,8 +73,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
                 context.appContext.getString(R.string.key_tool_alarm_send_location_interval) ->
                     if(isEnabled && isAlarm && sendSmsTimer != null){
                         sendSmsTimer?.cancel()
-                        sendSmsTimer = Timer("SendSmsTimer")
-                        sendSmsTimer!!.schedule(sendSmsTask, context.utilsContext.sendLocationInterval.toLong(), context.utilsContext.sendLocationInterval.toLong())
+                        scheduleSmsTimer()
                     }
             }
         }
@@ -122,12 +121,11 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
 
             val timerTask = object : TimerTask() {
                 override fun run() {
-
-                    val task = Runnable {
-                        isAlarm = true
-                        onAlarm()
-                    }
-                    utilsHelper.runOnUtilThread(task) // runOnUtilThread because timer run in own thread.
+                    utilsHelper.runOnUtilThread( // runOnUtilThread because timer run in own thread.
+                            Runnable {
+                                isAlarm = true
+                                onAlarm()
+                            })
                 }
             }
             timer = Timer("TimerThread")
@@ -139,7 +137,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
         Log.d(tag, "Alarm was activated.")
 
         // send alarm to communication providers
-        utilsHelper.communicationManager.sendAlarm()
+        utilsHelper.communicationManager.sendEvent(MessageType.Alarm, Calendar.getInstance().time.toString())
 
         if(context.utilsContext.isCallAllow) {
             CallProvider(context).createCall()
@@ -156,9 +154,13 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
         // start send location loop
         if (context.communicationContext.isMessageAllowed(SmsProvider::class.java.name, MessageType.AlarmLocation.name, "send")) {
             utilsHelper.registerObserver(OEnum.LocationProvider, this)
-            sendSmsTimer = Timer("SendSmsTimer")
-            sendSmsTimer!!.schedule(sendSmsTask, context.utilsContext.sendLocationInterval.toLong(), context.utilsContext.sendLocationInterval.toLong())
+            scheduleSmsTimer()
         }
+    }
+
+    private fun scheduleSmsTimer(){
+        sendSmsTimer = Timer("SendSmsTimer")
+        sendSmsTimer!!.schedule(sendSmsTask, context.utilsContext.sendLocationInterval.toLong(), context.utilsContext.sendLocationInterval.toLong())
     }
 
     override fun enable() {

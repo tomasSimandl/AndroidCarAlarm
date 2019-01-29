@@ -11,6 +11,7 @@ import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.context.UtilsContext
 import com.example.tomas.carsecurity.sensors.LocationProvider
+import com.example.tomas.carsecurity.storage.entity.Route
 import java.util.*
 import com.example.tomas.carsecurity.storage.entity.Location as DbLocation
 
@@ -20,8 +21,9 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
 
     private var lastLocation: Location? = null
     private var isEnabled = false
+    private var actualRoute: Route? = null
 
-    private lateinit var timer: Timer
+    //private lateinit var timer: Timer
 
     override val thisUtilEnum: UtilsEnum = UtilsEnum.Tracker
 
@@ -78,7 +80,8 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
 
         if (location.distanceTo(lastLocation) > context.utilsContext.ignoreDistance) {
             lastLocation = location
-            context.database.locationDao().insert(DbLocation(location))
+            utilsHelper.communicationManager.sendLocation(location, false, true) // TODO (in network need db location)
+            //context.storageService.saveLocation(DbLocation(location, actualRoute))
 
         } else if (location.time - lastLocation!!.time > context.utilsContext.timeout) {
             Log.d(tag, "Time not moving time interval passed. Tracker will be stopped.")
@@ -87,32 +90,32 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
     }
 
 
-    private fun initializeTimer(){
-        val timerTask = object : TimerTask() {
-            override fun run() {
-                Log.d(tag, """Update - Thread: ${Thread.currentThread().name}""")
-                synchronize()
-            }
-        }
+//    private fun initializeTimer(){
+//        val timerTask = object : TimerTask() {
+//            override fun run() {
+//                Log.d(tag, """Update - Thread: ${Thread.currentThread().name}""")
+//                synchronize()
+//            }
+//        }
+//
+//        timer = Timer("TrackerTimer")
+//        timer.schedule( timerTask, 30000, 30000) // TODO const
+//    }
 
-        timer = Timer("TrackerTimer")
-        timer.schedule( timerTask, 30000, 30000) // TODO const
-    }
-
-    private fun synchronize() { // TODO move all method to synchronizeManager? and run all in separate thread
-        var run: Boolean
-        do {
-            if(!context.database.isOpen) return
-
-            val locations = context.database.locationDao().getAll(10) // TODO const
-            run = locations.isNotEmpty()
-
-            if(run) {
-                println(locations) // TODO send to server
-                context.database.locationDao().delete(locations) // TODO if send success
-            }
-        } while (run)
-    }
+//    private fun synchronize() { // TODO move all method to synchronizeManager? and run all in separate thread
+//        var run: Boolean
+//        do {
+//            if(!context.database.isOpen) return
+//
+//            val locations = context.database.locationDao().getAll(10) // TODO const
+//            run = locations.isNotEmpty()
+//
+//            if(run) {
+//                println(locations) // TODO send to server
+//                context.database.locationDao().delete(locations) // TODO if send success
+//            }
+//        } while (run)
+//    }
 
     override fun enable() {
         assert(Thread.currentThread().name == "UtilsThread")
@@ -121,7 +124,9 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
             lastLocation = null
             utilsHelper.registerObserver(ObservableEnum.LocationProvider, this)
 
-            initializeTimer()
+            actualRoute = Route()
+            context.storageService.saveRoute(actualRoute!!)
+            //initializeTimer()
 
             setChanged()
             notifyObservers(true)
@@ -142,9 +147,12 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
 
             context.utilsContext.unregisterOnPreferenceChanged(this)
 
-
-            if(::timer.isInitialized) timer.cancel()
-            synchronize()
+            if(actualRoute != null) {
+                context.storageService.finishRoute(actualRoute!!)
+                actualRoute = null
+            }
+            //if(::timer.isInitialized) timer.cancel()
+            //synchronize()
 
             setChanged()
             notifyObservers(false)
