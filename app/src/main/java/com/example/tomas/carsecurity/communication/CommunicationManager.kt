@@ -3,6 +3,7 @@ package com.example.tomas.carsecurity.communication
 import android.content.SharedPreferences
 import android.location.Location
 import com.example.tomas.carsecurity.R
+import com.example.tomas.carsecurity.communication.sms.SmsProvider
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.utils.UtilsEnum
 

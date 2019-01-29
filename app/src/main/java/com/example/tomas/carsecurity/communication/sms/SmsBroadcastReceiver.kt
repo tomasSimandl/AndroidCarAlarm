@@ -1,4 +1,4 @@
-package com.example.tomas.carsecurity.communication
+package com.example.tomas.carsecurity.communication.sms
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -9,6 +9,7 @@ import android.telephony.PhoneNumberUtils
 import android.telephony.SmsMessage
 import android.util.Log
 import com.example.tomas.carsecurity.MainService
+import com.example.tomas.carsecurity.communication.MessageType
 import com.example.tomas.carsecurity.context.CommunicationContext
 import com.example.tomas.carsecurity.utils.UtilsEnum
 import com.google.android.gms.common.util.Strings

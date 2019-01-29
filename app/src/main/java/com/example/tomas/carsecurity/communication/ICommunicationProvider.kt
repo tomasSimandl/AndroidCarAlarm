@@ -11,14 +11,8 @@ interface ICommunicationProvider {
     fun destroy()
     fun isInitialize(): Boolean
 
-    fun sendMessage(text: String): Boolean
-
-
+    fun sendEvent(messageType: MessageType, vararg args: Any): Boolean
     fun sendUtilSwitch(utilsEnum: UtilsEnum, enabled: Boolean): Boolean
-    fun sendAlarm(): Boolean
-    fun sendLocation(location: Location, isAlarm: Boolean): Boolean
-    fun sendBatteryWarn(capacity: Int): Boolean
-    fun sendPowerConnected(capacity: Int): Boolean
-    fun sendPowerDisconnected(capacity: Int): Boolean
+    fun sendLocation(location: Location, isAlarm: Boolean, cache: Boolean = false): Boolean
     fun sendStatus(battery: Int, powerSaveMode: Boolean, utils: Map<UtilsEnum, Boolean>): Boolean
 }

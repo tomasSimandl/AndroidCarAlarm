@@ -7,7 +7,7 @@ import android.media.MediaPlayer
 import android.util.Log
 import com.example.tomas.carsecurity.*
 import com.example.tomas.carsecurity.communication.MessageType
-import com.example.tomas.carsecurity.communication.SmsProvider
+import com.example.tomas.carsecurity.communication.sms.SmsProvider
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.context.UtilsContext
 import com.example.tomas.carsecurity.sensors.LocationProvider

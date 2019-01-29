@@ -2,7 +2,7 @@ package com.example.tomas.carsecurity.context
 
 import android.content.Context
 import com.example.tomas.carsecurity.R
-import com.example.tomas.carsecurity.communication.SmsProvider
+import com.example.tomas.carsecurity.communication.sms.SmsProvider
 
 /**
  * Context contains data which are used in communication package and they are stored in
