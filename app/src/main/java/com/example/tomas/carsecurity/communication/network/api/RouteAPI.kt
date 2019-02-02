@@ -10,7 +10,7 @@ interface RouteAPI {
 
     @FormUrlEncoded
     @POST(Mapping.ROUTE_URL)
-    fun createRoute(@Field("car_id") carId: Long): Call<String>
+    fun createRoute(@Field("car_id") carId: Long): Call<Any>
 
 
 

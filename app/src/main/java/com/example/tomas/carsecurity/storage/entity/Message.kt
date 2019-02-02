@@ -14,6 +14,6 @@ data class Message(
         @ColumnInfo(name = "communicator")
         var communicatorHash: Int,
 
-        @ColumnInfo(name = "longitude")
+        @ColumnInfo(name = "body")
         var message: String
 )

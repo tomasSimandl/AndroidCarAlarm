@@ -12,6 +12,18 @@ class StorageService(appContext: Context) {
 
     // all running on main thread
 
+    companion object {
+
+        private var instance: StorageService? = null
+
+        fun getInstance(appContext: Context): StorageService{
+            if(instance == null){
+                instance = StorageService(appContext)
+            }
+            return instance!!
+        }
+    }
+
     fun close(){
         database.close()
     }
@@ -46,6 +58,14 @@ class StorageService(appContext: Context) {
 
     fun saveRoute(route: Route) {
         database.routeDao().insert(route)
+    }
+
+    fun updateRoute(route: Route){
+        database.routeDao().update(route)
+    }
+
+    fun getRoute(routeId: Int): Route {
+        return database.routeDao().get(routeId)
     }
 
     fun finishRoute(route: Route) {

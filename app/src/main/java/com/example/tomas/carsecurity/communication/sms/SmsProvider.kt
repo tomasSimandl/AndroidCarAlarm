@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Context
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.location.Location
 import android.support.v4.content.ContextCompat
 import android.telephony.SmsManager
 import android.util.Log
@@ -14,6 +13,7 @@ import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.communication.ICommunicationProvider
 import com.example.tomas.carsecurity.communication.MessageType
 import com.example.tomas.carsecurity.context.CommunicationContext
+import com.example.tomas.carsecurity.storage.entity.Location
 import com.example.tomas.carsecurity.utils.UtilsEnum
 import com.google.android.gms.common.util.Strings
 import java.util.*
@@ -112,12 +112,12 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
         }
     }
 
-    override fun sendEvent(messageType: MessageType, vararg args: Any): Boolean {
+    override fun sendEvent(messageType: MessageType, vararg args: String): Boolean {
         return when (messageType) {
             MessageType.Alarm -> sendAlarm()
-            MessageType.BatteryWarn -> sendBatteryWarn(args.first() as Int)
-            MessageType.PowerConnected -> sendPowerConnected(args.first() as Int)
-            MessageType.PowerDisconnected -> sendPowerDisconnected(args.first() as Int)
+            MessageType.BatteryWarn -> sendBatteryWarn(args.first())
+            MessageType.PowerConnected -> sendPowerConnected(args.first())
+            MessageType.PowerDisconnected -> sendPowerDisconnected(args.first())
             else -> {
                 Log.e(tag, "Sending SMS of message type $messageType is not supported as Event sending.")
                 false
@@ -135,7 +135,7 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
         }
     }
 
-    private fun sendBatteryWarn(capacity: Int): Boolean {
+    private fun sendBatteryWarn(capacity: String): Boolean {
         return if(communicationContext.isMessageAllowed(this.javaClass.name, MessageType.BatteryWarn.name, "send")){
             Log.d(tag, "Sending battery warning sms message.")
             sendMessage(communicationContext.appContext.getString(R.string.sms_battery_warn, capacity))
@@ -145,7 +145,7 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
         }
     }
 
-    private fun sendPowerConnected(capacity: Int): Boolean {
+    private fun sendPowerConnected(capacity: String): Boolean {
         return if(communicationContext.isMessageAllowed(this.javaClass.name, MessageType.PowerConnected.name, "send")){
             Log.d(tag, "Sending power connected warning sms message.")
             sendMessage(communicationContext.appContext.getString(R.string.sms_power_connected, capacity))
@@ -155,7 +155,7 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
         }
     }
 
-    private fun sendPowerDisconnected(capacity: Int): Boolean {
+    private fun sendPowerDisconnected(capacity: String): Boolean {
         return if(communicationContext.isMessageAllowed(this.javaClass.name, MessageType.PowerDisconnected.name, "send")){
             Log.d(tag, "Sending power disconnected warning sms message.")
             sendMessage(communicationContext.appContext.getString(R.string.sms_power_disconnected, capacity))
@@ -179,7 +179,7 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
         return if (communicationContext.isMessageAllowed(this.javaClass.name, MessageType.Status.name, "recv")) {
             Log.d(tag, "Sending status SMS message.")
 
-            val batteryInfo = communicationContext.appContext.getString(R.string.sms_info_battery, battery)
+            val batteryInfo = communicationContext.appContext.getString(R.string.sms_info_battery, battery.toString())
             val powerSaveModeResource = if (powerSaveMode) R.string.sms_info_power_save_mode_on else R.string.sms_info_power_save_mode_off
             val powerSaveModeInfo = communicationContext.appContext.getString(powerSaveModeResource)
             var utilsInfo = ""
@@ -196,5 +196,10 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
             Log.d(tag, "Status SMS message is not allowed.")
             false
         }
+    }
+
+    override fun sendRoute(localRouteId: Int): Boolean {
+        // Method is not implemented
+        return true
     }
 }

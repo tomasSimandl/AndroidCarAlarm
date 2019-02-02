@@ -30,7 +30,8 @@
 
         <EditTextPreference
             android:key="@string/key_communication_network_server_url"
-            android:title="@string/pref_communication_network_server_url_title" />
+            android:title="@string/pref_communication_network_server_url_title"
+            android:dialogMessage="@string/pref_communication_network_server_url_description"/>
 
         <MultiSelectListPreference
             android:key="@string/key_communication_network_allowed_message_types"

@@ -10,7 +10,7 @@ import android.location.Location
 @Entity(tableName = "location",
         foreignKeys = [ForeignKey(entity = Route::class,
                 parentColumns = arrayOf("uid"),
-                childColumns = arrayOf("route_id"),
+                childColumns = arrayOf("local_route_id"),
                 onDelete = ForeignKey.CASCADE)])
 data class Location(
 
@@ -35,17 +35,21 @@ data class Location(
         @ColumnInfo(name = "speed")
         var speed: Float = 0F,
 
-        @ColumnInfo(name = "route_id")
-        var routeId: Int? = null
+        @ColumnInfo(name = "server_route_id")
+        @Transient // Ignored in Retrofit but not in Room
+        var routeId: Long? = null,
+
+        @ColumnInfo(name = "local_route_id")
+        var localRouteId: Int? = null
 
 ) {
-    constructor(location: Location, routeId: Int?) : this() {
+    constructor(location: Location, localRouteId: Int? = null) : this() {
         latitude = location.latitude
         longitude = location.longitude
         altitude = location.altitude
         time = location.time
         accuracy = location.accuracy
         speed = location.speed
-        this.routeId = routeId
+        this.localRouteId = localRouteId
     }
 }

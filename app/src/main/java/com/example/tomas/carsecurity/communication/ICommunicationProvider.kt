@@ -1,6 +1,6 @@
 package com.example.tomas.carsecurity.communication
 
-import android.location.Location
+import com.example.tomas.carsecurity.storage.entity.Location
 import com.example.tomas.carsecurity.utils.UtilsEnum
 
 interface ICommunicationProvider {
@@ -11,8 +11,9 @@ interface ICommunicationProvider {
     fun destroy()
     fun isInitialize(): Boolean
 
-    fun sendEvent(messageType: MessageType, vararg args: Any): Boolean
+    fun sendEvent(messageType: MessageType, vararg args: String): Boolean
     fun sendUtilSwitch(utilsEnum: UtilsEnum, enabled: Boolean): Boolean
     fun sendLocation(location: Location, isAlarm: Boolean, cache: Boolean = false): Boolean
     fun sendStatus(battery: Int, powerSaveMode: Boolean, utils: Map<UtilsEnum, Boolean>): Boolean
+    fun sendRoute(localRouteId: Int): Boolean
 }

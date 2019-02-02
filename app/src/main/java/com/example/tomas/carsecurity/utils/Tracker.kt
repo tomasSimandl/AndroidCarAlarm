@@ -80,42 +80,14 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
 
         if (location.distanceTo(lastLocation) > context.utilsContext.ignoreDistance) {
             lastLocation = location
-            utilsHelper.communicationManager.sendLocation(location, false, true) // TODO (in network need db location)
-            //context.storageService.saveLocation(DbLocation(location, actualRoute))
+            val dbLocation = DbLocation(location, actualRoute?.uid)
+            utilsHelper.communicationManager.sendLocation(dbLocation, isAlarm = false, cache = true)
 
         } else if (location.time - lastLocation!!.time > context.utilsContext.timeout) {
             Log.d(tag, "Time not moving time interval passed. Tracker will be stopped.")
             disable()
         }
     }
-
-
-//    private fun initializeTimer(){
-//        val timerTask = object : TimerTask() {
-//            override fun run() {
-//                Log.d(tag, """Update - Thread: ${Thread.currentThread().name}""")
-//                synchronize()
-//            }
-//        }
-//
-//        timer = Timer("TrackerTimer")
-//        timer.schedule( timerTask, 30000, 30000) // TODO const
-//    }
-
-//    private fun synchronize() { // TODO move all method to synchronizeManager? and run all in separate thread
-//        var run: Boolean
-//        do {
-//            if(!context.database.isOpen) return
-//
-//            val locations = context.database.locationDao().getAll(10) // TODO const
-//            run = locations.isNotEmpty()
-//
-//            if(run) {
-//                println(locations) // TODO send to server
-//                context.database.locationDao().delete(locations) // TODO if send success
-//            }
-//        } while (run)
-//    }
 
     override fun enable() {
         assert(Thread.currentThread().name == "UtilsThread")
@@ -124,9 +96,8 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
             lastLocation = null
             utilsHelper.registerObserver(ObservableEnum.LocationProvider, this)
 
-            actualRoute = Route()
+            actualRoute = Route(carId = 1) // TODO (Use real car id)
             context.storageService.saveRoute(actualRoute!!)
-            //initializeTimer()
 
             setChanged()
             notifyObservers(true)
@@ -151,8 +122,6 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
                 context.storageService.finishRoute(actualRoute!!)
                 actualRoute = null
             }
-            //if(::timer.isInitialized) timer.cancel()
-            //synchronize()
 
             setChanged()
             notifyObservers(false)

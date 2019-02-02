@@ -1,11 +1,11 @@
 package com.example.tomas.carsecurity.communication
 
 import android.content.SharedPreferences
-import android.location.Location
 import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.communication.network.NetworkProvider
 import com.example.tomas.carsecurity.communication.sms.SmsProvider
 import com.example.tomas.carsecurity.context.MyContext
+import com.example.tomas.carsecurity.storage.entity.Location
 import com.example.tomas.carsecurity.utils.UtilsEnum
 
 class CommunicationManager(private val context: MyContext) : SharedPreferences.OnSharedPreferenceChangeListener {
@@ -77,9 +77,9 @@ class CommunicationManager(private val context: MyContext) : SharedPreferences.O
         }
     }
 
-    fun sendEvent(messageType: MessageType, vararg args: Any) {
+    fun sendEvent(messageType: MessageType, vararg args: String) {
         for (provider in activeCommunicators) {
-            provider.sendEvent(messageType, args)
+            provider.sendEvent(messageType, *args)
         }
     }
 
@@ -92,6 +92,12 @@ class CommunicationManager(private val context: MyContext) : SharedPreferences.O
     fun sendStatus(battery: Int, powerSaveMode: Boolean, utils: Map<UtilsEnum, Boolean>) {
         for (provider in activeCommunicators) {
             provider.sendStatus(battery, powerSaveMode, utils)
+        }
+    }
+
+    fun sendRoute(localRouteId: Int) {
+        for (provider in activeCommunicators){
+            provider.sendRoute(localRouteId)
         }
     }
 

@@ -11,8 +11,11 @@ data class Route (
         @PrimaryKey(autoGenerate = true)
         var uid: Int = 0,
 
-        @ColumnInfo(name = "server_id")
-        var serverId: Long = 0,
+        @ColumnInfo(name = "server_route_id")
+        var serverRouteId: Long? = null,
+
+        @ColumnInfo(name = "car_id")
+        var carId: Long = 0,
 
         @ColumnInfo(name = "finished")
         var finished: Boolean = false

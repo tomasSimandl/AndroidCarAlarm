@@ -13,6 +13,7 @@ import com.example.tomas.carsecurity.context.UtilsContext
 import com.example.tomas.carsecurity.sensors.LocationProvider
 import com.example.tomas.carsecurity.sensors.MoveDetector
 import com.example.tomas.carsecurity.sensors.SoundDetector
+import com.example.tomas.carsecurity.storage.entity.Location as DBLocation
 import java.util.*
 import com.example.tomas.carsecurity.ObservableEnum as OEnum
 
@@ -35,7 +36,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
     private val sendSmsTask = object: TimerTask() {
         override fun run() {
             if (lastLocation != null) {
-                utilsHelper.communicationManager.sendLocation(lastLocation!!, true)
+                utilsHelper.communicationManager.sendLocation(DBLocation(lastLocation!!, null), true)
             }
 
             utilsHelper.registerObserver(OEnum.LocationProvider, this@Alarm) // on location update can unregister listener

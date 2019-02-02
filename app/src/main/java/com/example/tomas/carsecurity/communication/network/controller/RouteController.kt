@@ -1,46 +1,36 @@
 package com.example.tomas.carsecurity.communication.network.controller
 
+import android.util.Log
 import com.example.tomas.carsecurity.communication.network.api.RouteAPI
-import retrofit2.Call
-import retrofit2.Callback
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class RouteController(serverUrl: String) : Callback<String> {
+class RouteController(serverUrl: String) {
 
-    val routeAPI: RouteAPI
+    private val tag = "RouteController"
+    private val routeAPI: RouteAPI
 
     init {
+        Log.d(tag, "Initializing")
         val retrofit = Retrofit.Builder()
-                    .baseUrl(serverUrl)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build()
+                .baseUrl(serverUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
 
         routeAPI = retrofit.create(RouteAPI::class.java)
     }
 
-    public fun createRoute(carId: Long){
-        routeAPI.createRoute(carId).enqueue(this) // Asynchronous
-        //routeAPI.createRoute(carId).execute()  // Synchronous
-    }
+    fun createRoute(carId: Long): Response<Any> {
+        val method = routeAPI.createRoute(carId)
 
-
-    override fun onResponse(call: Call<String>, response: Response<String>) {
-        if(response.isSuccessful) {
-            println("=============================================================================")
-            println("Message: ${response.body()}")
-            println("=============================================================================")
-        } else {
-            println("=============================================================================")
-            println("Error message: ${response.errorBody()}")
-            println("=============================================================================")
+        Log.d(tag, "Sending message to create route endpoint. URL: ${method.request().url()}")
+        return try {
+            method.execute()
+        } catch (e: Exception) {
+            Log.d(tag, "Can not send request. Exception: $e")
+            Response.error(418, ResponseBody.create(null, ""))
         }
-    }
-
-    override fun onFailure(call: Call<String>, t: Throwable) {
-        println("=============================================================================")
-        println("Failure: ${t.message}")
-        println("=============================================================================")
     }
 }

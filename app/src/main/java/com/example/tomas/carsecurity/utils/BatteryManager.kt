@@ -49,7 +49,7 @@ class BatteryManager (private val context: MyContext, private val utilsHelper: U
 
         if (percent <= context.utilsContext.batteryCriticalLevel) {
             if (!shouldBeSaveMode) {
-                utilsHelper.communicationManager.sendEvent(MessageType.BatteryWarn, percent)
+                utilsHelper.communicationManager.sendEvent(MessageType.BatteryWarn, percent.toString())
                 shouldBeSaveMode = true
                 changePowerSaveMode()
             }
@@ -71,12 +71,12 @@ class BatteryManager (private val context: MyContext, private val utilsHelper: U
 
     private fun batteryConnected(percent: Int, charging: Boolean) {
         Log.d(tag, """Battery power is connected. Capacity: $percent Charging: $charging""")
-        utilsHelper.communicationManager.sendEvent(MessageType.PowerConnected, percent)
+        utilsHelper.communicationManager.sendEvent(MessageType.PowerConnected, percent.toString())
     }
 
     private fun batteryDisconnected(percent: Int, charging: Boolean) {
         Log.d(tag, """Battery power is disconnected. Capacity: $percent Charging: $charging""")
-        utilsHelper.communicationManager.sendEvent(MessageType.PowerDisconnected, percent)
+        utilsHelper.communicationManager.sendEvent(MessageType.PowerDisconnected, percent.toString())
     }
 
 
