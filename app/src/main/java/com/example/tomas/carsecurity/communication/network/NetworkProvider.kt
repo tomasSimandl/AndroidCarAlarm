@@ -141,6 +141,10 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
         return true
     }
 
+    private fun canUseConnection(): Boolean {
+        return isConnected() && ( communicationContext.cellular || !isCellular())
+    }
+
     override fun sendUtilSwitch(utilsEnum: UtilsEnum, enabled: Boolean): Boolean {
         if (!canSendMessage()) return false
 
@@ -223,13 +227,19 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
 
         val task = Runnable {
             val strEvent = Gson().toJson(event)
-            val result = eventController.createEvent(strEvent)
-            if (!result.isSuccessful) {
+
+            val store = if(canUseConnection()){
+                val result = eventController.createEvent(strEvent)
+                !result.isSuccessful
+            } else {
+                true
+            }
+
+            if (store) {
                 StorageService.getInstance(communicationContext.appContext).saveMessage(Message(communicatorHash = NetworkProvider.hashCode(), message = strEvent))
                 // TODO (maybe set timeout to load from db)
             }
         }
-
         workerThread.postTask(task)
     }
 
@@ -240,7 +250,7 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
             return false
         }
 
-        return if (cache) {
+        return if (cache || !canUseConnection()) {
             StorageService.getInstance(communicationContext.appContext).saveLocation(location)
             true
         } else {
@@ -267,6 +277,7 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
 
     override fun sendRoute(localRouteId: Int): Boolean {
         if (!canSendMessage()) return false
+        if (!canUseConnection()) return false // network not available but route is already in DB => no work
 
         val storage = StorageService.getInstance(communicationContext.appContext)
         val route = storage.getRoute(localRouteId)
