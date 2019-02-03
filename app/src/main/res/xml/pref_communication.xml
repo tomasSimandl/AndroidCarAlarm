@@ -34,11 +34,11 @@
             android:dialogMessage="@string/pref_communication_network_server_url_description"/>
 
         <CheckBoxPreference
-            android:key="@string/key_communication_network_only_wifi"
-            android:title="@string/pref_communication_network_only_wifi_title"
-            android:summary="@string/pref_communication_network_only_wifi_description"
+            android:key="@string/key_communication_network_cellular"
+            android:title="@string/pref_communication_network_cellular_title"
+            android:summary="@string/pref_communication_network_cellular_description"
             android:dependency="@string/key_communication_network_is_allowed"
-            android:defaultValue="@bool/default_communication_network_only_wifi" />
+            android:defaultValue="@bool/default_communication_network_cellular" />
 
         <MultiSelectListPreference
             android:key="@string/key_communication_network_allowed_message_types"

@@ -74,7 +74,7 @@
     <!-- Indicates if network communication provider is allowed. -->
     <bool name="default_communication_network_is_allowed">true</bool>
     <!-- Indicates if network communication will only be via WiFi. -->
-    <bool name="default_communication_network_only_wifi">true</bool>
+    <bool name="default_communication_network_cellular">false</bool>
 
 
     <!-- CAN NOT CHANGE WITH VALUE FROM SHARED PREFERENCES -->
