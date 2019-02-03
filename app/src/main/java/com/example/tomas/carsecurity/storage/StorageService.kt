@@ -6,7 +6,7 @@ import com.example.tomas.carsecurity.storage.entity.Location
 import com.example.tomas.carsecurity.storage.entity.Message
 import com.example.tomas.carsecurity.storage.entity.Route
 
-class StorageService(appContext: Context) {
+class StorageService private constructor(appContext: Context) {
 
     private val database = Room.databaseBuilder(appContext, AppDatabase::class.java, "CarSecurityDB")
             .fallbackToDestructiveMigration()
@@ -23,6 +23,10 @@ class StorageService(appContext: Context) {
                 instance = StorageService(appContext)
             }
             return instance!!
+        }
+
+        fun destroy(){
+            instance?.close()
         }
     }
 
