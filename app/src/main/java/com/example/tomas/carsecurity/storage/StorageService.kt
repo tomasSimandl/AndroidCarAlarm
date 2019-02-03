@@ -8,7 +8,9 @@ import com.example.tomas.carsecurity.storage.entity.Route
 
 class StorageService(appContext: Context) {
 
-    private val database = Room.databaseBuilder(appContext, AppDatabase::class.java, "CarSecurityDB").build()
+    private val database = Room.databaseBuilder(appContext, AppDatabase::class.java, "CarSecurityDB")
+            .fallbackToDestructiveMigration()
+            .build()
 
     // all running on main thread
 

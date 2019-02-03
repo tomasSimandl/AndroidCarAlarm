@@ -6,8 +6,6 @@ import android.arch.persistence.room.Query
 import com.example.tomas.carsecurity.storage.entity.Location
 import android.arch.persistence.room.Delete
 
-
-
 @Dao
 interface LocationDao {
 
@@ -17,8 +15,8 @@ interface LocationDao {
     @Query("SELECT * FROM location LIMIT :limit")
     fun getAll(limit: Int): List<Location>
 
-    @Query("SELECT * FROM location WHERE route_id = :routeId")
-    fun getAllByRouteId(routeId: Int)
+    @Query("SELECT * FROM location WHERE local_route_id = :routeId")
+    fun getAllByRouteId(routeId: Int): List<Location>
 
     @Insert
     fun insert(location: Location)
