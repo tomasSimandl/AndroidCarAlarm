@@ -22,6 +22,7 @@ import com.example.tomas.carsecurity.context.CommunicationContext
 import com.example.tomas.carsecurity.storage.StorageService
 import com.example.tomas.carsecurity.storage.entity.Location
 import com.example.tomas.carsecurity.storage.entity.Message
+import com.example.tomas.carsecurity.storage.entity.Route
 import com.example.tomas.carsecurity.utils.UtilsEnum
 import com.google.gson.Gson
 import com.google.gson.JsonParser
@@ -36,7 +37,7 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
     private lateinit var eventController: EventController
     private lateinit var locationController: LocationController
 
-    private val connectivitySevice = communicationContext.appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+    private val connectivityService = communicationContext.appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
 
     private var isInitialized: Boolean = false
 
@@ -114,101 +115,84 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
     }
 
     override fun sendUtilSwitch(utilsEnum: UtilsEnum, enabled: Boolean): Boolean {
-        if (!canSendMessage()) return false
+        val actualTime = Calendar.getInstance().timeInMillis
 
-        return if (communicationContext.isMessageAllowed(this.javaClass.name, "Tool_State_Changed_send")) {
-            Log.d(tag, "Sending util switch network message of util: ${utilsEnum.name}.")
+        val task = Runnable {
+            if (!canSendMessage()) return@Runnable
 
-            val messageType: Long
-            val note: String
-            if (enabled) {
-                messageType = communicationContext.appContext.resources.getInteger(R.integer.event_util_switch_on).toLong()
-                note = "Util ${utilsEnum.name} was turned on."
+            if (communicationContext.isMessageAllowed(this.javaClass.name, "Tool_State_Changed_send")) {
+                Log.d(tag, "Sending util switch network message of util: ${utilsEnum.name}.")
+
+                val messageType: Long
+                val note: String
+                if (enabled) {
+                    messageType = communicationContext.appContext.resources.getInteger(R.integer.event_util_switch_on).toLong()
+                    note = "Util ${utilsEnum.name} was turned on."
+                } else {
+                    messageType = communicationContext.appContext.resources.getInteger(R.integer.event_util_switch_off).toLong()
+                    note = "Util ${utilsEnum.name} was turned off."
+                }
+
+                val event = EventCreate(messageType, actualTime, 1, note) // TODO (use real car id)
+                val eventStr = Gson().toJson(event)
+                val message = Message(communicatorHash = NetworkProvider.hashCode(), message = eventStr)
+
+                sendEvent(message)
             } else {
-                messageType = communicationContext.appContext.resources.getInteger(R.integer.event_util_switch_off).toLong()
-                note = "Util ${utilsEnum.name} was turned off."
+                Log.d(tag, "Util switch Network message is not allowed for util ${utilsEnum.name}.")
             }
-            createEvent(messageType, 1, note) // TODO (use real car id)
-
-            true
-        } else {
-            Log.d(tag, "Util switch Network message is not allowed for util ${utilsEnum.name}.")
-            // TODO (Implement)
-            false
         }
+        workerThread.postTask(task)
+        return true
     }
 
     override fun sendEvent(messageType: MessageType, vararg args: String): Boolean {
-        if (!canSendMessage()) return false
-        if (!canSendEvent(messageType)) return false
+        val actualTime = Calendar.getInstance().timeInMillis
+        val task = Runnable {
+            if (!canSendMessage()) return@Runnable
+            if (!canSendEvent(messageType)) return@Runnable
 
-        var note = ""
-        args.iterator().forEach { item -> note += "$item," }
-        if (note.isNotEmpty()) note = note.dropLast(1)
+            var note = ""
+            args.iterator().forEach { item -> note += "$item," }
+            if (note.isNotEmpty()) note = note.dropLast(1)
 
-        createEvent(getEventType(messageType).toLong(), 1, note) // TODO (use real car id)
+            val event = EventCreate(getEventType(messageType).toLong(), actualTime, 1, note) // TODO (use real car id)
+            val eventStr = Gson().toJson(event)
+            val message = Message(communicatorHash = NetworkProvider.hashCode(), message = eventStr)
+
+            sendEvent(message)
+        }
+        workerThread.postTask(task)
 
         return true
     }
 
-    override fun sendLocation(location: Location, isAlarm: Boolean, cache: Boolean): Boolean {
-        if (!canSendMessage()) return false
-        if (isAlarm && !communicationContext.isMessageAllowed(this.javaClass.name, "Alarm_Position_send")) {
-            Log.d(tag, "Sending alarm location network message is not allowed.")
-            return false
-        }
 
-        return if (cache || !canUseConnection()) {
-            StorageService.getInstance(communicationContext.appContext).saveLocation(location)
-            true
-        } else {
-            val task = Runnable {
-                if (location.localRouteId != null) {
-                    val storage = StorageService.getInstance(communicationContext.appContext)
-                    val route = storage.getRoute(location.localRouteId!!)
-                    if (route.serverRouteId == null) {
-                        Log.w(tag, "Can not send position because route was not created yet.")
-                        return@Runnable
-                    }
-                    location.routeId = route.serverRouteId
-                }
-                val result = locationController.createLocations(listOf(location))
-                if (!result.isSuccessful) {
-                    StorageService.getInstance(communicationContext.appContext).saveLocation(location)
-                    // TODO (maybe set timeout to load from db)
-                }
+    override fun sendLocation(location: Location, isAlarm: Boolean, cache: Boolean): Boolean {
+
+        val task = Runnable {
+            if (!canSendMessage()) return@Runnable
+            if (isAlarm && !communicationContext.isMessageAllowed(this.javaClass.name, "Alarm_Position_send")) {
+                Log.d(tag, "Sending alarm location network message is not allowed.")
+                return@Runnable
             }
-            workerThread.postTask(task)
-            true
+
+            if (cache) {
+                StorageService.getInstance(communicationContext.appContext).saveLocation(location)
+            } else {
+                sendLocation(location)
+            }
         }
+        workerThread.postTask(task)
+        return true
     }
 
     override fun sendRoute(localRouteId: Int): Boolean {
-        if (!canSendMessage()) return false
-        if (!canUseConnection()) return false // network not available but route is already in DB => no work
-
-        val storage = StorageService.getInstance(communicationContext.appContext)
-        val route = storage.getRoute(localRouteId)
-
-        if (route.serverRouteId != null) {
-            Log.e(tag, "Route is already created.")
-            return false
-        }
-
         val task = Runnable {
+            if (!canSendMessage()) return@Runnable
 
-            val response = routeController.createRoute(route.carId)
-            if (response.isSuccessful) {
-                val jsonResponse = JsonParser().parse(response.body().toString()).asJsonObject
-                val serverRouteId = jsonResponse["route_id"].asLong
-
-                route.serverRouteId = serverRouteId
-                storage.updateRoute(route)
-                Log.d(tag, "Route was successfully created and stored to DB")
-                // TODO (inform something that positions can be send to server now)
-            } else {
-                Log.d(tag, "Creating of route was not successful")
-            }
+            val route = StorageService.getInstance(communicationContext.appContext).getRoute(localRouteId)
+            sendRoute(route)
         }
 
         workerThread.postTask(task)
@@ -220,38 +204,119 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    private fun createEvent(eventType: Long, carId: Long, note: String) {
-        val event = EventCreate(eventType, Calendar.getInstance().timeInMillis, carId, note)
+    /**
+     * Can not run in main thread
+     */
+    private fun sendEvent(msg: Message) {
 
-        val task = Runnable {
-            val strEvent = Gson().toJson(event)
+        var inDB = true
 
-            val store = if(canUseConnection()){
-                val result = eventController.createEvent(strEvent)
-                !result.isSuccessful
-            } else {
-                true
-            }
-
-            if (store) {
-                StorageService.getInstance(communicationContext.appContext).saveMessage(Message(communicatorHash = NetworkProvider.hashCode(), message = strEvent))
-                // TODO (maybe set timeout to load from db)
+        if (canUseConnection()) {
+            val result = eventController.createEvent(msg.message)
+            if (result.isSuccessful) {
+                inDB = false
             }
         }
-        workerThread.postTask(task)
+
+        if (inDB && msg.uid == 0) {
+            // should be in DB but msg.uid == 0 => it is not in DB
+            StorageService.getInstance(communicationContext.appContext).saveMessage(msg)
+        } else if (!inDB && msg.uid != 0) {
+            // should not be in DB but msg.uid != 0 => it is in DB
+            StorageService.getInstance(communicationContext.appContext).deleteMessage(msg)
+        }
+    }
+
+    /**
+     * Can not run in main thread
+     */
+    private fun sendLocation(location: Location) {
+
+        var inDB = true
+        var update = false
+        var send = true
+        val storage = StorageService.getInstance(communicationContext.appContext)
+
+        if (canUseConnection()) {
+
+            if (location.localRouteId != null && location.routeId == null) {
+                val route = storage.getRoute(location.localRouteId!!)
+                if (route.serverRouteId == null) {
+                    Log.w(tag, "Can not send position because route was not created yet.")
+                    inDB = true
+                    send = false
+                } else {
+                    location.routeId = route.serverRouteId
+                    update = true
+                }
+            }
+
+            if (send) {
+                val result = locationController.createLocations(listOf(location))
+                if (result.isSuccessful) inDB = false
+            }
+        }
+
+        if (inDB && location.uid != 0 && update) {
+            // should be in DB it is in DB but need to be updated
+            storage.updateLocation(location)
+        } else if (inDB && location.uid == 0) {
+            // should be in DB but location.uid == 0 => it is not in DB
+            storage.saveLocation(location)
+        } else if (!inDB && location.uid != 0) {
+            // should not be in DB but location.uid != 0 => it is in DB
+            storage.deleteLocations(listOf(location))
+        }
+    }
+
+    /**
+     * Can not run in main thread
+     */
+    private fun sendRoute(route: Route) {
+
+        if (route.serverRouteId != null) {
+            Log.e(tag, "Route is already created.")
+            return
+        }
+
+        if (canUseConnection()) {
+            val storage = StorageService.getInstance(communicationContext.appContext)
+
+            val response = routeController.createRoute(route.carId)
+            if (response.isSuccessful) {
+                val jsonResponse = JsonParser().parse(response.body().toString()).asJsonObject
+                val serverRouteId = jsonResponse["route_id"].asLong
+
+                route.serverRouteId = serverRouteId
+                if (route.uid == 0) {
+                    storage.saveRoute(route)
+                } else {
+                    storage.updateRoute(route)
+                }
+
+                Log.d(tag, "Route was successfully created and stored to DB")
+                // TODO (inform something that positions can be send to server now)
+            } else {
+                Log.d(tag, "Creating of route was not successful")
+            }
+        }
+
+        if (route.uid == 0){
+            StorageService.getInstance(communicationContext.appContext).saveRoute(route)
+        }
     }
 
     private fun isConnected(): Boolean {
-        return connectivitySevice?.activeNetworkInfo?.isConnected ?: false
+        return connectivityService?.activeNetworkInfo?.isConnected ?: false
     }
 
     private fun isCellular(): Boolean {
         return if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M) {
-            connectivitySevice?.activeNetworkInfo?.type == ConnectivityManager.TYPE_MOBILE
+            connectivityService?.activeNetworkInfo?.type == ConnectivityManager.TYPE_MOBILE
         } else {
-            val activeNetwork = connectivitySevice?.activeNetwork ?: return false
+            val activeNetwork = connectivityService?.activeNetwork ?: return false
 
-            val capabilities = connectivitySevice.getNetworkCapabilities(activeNetwork)
+            val capabilities = connectivityService.getNetworkCapabilities(activeNetwork)
             capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
         }
     }
@@ -270,7 +335,7 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
     }
 
     private fun canUseConnection(): Boolean {
-        return isConnected() && ( communicationContext.cellular || !isCellular())
+        return isConnected() && (communicationContext.cellular || !isCellular())
     }
 
     private fun getEventType(messageType: MessageType): Int {

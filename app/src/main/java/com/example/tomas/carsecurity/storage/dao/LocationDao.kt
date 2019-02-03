@@ -1,10 +1,7 @@
 package com.example.tomas.carsecurity.storage.dao
 
-import android.arch.persistence.room.Dao
-import android.arch.persistence.room.Insert
-import android.arch.persistence.room.Query
+import android.arch.persistence.room.*
 import com.example.tomas.carsecurity.storage.entity.Location
-import android.arch.persistence.room.Delete
 
 @Dao
 interface LocationDao {
@@ -20,6 +17,9 @@ interface LocationDao {
 
     @Insert
     fun insert(location: Location)
+
+    @Update
+    fun update(location: Location)
 
     @Delete
     fun delete(vararg location: Location)

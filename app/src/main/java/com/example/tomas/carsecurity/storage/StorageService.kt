@@ -49,8 +49,16 @@ class StorageService private constructor(appContext: Context) {
         database.messageDao().deleteAllByCommunicatorHash(communicatorHash)
     }
 
+    fun deleteMessage(message: Message){
+        database.messageDao().delete(message)
+    }
+
     fun saveLocation(location: Location) {
         database.locationDao().insert(location)
+    }
+
+    fun updateLocation(location: Location) {
+        database.locationDao().update(location)
     }
 
     fun getLocations(): List<Location> {
