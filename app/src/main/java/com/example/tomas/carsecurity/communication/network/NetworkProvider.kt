@@ -18,8 +18,8 @@ import com.example.tomas.carsecurity.communication.network.controller.RouteContr
 import com.example.tomas.carsecurity.communication.network.dto.EventCreate
 import com.example.tomas.carsecurity.context.CommunicationContext
 import com.example.tomas.carsecurity.storage.StorageService
-import com.example.tomas.carsecurity.storage.entity.Message
 import com.example.tomas.carsecurity.storage.entity.Location
+import com.example.tomas.carsecurity.storage.entity.Message
 import com.example.tomas.carsecurity.utils.UtilsEnum
 import com.google.gson.Gson
 import com.google.gson.JsonParser
@@ -199,7 +199,7 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
     }
 
     private fun createEvent(eventType: Long, carId: Long, note: String) {
-        val event = EventCreate(eventType, Calendar.getInstance().time, carId, note)
+        val event = EventCreate(eventType, Calendar.getInstance().timeInMillis, carId, note)
 
         val task = Runnable {
             val strEvent = Gson().toJson(event)
