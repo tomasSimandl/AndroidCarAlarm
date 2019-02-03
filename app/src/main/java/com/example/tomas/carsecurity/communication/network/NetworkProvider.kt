@@ -73,21 +73,6 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
         }
     }
 
-    private fun isConnected(): Boolean {
-        return connectivitySevice?.activeNetworkInfo?.isConnected ?: false
-    }
-
-    private fun isCellular(): Boolean {
-        return if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M) {
-            connectivitySevice?.activeNetworkInfo?.type == ConnectivityManager.TYPE_MOBILE
-        } else {
-            val activeNetwork = connectivitySevice?.activeNetwork ?: return false
-
-            val capabilities = connectivitySevice.getNetworkCapabilities(activeNetwork)
-            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
-        }
-    }
-
     override fun initialize(): Boolean {
         isInitialized = false
 
@@ -128,23 +113,6 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
         return isInitialized
     }
 
-    private fun canSendMessage(): Boolean {
-        if (!isInitialized) {
-            Log.w(tag, "Can not send message because NetworkProvider is not initialized.")
-            return false
-        }
-
-        if (check(communicationContext.appContext) != CheckCodes.success) {
-            Log.d(tag, "Can not send message to server.")
-            return false
-        }
-        return true
-    }
-
-    private fun canUseConnection(): Boolean {
-        return isConnected() && ( communicationContext.cellular || !isCellular())
-    }
-
     override fun sendUtilSwitch(utilsEnum: UtilsEnum, enabled: Boolean): Boolean {
         if (!canSendMessage()) return false
 
@@ -170,45 +138,6 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
         }
     }
 
-    private fun getEventType(messageType: MessageType): Int {
-        return when (messageType) {
-            MessageType.UtilSwitch ->
-                communicationContext.appContext.resources.getInteger(R.integer.event_unknown)
-            MessageType.Alarm ->
-                communicationContext.appContext.resources.getInteger(R.integer.event_alarm_on)
-            MessageType.AlarmLocation ->
-                communicationContext.appContext.resources.getInteger(R.integer.event_unknown)
-            MessageType.Location ->
-                communicationContext.appContext.resources.getInteger(R.integer.event_unknown)
-            MessageType.BatteryWarn ->
-                communicationContext.appContext.resources.getInteger(R.integer.event_battery)
-            MessageType.Status ->
-                communicationContext.appContext.resources.getInteger(R.integer.event_unknown)
-            MessageType.PowerConnected ->
-                communicationContext.appContext.resources.getInteger(R.integer.event_power_connected)
-            MessageType.PowerDisconnected ->
-                communicationContext.appContext.resources.getInteger(R.integer.event_power_disconnected)
-
-        }
-    }
-
-    private fun canSendEvent(messageType: MessageType): Boolean {
-        return when (messageType) {
-
-            MessageType.Alarm ->
-                communicationContext.isMessageAllowed(this.javaClass.name, "Alarm_Position_send")
-            MessageType.BatteryWarn,
-            MessageType.PowerConnected,
-            MessageType.PowerDisconnected ->
-                communicationContext.isMessageAllowed(this.javaClass.name, "Battery_State_Changed_send")
-            else -> {
-                Log.e(tag, "Sending Network message of message type $messageType is not supported as Event sending.")
-                false
-            }
-
-        }
-    }
-
     override fun sendEvent(messageType: MessageType, vararg args: String): Boolean {
         if (!canSendMessage()) return false
         if (!canSendEvent(messageType)) return false
@@ -220,27 +149,6 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
         createEvent(getEventType(messageType).toLong(), 1, note) // TODO (use real car id)
 
         return true
-    }
-
-    private fun createEvent(eventType: Long, carId: Long, note: String) {
-        val event = EventCreate(eventType, Calendar.getInstance().timeInMillis, carId, note)
-
-        val task = Runnable {
-            val strEvent = Gson().toJson(event)
-
-            val store = if(canUseConnection()){
-                val result = eventController.createEvent(strEvent)
-                !result.isSuccessful
-            } else {
-                true
-            }
-
-            if (store) {
-                StorageService.getInstance(communicationContext.appContext).saveMessage(Message(communicatorHash = NetworkProvider.hashCode(), message = strEvent))
-                // TODO (maybe set timeout to load from db)
-            }
-        }
-        workerThread.postTask(task)
     }
 
     override fun sendLocation(location: Location, isAlarm: Boolean, cache: Boolean): Boolean {
@@ -312,4 +220,95 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
+    private fun createEvent(eventType: Long, carId: Long, note: String) {
+        val event = EventCreate(eventType, Calendar.getInstance().timeInMillis, carId, note)
+
+        val task = Runnable {
+            val strEvent = Gson().toJson(event)
+
+            val store = if(canUseConnection()){
+                val result = eventController.createEvent(strEvent)
+                !result.isSuccessful
+            } else {
+                true
+            }
+
+            if (store) {
+                StorageService.getInstance(communicationContext.appContext).saveMessage(Message(communicatorHash = NetworkProvider.hashCode(), message = strEvent))
+                // TODO (maybe set timeout to load from db)
+            }
+        }
+        workerThread.postTask(task)
+    }
+
+    private fun isConnected(): Boolean {
+        return connectivitySevice?.activeNetworkInfo?.isConnected ?: false
+    }
+
+    private fun isCellular(): Boolean {
+        return if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M) {
+            connectivitySevice?.activeNetworkInfo?.type == ConnectivityManager.TYPE_MOBILE
+        } else {
+            val activeNetwork = connectivitySevice?.activeNetwork ?: return false
+
+            val capabilities = connectivitySevice.getNetworkCapabilities(activeNetwork)
+            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+        }
+    }
+
+    private fun canSendMessage(): Boolean {
+        if (!isInitialized) {
+            Log.w(tag, "Can not send message because NetworkProvider is not initialized.")
+            return false
+        }
+
+        if (check(communicationContext.appContext) != CheckCodes.success) {
+            Log.d(tag, "Can not send message to server.")
+            return false
+        }
+        return true
+    }
+
+    private fun canUseConnection(): Boolean {
+        return isConnected() && ( communicationContext.cellular || !isCellular())
+    }
+
+    private fun getEventType(messageType: MessageType): Int {
+        return when (messageType) {
+            MessageType.UtilSwitch ->
+                communicationContext.appContext.resources.getInteger(R.integer.event_unknown)
+            MessageType.Alarm ->
+                communicationContext.appContext.resources.getInteger(R.integer.event_alarm_on)
+            MessageType.AlarmLocation ->
+                communicationContext.appContext.resources.getInteger(R.integer.event_unknown)
+            MessageType.Location ->
+                communicationContext.appContext.resources.getInteger(R.integer.event_unknown)
+            MessageType.BatteryWarn ->
+                communicationContext.appContext.resources.getInteger(R.integer.event_battery)
+            MessageType.Status ->
+                communicationContext.appContext.resources.getInteger(R.integer.event_unknown)
+            MessageType.PowerConnected ->
+                communicationContext.appContext.resources.getInteger(R.integer.event_power_connected)
+            MessageType.PowerDisconnected ->
+                communicationContext.appContext.resources.getInteger(R.integer.event_power_disconnected)
+
+        }
+    }
+
+    private fun canSendEvent(messageType: MessageType): Boolean {
+        return when (messageType) {
+
+            MessageType.Alarm ->
+                communicationContext.isMessageAllowed(this.javaClass.name, "Alarm_Position_send")
+            MessageType.BatteryWarn,
+            MessageType.PowerConnected,
+            MessageType.PowerDisconnected ->
+                communicationContext.isMessageAllowed(this.javaClass.name, "Battery_State_Changed_send")
+            else -> {
+                Log.e(tag, "Sending Network message of message type $messageType is not supported as Event sending.")
+                false
+            }
+
+        }
+    }
 }
