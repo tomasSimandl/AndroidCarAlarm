@@ -4,6 +4,8 @@ import android.Manifest
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import com.example.tomas.carsecurity.CheckCodes
@@ -25,6 +27,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonParser
 import java.util.*
 
+
 class NetworkProvider(private val communicationContext: CommunicationContext) : ICommunicationProvider, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private val tag = "NetworkProvider"
@@ -32,6 +35,8 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
     private lateinit var routeController: RouteController
     private lateinit var eventController: EventController
     private lateinit var locationController: LocationController
+
+    private val connectivitySevice = communicationContext.appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
 
     private var isInitialized: Boolean = false
 
@@ -65,6 +70,21 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
             if (!initControllers()) {
                 isInitialized = false
             }
+        }
+    }
+
+    private fun isConnected(): Boolean {
+        return connectivitySevice?.activeNetworkInfo?.isConnected ?: false
+    }
+
+    private fun isCellular(): Boolean {
+        return if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M) {
+            connectivitySevice?.activeNetworkInfo?.type == ConnectivityManager.TYPE_MOBILE
+        } else {
+            val activeNetwork = connectivitySevice?.activeNetwork ?: return false
+
+            val capabilities = connectivitySevice.getNetworkCapabilities(activeNetwork)
+            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
         }
     }
 
@@ -225,10 +245,10 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
             true
         } else {
             val task = Runnable {
-                if (location.localRouteId != null){
+                if (location.localRouteId != null) {
                     val storage = StorageService.getInstance(communicationContext.appContext)
                     val route = storage.getRoute(location.localRouteId!!)
-                    if(route.serverRouteId == null){
+                    if (route.serverRouteId == null) {
                         Log.w(tag, "Can not send position because route was not created yet.")
                         return@Runnable
                     }
