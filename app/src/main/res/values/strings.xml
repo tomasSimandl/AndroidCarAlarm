@@ -140,6 +140,9 @@
     <string name="pref_communication_network_message_types_title">Additional communication</string>
     <string name="pref_communication_network_message_types_description">Sets which additional messages are allowed for communication over network</string>
 
+    <string name="pref_communication_network_update_interval_title">Synchronization interval</string>
+    <string name="pref_communication_network_update_interval_description">Sets how often will be synchronize data whith server</string>
+
     <string-array name="pref_communication_network_messages">
         <item>Tool state changed</item>
         <item>Alarm + Alarm position</item>

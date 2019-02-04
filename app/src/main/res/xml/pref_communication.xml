@@ -1,4 +1,5 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:sample="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory android:key="sms_category" android:title="@string/pref_communication_sms_group_name">
         <SwitchPreference
@@ -48,5 +49,18 @@
             android:entries="@array/pref_communication_network_messages"
             android:entryValues="@array/pref_communication_network_messages_values"
             android:defaultValue="@array/pref_communication_network_messages_values" />
+
+        <com.pavelsikun.seekbarpreference.SeekBarPreferenceCompat
+            android:key="@string/key_communication_network_update_interval"
+            android:title="@string/pref_communication_network_update_interval_title"
+            android:summary="@string/pref_communication_network_update_interval_description"
+            android:dependency="@string/key_communication_network_is_allowed"
+            android:defaultValue="@integer/default_communication_network_update_interval"
+
+            sample:msbp_minValue="1"
+            sample:msbp_maxValue="120"
+            sample:msbp_interval="1"
+            sample:msbp_measurementUnit="min"
+            sample:msbp_dialogEnabled="false"/>
     </PreferenceCategory>
 </PreferenceScreen>

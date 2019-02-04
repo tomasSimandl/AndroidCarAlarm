@@ -60,6 +60,11 @@ class CommunicationContext(appContext: Context) : BaseContext(appContext) {
     val cellular: Boolean
         get() = getBoolean(R.string.key_communication_network_cellular,
                 R.bool.default_communication_network_cellular)
+
+    /** Returns how often should by synchronize local database with server */
+    val synchronizationInterval: Long
+        get() = getInt(R.string.key_communication_network_update_interval,
+                R.integer.default_communication_network_update_interval) * 60000L // *60 to second *1000 to milliseconds
 }
 
 
