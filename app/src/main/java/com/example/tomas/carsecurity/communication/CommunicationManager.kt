@@ -1,22 +1,26 @@
 package com.example.tomas.carsecurity.communication
 
 import android.content.SharedPreferences
+import android.util.Log
 import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.communication.network.NetworkProvider
 import com.example.tomas.carsecurity.communication.sms.SmsProvider
-import com.example.tomas.carsecurity.context.MyContext
+import com.example.tomas.carsecurity.context.CommunicationContext
 import com.example.tomas.carsecurity.storage.entity.Location
 import com.example.tomas.carsecurity.utils.UtilsEnum
 
-class CommunicationManager(private val context: MyContext) : SharedPreferences.OnSharedPreferenceChangeListener {
+class CommunicationManager(private val communicationContext: CommunicationContext)
+    : SharedPreferences.OnSharedPreferenceChangeListener {
 
     private val activeCommunicators: MutableSet<ICommunicationProvider> = HashSet()
+    private val tag = "CommunicationManager"
+
 
     init {
-        tryInitializeProvider(SmsProvider(context.communicationContext))
-        tryInitializeProvider(NetworkProvider(context.communicationContext))
+        tryInitializeProvider(SmsProvider(communicationContext))
+        tryInitializeProvider(NetworkProvider(communicationContext))
 
-        context.communicationContext.registerOnPreferenceChanged(this)
+        communicationContext.registerOnPreferenceChanged(this)
     }
 
     private fun tryInitializeProvider(provider: ICommunicationProvider) {
@@ -29,16 +33,16 @@ class CommunicationManager(private val context: MyContext) : SharedPreferences.O
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
         //  TODO warning - run in main thread
         // TODO use all possible resources (phone number)
-        if (key == context.appContext.getString(R.string.key_communication_sms_is_allowed)) {
+        if (key == communicationContext.appContext.getString(R.string.key_communication_sms_is_allowed)) {
 
-            if(canRegisterProvider(activeCommunicators.find { it is SmsProvider }, sharedPreferences, key))
-                tryInitializeProvider(SmsProvider(context.communicationContext))
+            if (canRegisterProvider(activeCommunicators.find { it is SmsProvider }, sharedPreferences, key))
+                tryInitializeProvider(SmsProvider(communicationContext))
         }
 
-        if (key == context.appContext.getString(R.string.key_communication_network_is_allowed)) {
+        if (key == communicationContext.appContext.getString(R.string.key_communication_network_is_allowed)) {
 
-            if(canRegisterProvider(activeCommunicators.find { it is NetworkProvider }, sharedPreferences, key))
-                tryInitializeProvider(NetworkProvider(context.communicationContext))
+            if (canRegisterProvider(activeCommunicators.find { it is NetworkProvider }, sharedPreferences, key))
+                tryInitializeProvider(NetworkProvider(communicationContext))
         }
     }
 
@@ -46,7 +50,7 @@ class CommunicationManager(private val context: MyContext) : SharedPreferences.O
      * Method resolve if provider should be created. When provider is not allowed but already
      * exists, it is removed from active providers
      */
-    private fun canRegisterProvider(provider: ICommunicationProvider?, sharedPreferences: SharedPreferences, key: String): Boolean{
+    private fun canRegisterProvider(provider: ICommunicationProvider?, sharedPreferences: SharedPreferences, key: String): Boolean {
 
         if (sharedPreferences.getBoolean(key, false)) {
             // new value is true
@@ -66,7 +70,8 @@ class CommunicationManager(private val context: MyContext) : SharedPreferences.O
 
 
     fun destroy() {
-        context.communicationContext.unregisterOnPreferenceChanged(this)
+        Log.d(tag, "Destroying")
+        communicationContext.unregisterOnPreferenceChanged(this)
         activeCommunicators.forEach { it.destroy() }
         activeCommunicators.clear()
     }
@@ -96,7 +101,7 @@ class CommunicationManager(private val context: MyContext) : SharedPreferences.O
     }
 
     fun sendRoute(localRouteId: Int) {
-        for (provider in activeCommunicators){
+        for (provider in activeCommunicators) {
             provider.sendRoute(localRouteId)
         }
     }
