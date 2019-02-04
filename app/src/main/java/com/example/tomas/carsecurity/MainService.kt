@@ -102,6 +102,7 @@ class MainService : Service(), Observer {
 
     override fun onDestroy() {
         super.onDestroy()
+        Log.d(tag, "Destroying")
         if (::context.isInitialized) context.destroy()
         if (::workerThread.isInitialized) workerThread.quit()
         if (::utilsManager.isInitialized) utilsManager.destroy()
@@ -116,7 +117,6 @@ class MainService : Service(), Observer {
     private fun stopService(safely: Boolean){
         if(!safely || (tasksInQueue.get() == 0 && !utilsManager.isAnyUtilEnabled())){
             stopForeground(true)
-            stopSelf()
         }
     }
 
