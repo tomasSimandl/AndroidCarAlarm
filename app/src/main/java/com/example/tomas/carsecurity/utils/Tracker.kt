@@ -98,7 +98,7 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
             utilsHelper.registerObserver(ObservableEnum.LocationProvider, this)
 
             actualRoute = Route(carId = 1) // TODO (Use real car id)
-            StorageService.getInstance(context.appContext).saveRoute(actualRoute!!)
+            actualRoute!!.uid = StorageService.getInstance(context.appContext).saveRoute(actualRoute!!).toInt()
 
             setChanged()
             notifyObservers(true)
