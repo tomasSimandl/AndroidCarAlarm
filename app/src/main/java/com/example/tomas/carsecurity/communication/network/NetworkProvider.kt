@@ -1,8 +1,7 @@
 package com.example.tomas.carsecurity.communication.network
 
 import android.Manifest
-import android.content.Context
-import android.content.SharedPreferences
+import android.content.*
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -26,10 +25,12 @@ import com.example.tomas.carsecurity.storage.entity.Route
 import com.example.tomas.carsecurity.utils.UtilsEnum
 import com.google.gson.Gson
 import com.google.gson.JsonParser
+import java.net.HttpURLConnection
 import java.util.*
+import kotlin.collections.ArrayList
 
 
-class NetworkProvider(private val communicationContext: CommunicationContext) : ICommunicationProvider, SharedPreferences.OnSharedPreferenceChangeListener {
+class NetworkProvider(private val communicationContext: CommunicationContext) : ICommunicationProvider, SharedPreferences.OnSharedPreferenceChangeListener, BroadcastReceiver() {
 
     private val tag = "NetworkProvider"
     private lateinit var workerThread: WorkerThread
@@ -40,6 +41,8 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
     private val connectivityService = communicationContext.appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
 
     private var isInitialized: Boolean = false
+
+    private var synchronizeTimer: Timer? = null
 
     companion object Check : CheckObjByte {
         override fun check(context: Context): Byte {
@@ -64,12 +67,101 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
         }
     }
 
+    override fun onReceive(context: Context, intent: Intent) {
+        if (intent.action == ConnectivityManager.CONNECTIVITY_ACTION) {
+            onNetworkStatusChanged()
+        }
+    }
+
+    private fun onNetworkStatusChanged(){
+        synchronized(this) {
+            if (canUseConnection()) {
+                Log.d(tag, "Network connectivity was changed and it is possible to send data.")
+
+                if (synchronizeTimer == null) {
+                    val synchronizeTask = object : TimerTask() {
+                        override fun run() {
+                            if (!canUseConnection()) {
+                                Log.d(tag, "Stopping network synchronization. Can not use connection.")
+                                return
+                            }
+
+                            val storage = StorageService.getInstance(communicationContext.appContext)
+
+                            val messages = storage.getMessages(NetworkProvider.hashCode())
+                            for (message in messages) {
+                                sendEvent(message)
+                            }
+
+                            val routes = storage.getRoutes()
+                            val routesWithId: MutableList<Route> = ArrayList()
+                            var maxRouteId: Int = Integer.MIN_VALUE
+                            for (route in routes) {
+                                if (route.uid > maxRouteId) maxRouteId = route.uid
+
+                                if (route.serverRouteId != null) {
+                                    routesWithId.add(route)
+                                } else {
+                                    sendRoute(route)
+                                }
+                            }
+
+                            for (route in routesWithId) {
+                                val locations = storage.getLocationsByLocalRouteId(route.uid)
+                                for (location in locations) {
+                                    sendLocation(location)
+                                }
+
+                                // Can not remove last route because it is possibility that is stil used
+                                if (route.uid < maxRouteId && storage.getLocationsByLocalRouteId(route.uid).isEmpty()) {
+                                    storage.deleteRoute(route)
+                                }
+                            }
+
+                            val locations = storage.getLocationsByLocalRouteId(null)
+                            for (location in locations) {
+                                sendLocation(location)
+                            }
+                        }
+                    }
+                    synchronizeTimer = Timer("NetworkSynchronize")
+                    synchronizeTimer!!.schedule(synchronizeTask, 1000L, communicationContext.synchronizationInterval)
+                }
+            } else {
+                Log.d(tag, "Network connectivity was changed. Can not send data.")
+
+                if (synchronizeTimer != null) {
+                    synchronizeTimer!!.cancel()
+                    synchronizeTimer = null
+                }
+            }
+        }
+    }
+
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
 
-        if (key == communicationContext.appContext.getString(R.string.key_communication_network_server_url)) {
-            Log.d(tag, "Servers url was changed. Reinitializing Controllers")
-            if (!initControllers()) {
-                isInitialized = false
+        when (key) {
+            communicationContext.appContext.getString(R.string.key_communication_network_server_url) -> {
+                Log.d(tag, "Servers url was changed. Reinitializing Controllers")
+                if (!initControllers()) {
+                    isInitialized = false
+                }
+            }
+
+            communicationContext.appContext.getString(R.string.key_communication_network_cellular) -> {
+                Log.d(tag, "Cellular status changed")
+                onNetworkStatusChanged()
+            }
+
+            communicationContext.appContext.getString(R.string.key_communication_network_update_interval) -> {
+                Log.d(tag, "Update interval was changed")
+                synchronized(this) {
+                    if (synchronizeTimer != null) {
+                        synchronizeTimer!!.cancel()
+                        synchronizeTimer = null
+                    }
+                }
+                onNetworkStatusChanged()
             }
         }
     }
@@ -79,6 +171,7 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
 
         if (check(communicationContext.appContext) == CheckCodes.success) {
 
+            Log.d(tag, "Initializing Network provider")
             if (!initControllers()) return false
 
             workerThread = WorkerThread("NetworkThread")
@@ -86,6 +179,10 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
             workerThread.prepareHandler()
 
             communicationContext.registerOnPreferenceChanged(this)
+
+            val intentFilter = IntentFilter("android.net.conn.CONNECTIVITY_CHANGE")
+            communicationContext.appContext.registerReceiver(this, intentFilter)
+
             isInitialized = true
             return true
         }
@@ -105,9 +202,16 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
     }
 
     override fun destroy() {
+        Log.d(tag, "Destroying")
         isInitialized = false
         if (::workerThread.isInitialized) workerThread.quit()
         communicationContext.unregisterOnPreferenceChanged(this)
+        communicationContext.appContext.unregisterReceiver(this)
+
+        if(synchronizeTimer != null){
+            synchronizeTimer!!.cancel()
+            synchronizeTimer = null
+        }
     }
 
     override fun isInitialize(): Boolean {
@@ -254,6 +358,7 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
             if (send) {
                 val result = locationController.createLocations(listOf(location))
                 if (result.isSuccessful) inDB = false
+                if (result.code() == HttpURLConnection.HTTP_CONFLICT) inDB = false // already in DB
             }
         }
 
@@ -295,13 +400,12 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
                 }
 
                 Log.d(tag, "Route was successfully created and stored to DB")
-                // TODO (inform something that positions can be send to server now)
             } else {
                 Log.d(tag, "Creating of route was not successful")
             }
         }
 
-        if (route.uid == 0){
+        if (route.uid == 0) {
             StorageService.getInstance(communicationContext.appContext).saveRoute(route)
         }
     }

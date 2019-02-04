@@ -12,8 +12,8 @@ interface LocationDao {
     @Query("SELECT * FROM location LIMIT :limit")
     fun getAll(limit: Int): List<Location>
 
-    @Query("SELECT * FROM location WHERE local_route_id = :routeId")
-    fun getAllByRouteId(routeId: Int): List<Location>
+    @Query("SELECT * FROM location WHERE local_route_id is :routeId")
+    fun getAllByLocalRouteId(routeId: Int?): List<Location>
 
     @Insert
     fun insert(location: Location)

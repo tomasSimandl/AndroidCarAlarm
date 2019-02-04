@@ -58,7 +58,7 @@ class StorageService private constructor(appContext: Context) {
         database.messageDao().deleteAllByCommunicatorHash(communicatorHash)
     }
 
-    fun deleteMessage(message: Message){
+    fun deleteMessage(message: Message) {
         database.messageDao().delete(message)
     }
 
@@ -74,21 +74,33 @@ class StorageService private constructor(appContext: Context) {
         return database.locationDao().getAll()
     }
 
+    fun getLocationsByLocalRouteId(routeId: Int?): List<Location> {
+        return database.locationDao().getAllByLocalRouteId(routeId)
+    }
+
     fun deleteLocations(locations: List<Location>) {
         database.locationDao().delete(locations)
     }
 
 
-    fun saveRoute(route: Route) {
-        database.routeDao().insert(route)
+    fun saveRoute(route: Route): Long{
+        return database.routeDao().insert(route)
     }
 
-    fun updateRoute(route: Route){
+    fun updateRoute(route: Route) {
         database.routeDao().update(route)
+    }
+
+    fun getRoutes(): List<Route> {
+        return database.routeDao().getAll()
     }
 
     fun getRoute(routeId: Int): Route {
         return database.routeDao().get(routeId)
+    }
+
+    fun deleteRoute(route: Route) {
+        database.routeDao().delete(route)
     }
 
     fun finishRoute(route: Route) {

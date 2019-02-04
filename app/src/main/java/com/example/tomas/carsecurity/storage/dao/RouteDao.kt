@@ -14,7 +14,7 @@ interface RouteDao {
     fun get(routeId: Int): Route
 
     @Insert
-    fun insert(route: Route)
+    fun insert(route: Route): Long
 
     @Delete
     fun delete(vararg route: Route)
