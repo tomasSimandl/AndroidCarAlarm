@@ -8,9 +8,7 @@ import com.example.tomas.carsecurity.storage.entity.Route
 
 class StorageService private constructor(appContext: Context) {
 
-    private val database = Room.databaseBuilder(appContext, AppDatabase::class.java, "CarSecurityDB")
-            .fallbackToDestructiveMigration()
-            .build()
+    private lateinit var database: AppDatabase
 
     // all running on main thread
 
@@ -18,20 +16,31 @@ class StorageService private constructor(appContext: Context) {
 
         private var instance: StorageService? = null
 
-        fun getInstance(appContext: Context): StorageService{
-            if(instance == null){
+        fun getInstance(appContext: Context): StorageService {
+            // Initialize singleton
+            if (instance == null) {
                 instance = StorageService(appContext)
             }
+
+            // reopen database if it is not initialized or closed
+            if (!instance!!::database.isInitialized || !instance!!.database.isOpen) {
+                instance!!.database = Room.databaseBuilder(appContext, AppDatabase::class.java, "CarSecurityDB")
+                        .fallbackToDestructiveMigration()
+                        .build()
+            }
+
             return instance!!
         }
 
-        fun destroy(){
+        fun destroy() {
             instance?.close()
         }
     }
 
-    fun close(){
-        database.close()
+    fun close() {
+        if (database.isOpen) {
+            database.close()
+        }
     }
 
     fun saveMessage(message: Message) {
