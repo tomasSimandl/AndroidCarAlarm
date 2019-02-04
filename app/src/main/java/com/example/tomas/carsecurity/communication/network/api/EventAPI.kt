@@ -10,5 +10,5 @@ import retrofit2.http.POST
 interface EventAPI {
 
     @POST(Mapping.EVENT_URL)
-    fun createEvent(@Body event: RequestBody): Call<Any>
+    fun createEvent(@Body event: RequestBody): Call<Void>
 }

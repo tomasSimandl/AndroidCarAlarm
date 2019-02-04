@@ -11,5 +11,5 @@ import retrofit2.http.POST
 interface LocationAPI {
 
     @POST(Mapping.LOCATION_URL)
-    fun createLocations(@Body location: List<Location>): Call<Any>
+    fun createLocations(@Body location: List<Location>): Call<Void>
 }

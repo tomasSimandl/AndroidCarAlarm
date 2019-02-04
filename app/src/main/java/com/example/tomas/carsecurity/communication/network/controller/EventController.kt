@@ -23,7 +23,7 @@ class EventController(serverUrl: String) {
         eventAPI = retrofit.create(EventAPI::class.java)
     }
 
-    fun createEvent(event: String): Response<Any> {
+    fun createEvent(event: String): Response<Void> {
         val requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), event)
         val method = eventAPI.createEvent(requestBody)
 
@@ -31,7 +31,7 @@ class EventController(serverUrl: String) {
         return try {
             method.execute()
         } catch (e: Exception) {
-            Log.d(tag, "Can not send request. Exception: $e")
+            Log.d(tag, "Can not send request. Exception: ${e.printStackTrace()}")
             Response.error(418, ResponseBody.create(null, ""))
         }
     }

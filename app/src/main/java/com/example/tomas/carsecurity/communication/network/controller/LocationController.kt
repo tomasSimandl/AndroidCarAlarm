@@ -23,7 +23,7 @@ class LocationController(serverUrl: String) {
         locationAPI = retrofit.create(LocationAPI::class.java)
     }
 
-    fun createLocations(locations: List<Location>): Response<Any> {
+    fun createLocations(locations: List<Location>): Response<Void> {
         val method = locationAPI.createLocations(locations)
 
         Log.d(tag, "Sending message to create locations endpoint. URL: ${method.request().url()}")
