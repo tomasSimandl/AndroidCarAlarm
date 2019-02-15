@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.support.v4.content.LocalBroadcastManager
 import android.util.Log
+import com.example.tomas.carsecurity.fragments.MainFragment
 import com.example.tomas.carsecurity.utils.UtilsEnum
 
 class BroadcastSender(private val context: Context) {
@@ -12,10 +13,10 @@ class BroadcastSender(private val context: Context) {
 
     fun informUI(utilEnum: UtilsEnum, enabled: Boolean) {
         Log.d(tag, """Sending information about util to UI. Util: ${utilEnum.name} is ${if(enabled) "enabled" else "disabled"}.""")
-        val intent = Intent(MainActivity.BroadcastKeys.BroadcastUpdateUI.name)
+        val intent = Intent(MainFragment.BroadcastKeys.BroadcastUpdateUI.name)
 
-        intent.putExtra(MainActivity.BroadcastKeys.KeyUtilName.name, utilEnum.name)
-        intent.putExtra(MainActivity.BroadcastKeys.KeyUtilActivated.name, enabled)
+        intent.putExtra(MainFragment.BroadcastKeys.KeyUtilName.name, utilEnum.name)
+        intent.putExtra(MainFragment.BroadcastKeys.KeyUtilActivated.name, enabled)
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
     }
 
@@ -26,9 +27,9 @@ class BroadcastSender(private val context: Context) {
     }
 
     fun showMessage(msg: String) {
-        val intent = Intent(MainActivity.BroadcastKeys.BroadcastUpdateUI.name)
+        val intent = Intent(MainFragment.BroadcastKeys.BroadcastUpdateUI.name)
 
-        intent.putExtra(MainActivity.BroadcastKeys.KeyShowMessage.name, msg)
+        intent.putExtra(MainFragment.BroadcastKeys.KeyShowMessage.name, msg)
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
     }
 

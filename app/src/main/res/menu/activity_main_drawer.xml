@@ -5,6 +5,14 @@
 
     <group android:checkableBehavior="none">
         <item
+            android:id="@+id/menu_home"
+            android:icon="@drawable/ic_home_black_24dp"
+            android:title="@string/menu_home_title" />
+        <item
+            android:id="@+id/menu_login"
+            android:icon="@drawable/ic_input_black_24dp"
+            android:title="@string/menu_login_title" />
+        <item
             android:id="@+id/menu_settings"
             android:icon="@drawable/ic_settings_black_24dp"
             android:title="@string/menu_settings_title" />

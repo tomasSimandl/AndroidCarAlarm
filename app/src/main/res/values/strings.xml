@@ -163,6 +163,8 @@
     <string name="nav_image_description">Car security application icon</string>
 
     <string name="menu_settings_title">Settings</string>
+    <string name="menu_login_title">Login</string>
+    <string name="menu_home_title">Home</string>
 
 
     <!-- =============================== STRINGS OF SMS MESSAGES =============================== -->

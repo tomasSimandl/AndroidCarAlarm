@@ -19,8 +19,13 @@
             app:popupTheme="@style/AppTheme.PopupOverlay" />
     </android.support.design.widget.AppBarLayout>
 
+
     <!-- main activity content -->
-    <include layout="@layout/content_main" />
+    <FrameLayout
+        android:id="@+id/view_content"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
     <!-- floating button -->
     <android.support.design.widget.FloatingActionButton
