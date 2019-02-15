@@ -30,22 +30,6 @@ class SoundDetector(private val context : MyContext) : GeneralObservable(), Shar
 
     private var timer: Timer? = null
 
-    private val timerTask = object : TimerTask() {
-        override fun run() {
-
-            Log.v(tag, "timer thread was triggered.")
-
-            val amplitude = recorder?.maxAmplitude ?: 0
-            if (amplitude > context.sensorContext.maxAmplitude) {
-                Log.d(tag,"""Max amplitude $amplitude is over limit ${context.sensorContext.maxAmplitude}""")
-
-                setChanged()
-                notifyObservers()
-                Log.d(tag, """Update - Thread: ${Thread.currentThread().name}""")
-            }
-        }
-    }
-
     companion object Check: CheckObjByte {
         override fun check(context: Context): Byte {
             return if (!context.packageManager.hasSystemFeature(PackageManager.FEATURE_MICROPHONE)) {
@@ -144,6 +128,22 @@ class SoundDetector(private val context : MyContext) : GeneralObservable(), Shar
      * state for maximal [SensorContext].measureInterval milliseconds before it ends.
      */
     private fun initSoundChecker(){
+        val timerTask = object : TimerTask() {
+            override fun run() {
+
+                Log.v(tag, "timer thread was triggered.")
+
+                val amplitude = recorder?.maxAmplitude ?: 0
+                if (amplitude > context.sensorContext.maxAmplitude) {
+                    Log.d(tag,"""Max amplitude $amplitude is over limit ${context.sensorContext.maxAmplitude}""")
+
+                    setChanged()
+                    notifyObservers()
+                    Log.d(tag, """Update - Thread: ${Thread.currentThread().name}""")
+                }
+            }
+        }
+
         timer = Timer("SoundDetectorThread")
         timer?.schedule( timerTask, context.sensorContext.measureInterval.toLong(), context.sensorContext.measureInterval.toLong())
     }
