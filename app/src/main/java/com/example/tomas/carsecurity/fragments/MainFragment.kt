@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatDelegate
 import android.support.v7.content.res.AppCompatResources
 import android.util.Log
 import android.view.LayoutInflater
@@ -15,7 +14,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ProgressBar
-import android.widget.TextView
 import com.example.tomas.carsecurity.MainService
 import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.context.UtilsContext
@@ -31,6 +29,7 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
 
     private lateinit var utilsContext: UtilsContext
     private var isProgressRun = false
+    private var canShowProgress = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,6 +49,7 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
                 null)
 
         view.actionAlarm.setOnClickListener {
+            canShowProgress = true
             sendIntentSwitchUtil(UtilsEnum.Alarm)
         }
 
@@ -62,6 +62,7 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
 
     override fun onResume() {
         super.onResume()
+        canShowProgress = false
 
         val broadcastManager = LocalBroadcastManager.getInstance(requireContext())
         broadcastManager.registerReceiver(receiver, IntentFilter(BroadcastKeys.BroadcastUpdateUI.name))
@@ -105,7 +106,7 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
 
                 when (utilName) {
                     UtilsEnum.Alarm.name -> {
-                        if (utilEnabled) {
+                        if (utilEnabled && canShowProgress) {
                             runProgress(context)
                         } else {
                             progressBar.max = 0
@@ -141,7 +142,7 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
             val handler = Handler()
 
             Thread(Runnable {
-                while (progressBar.max > progressBar.progress) {
+                while (progressBar != null && progressBar.max > progressBar.progress) {
                     handler.post {
                         progressBar.progress++
                     }
