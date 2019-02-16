@@ -18,7 +18,7 @@ import com.example.tomas.carsecurity.communication.network.controller.LocationCo
 import com.example.tomas.carsecurity.communication.network.controller.RouteController
 import com.example.tomas.carsecurity.communication.network.dto.EventCreate
 import com.example.tomas.carsecurity.context.CommunicationContext
-import com.example.tomas.carsecurity.storage.StorageService
+import com.example.tomas.carsecurity.storage.Storage
 import com.example.tomas.carsecurity.storage.entity.Location
 import com.example.tomas.carsecurity.storage.entity.Message
 import com.example.tomas.carsecurity.storage.entity.Route
@@ -86,14 +86,14 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
                                 return
                             }
 
-                            val storage = StorageService.getInstance(communicationContext.appContext)
+                            val storage = Storage.getInstance(communicationContext.appContext)
 
-                            val messages = storage.getMessages(NetworkProvider.hashCode())
+                            val messages = storage.messageService.getMessages(NetworkProvider.hashCode())
                             for (message in messages) {
                                 sendEvent(message)
                             }
 
-                            val routes = storage.getRoutes()
+                            val routes = storage.routeService.getRoutes()
                             val routesWithId: MutableList<Route> = ArrayList()
                             var maxRouteId: Int = Integer.MIN_VALUE
                             for (route in routes) {
@@ -107,18 +107,18 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
                             }
 
                             for (route in routesWithId) {
-                                val locations = storage.getLocationsByLocalRouteId(route.uid)
+                                val locations = storage.locationService.getLocationsByLocalRouteId(route.uid)
                                 for (location in locations) {
                                     sendLocation(location)
                                 }
 
                                 // Can not remove last route because it is possibility that is stil used
-                                if (route.uid < maxRouteId && storage.getLocationsByLocalRouteId(route.uid).isEmpty()) {
-                                    storage.deleteRoute(route)
+                                if (route.uid < maxRouteId && storage.locationService.getLocationsByLocalRouteId(route.uid).isEmpty()) {
+                                    storage.routeService.deleteRoute(route)
                                 }
                             }
 
-                            val locations = storage.getLocationsByLocalRouteId(null)
+                            val locations = storage.locationService.getLocationsByLocalRouteId(null)
                             for (location in locations) {
                                 sendLocation(location)
                             }
@@ -282,7 +282,7 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
             }
 
             if (cache) {
-                StorageService.getInstance(communicationContext.appContext).saveLocation(location)
+                Storage.getInstance(communicationContext.appContext).locationService.saveLocation(location)
             } else {
                 sendLocation(location)
             }
@@ -295,7 +295,7 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
         val task = Runnable {
             if (!canSendMessage()) return@Runnable
 
-            val route = StorageService.getInstance(communicationContext.appContext).getRoute(localRouteId)
+            val route = Storage.getInstance(communicationContext.appContext).routeService.getRoute(localRouteId)
             sendRoute(route)
         }
 
@@ -324,10 +324,10 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
 
         if (inDB && msg.uid == 0) {
             // should be in DB but msg.uid == 0 => it is not in DB
-            StorageService.getInstance(communicationContext.appContext).saveMessage(msg)
+            Storage.getInstance(communicationContext.appContext).messageService.saveMessage(msg)
         } else if (!inDB && msg.uid != 0) {
             // should not be in DB but msg.uid != 0 => it is in DB
-            StorageService.getInstance(communicationContext.appContext).deleteMessage(msg)
+            Storage.getInstance(communicationContext.appContext).messageService.deleteMessage(msg)
         }
     }
 
@@ -339,12 +339,12 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
         var inDB = true
         var update = false
         var send = true
-        val storage = StorageService.getInstance(communicationContext.appContext)
+        val storage = Storage.getInstance(communicationContext.appContext)
 
         if (canUseConnection()) {
 
             if (location.localRouteId != null && location.routeId == null) {
-                val route = storage.getRoute(location.localRouteId!!)
+                val route = storage.routeService.getRoute(location.localRouteId!!)
                 if (route.serverRouteId == null) {
                     Log.w(tag, "Can not send position because route was not created yet.")
                     inDB = true
@@ -364,13 +364,13 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
 
         if (inDB && location.uid != 0 && update) {
             // should be in DB it is in DB but need to be updated
-            storage.updateLocation(location)
+            storage.locationService.updateLocation(location)
         } else if (inDB && location.uid == 0) {
             // should be in DB but location.uid == 0 => it is not in DB
-            storage.saveLocation(location)
+            storage.locationService.saveLocation(location)
         } else if (!inDB && location.uid != 0) {
             // should not be in DB but location.uid != 0 => it is in DB
-            storage.deleteLocations(listOf(location))
+            storage.locationService.deleteLocations(listOf(location))
         }
     }
 
@@ -385,7 +385,7 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
         }
 
         if (canUseConnection()) {
-            val storage = StorageService.getInstance(communicationContext.appContext)
+            val storage = Storage.getInstance(communicationContext.appContext)
 
             val response = routeController.createRoute(route.carId)
             if (response.isSuccessful) {
@@ -394,9 +394,9 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
 
                 route.serverRouteId = serverRouteId
                 if (route.uid == 0) {
-                    storage.saveRoute(route)
+                    storage.routeService.saveRoute(route)
                 } else {
-                    storage.updateRoute(route)
+                    storage.routeService.updateRoute(route)
                 }
 
                 Log.d(tag, "Route was successfully created and stored to DB")
@@ -406,7 +406,7 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
         }
 
         if (route.uid == 0) {
-            StorageService.getInstance(communicationContext.appContext).saveRoute(route)
+            Storage.getInstance(communicationContext.appContext).routeService.saveRoute(route)
         }
     }
 

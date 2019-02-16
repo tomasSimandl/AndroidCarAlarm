@@ -2,7 +2,7 @@ package com.example.tomas.carsecurity.context
 
 import android.content.Context
 import android.os.Looper
-import com.example.tomas.carsecurity.storage.StorageService
+import com.example.tomas.carsecurity.storage.Storage
 
 class MyContext(val appContext: Context, val mainServiceThreadLooper: Looper) {
 
@@ -11,6 +11,6 @@ class MyContext(val appContext: Context, val mainServiceThreadLooper: Looper) {
     val communicationContext = CommunicationContext(appContext)
 
     fun destroy(){
-        StorageService.destroy()
+        Storage.destroy()
     }
 }

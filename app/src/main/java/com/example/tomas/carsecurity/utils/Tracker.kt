@@ -11,7 +11,7 @@ import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.context.UtilsContext
 import com.example.tomas.carsecurity.sensors.LocationProvider
-import com.example.tomas.carsecurity.storage.StorageService
+import com.example.tomas.carsecurity.storage.Storage
 import com.example.tomas.carsecurity.storage.entity.Route
 import java.util.*
 import com.example.tomas.carsecurity.storage.entity.Location as DbLocation
@@ -98,7 +98,7 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
             utilsHelper.registerObserver(ObservableEnum.LocationProvider, this)
 
             actualRoute = Route(carId = 1) // TODO (Use real car id)
-            actualRoute!!.uid = StorageService.getInstance(context.appContext).saveRoute(actualRoute!!).toInt()
+            actualRoute!!.uid = Storage.getInstance(context.appContext).routeService.saveRoute(actualRoute!!).toInt()
 
             setChanged()
             notifyObservers(true)
@@ -120,7 +120,7 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
             context.utilsContext.unregisterOnPreferenceChanged(this)
 
             if(actualRoute != null) {
-                StorageService.getInstance(context.appContext).finishRoute(actualRoute!!)
+                Storage.getInstance(context.appContext).routeService.finishRoute(actualRoute!!)
                 actualRoute = null
             }
 
