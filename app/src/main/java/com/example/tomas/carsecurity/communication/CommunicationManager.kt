@@ -106,4 +106,13 @@ class CommunicationManager(private val communicationContext: CommunicationContex
         }
     }
 
+    fun sendNetworkLogin(username: String, password: String){
+        for (provider in activeCommunicators) {
+            if(provider is NetworkProvider){
+                provider.login(username, password)
+                break
+            }
+        }
+    }
+
 }

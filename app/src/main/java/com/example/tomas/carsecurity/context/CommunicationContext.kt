@@ -53,6 +53,10 @@ class CommunicationContext(appContext: Context) : BaseContext(appContext) {
     val serverUrl: String
         get() = getString(R.string.key_communication_network_server_url, R.string.empty)
 
+    /** Return url of authorization server. Return value from sharedPreferences or empty string. */
+    val authorizationServerUrl: String
+        get() = getString(R.string.key_communication_network_auth_server_url, R.string.empty)
+
     /**
      * Indicates if can be used cellular for network synchronization.
      * Return value from sharedPreferences or empty string.

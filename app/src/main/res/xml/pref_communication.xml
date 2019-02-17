@@ -34,6 +34,11 @@
             android:title="@string/pref_communication_network_server_url_title"
             android:dialogMessage="@string/pref_communication_network_server_url_description"/>
 
+        <EditTextPreference
+            android:key="@string/key_communication_network_auth_server_url"
+            android:title="@string/pref_communication_network_auth_server_url_title"
+            android:dialogMessage="@string/pref_communication_network_auth_server_url_description"/>
+
         <CheckBoxPreference
             android:key="@string/key_communication_network_cellular"
             android:title="@string/pref_communication_network_cellular_title"

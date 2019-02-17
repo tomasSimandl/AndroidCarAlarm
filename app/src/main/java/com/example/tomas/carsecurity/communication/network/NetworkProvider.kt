@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.support.v4.content.ContextCompat
+import android.support.v4.content.LocalBroadcastManager
 import android.util.Log
 import com.example.tomas.carsecurity.CheckCodes
 import com.example.tomas.carsecurity.CheckObjByte
@@ -13,18 +14,21 @@ import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.WorkerThread
 import com.example.tomas.carsecurity.communication.ICommunicationProvider
 import com.example.tomas.carsecurity.communication.MessageType
-import com.example.tomas.carsecurity.communication.network.controller.EventController
-import com.example.tomas.carsecurity.communication.network.controller.LocationController
-import com.example.tomas.carsecurity.communication.network.controller.RouteController
+import com.example.tomas.carsecurity.communication.network.controller.*
 import com.example.tomas.carsecurity.communication.network.dto.EventCreate
+import com.example.tomas.carsecurity.communication.network.dto.Token
 import com.example.tomas.carsecurity.context.CommunicationContext
+import com.example.tomas.carsecurity.fragments.LoginFragment
 import com.example.tomas.carsecurity.storage.Storage
 import com.example.tomas.carsecurity.storage.entity.Location
 import com.example.tomas.carsecurity.storage.entity.Message
 import com.example.tomas.carsecurity.storage.entity.Route
+import com.example.tomas.carsecurity.storage.entity.User
 import com.example.tomas.carsecurity.utils.UtilsEnum
 import com.google.gson.Gson
 import com.google.gson.JsonParser
+import com.google.gson.internal.LinkedTreeMap
+import okhttp3.OkHttpClient
 import java.net.HttpURLConnection
 import java.util.*
 import kotlin.collections.ArrayList
@@ -32,17 +36,20 @@ import kotlin.collections.ArrayList
 
 class NetworkProvider(private val communicationContext: CommunicationContext) : ICommunicationProvider, SharedPreferences.OnSharedPreferenceChangeListener, BroadcastReceiver() {
 
+    // TODO create this class as singleton because is used in service and in login page
     private val tag = "NetworkProvider"
     private lateinit var workerThread: WorkerThread
     private lateinit var routeController: RouteController
     private lateinit var eventController: EventController
     private lateinit var locationController: LocationController
+    private lateinit var userController: UserController
 
     private val connectivityService = communicationContext.appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
 
     private var isInitialized: Boolean = false
 
     private var synchronizeTimer: Timer? = null
+    private val loginLock: Any = Any()
 
     companion object Check : CheckObjByte {
         override fun check(context: Context): Byte {
@@ -73,7 +80,7 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
         }
     }
 
-    private fun onNetworkStatusChanged(){
+    private fun onNetworkStatusChanged() {
         synchronized(this) {
             if (canUseConnection()) {
                 Log.d(tag, "Network connectivity was changed and it is possible to send data.")
@@ -191,9 +198,14 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
 
     private fun initControllers(): Boolean {
         return try {
-            routeController = RouteController(communicationContext.serverUrl)
-            eventController = EventController(communicationContext.serverUrl)
-            locationController = LocationController(communicationContext.serverUrl)
+            val httpClient = OkHttpClient.Builder()
+                    .authenticator(TokenAuthenticator(communicationContext.authorizationServerUrl, communicationContext.appContext))
+                    .addInterceptor(TokenInterceptor(communicationContext.appContext))
+                    .build()
+            routeController = RouteController(communicationContext.serverUrl, httpClient)
+            eventController = EventController(communicationContext.serverUrl, httpClient)
+            locationController = LocationController(communicationContext.serverUrl, httpClient)
+            userController = UserController(communicationContext.authorizationServerUrl)
             true
         } catch (e: Exception) {
             Log.e(tag, "Can not initialize Controllers: $e")
@@ -208,7 +220,7 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
         communicationContext.unregisterOnPreferenceChanged(this)
         communicationContext.appContext.unregisterReceiver(this)
 
-        if(synchronizeTimer != null){
+        if (synchronizeTimer != null) {
             synchronizeTimer!!.cancel()
             synchronizeTimer = null
         }
@@ -306,6 +318,65 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
     override fun sendStatus(battery: Int, powerSaveMode: Boolean, utils: Map<UtilsEnum, Boolean>): Boolean {
         if (!canSendMessage()) return false
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    fun login(username: String, password: String) {
+
+        val longTime = Date().time
+
+        val task = Runnable {
+
+            synchronized(loginLock) {
+                if (!canSendMessage()) {
+                    sendLoginBroadcast(false, R.string.err_login_init_network)
+                    return@Runnable
+                }
+                val userService = Storage.getInstance(communicationContext.appContext).userService
+                if (userService.getUser() != null) {
+                    Log.d(tag, "already loged in")
+                    sendLoginBroadcast(false, R.string.err_login_already_login)
+                    return@Runnable
+                }
+
+                try {
+                    val tokenResponse = userController.login(username, password)
+                    if (tokenResponse.isSuccessful) {
+
+                        Log.d(tag, "Parsing login response: ${tokenResponse.body().toString()}")
+
+                        val token = Token(tokenResponse.body() as LinkedTreeMap<*, *>)
+                        userService.saveUser(User(token, username, longTime))
+                        Log.d(tag, "User successfully loged in")
+                        sendLoginBroadcast(true, 0)
+
+                    } else {
+                        Log.d(tag, "Can not login: $tokenResponse")
+                        if (tokenResponse.code() == 401) {
+                            sendLoginBroadcast(false, R.string.err_login_credentials)
+                        } else {
+                            sendLoginBroadcast(false, R.string.err_login_bad_request, tokenResponse.code())
+                        }
+                    }
+
+                } catch (e: Exception) {
+                    Log.e(tag, "Can not login user. Cause: ${e.message}")
+                    sendLoginBroadcast(false, R.string.err_login_failed)
+                }
+            }
+        }
+
+        workerThread.postTask(task)
+    }
+
+    private fun sendLoginBroadcast(success: Boolean, errorMessageResId: Int, vararg args: Any) {
+        val intent = Intent(LoginFragment.BroadcastKeys.BroadcastLoginResult.name)
+
+        intent.putExtra(LoginFragment.BroadcastKeys.KeySuccess.name, success)
+        if (!success) {
+            val message = communicationContext.appContext.getString(errorMessageResId, *args)
+            intent.putExtra(LoginFragment.BroadcastKeys.KeyErrorMessage.name, message)
+        }
+        LocalBroadcastManager.getInstance(communicationContext.appContext).sendBroadcast(intent)
     }
 
     /**

@@ -5,6 +5,7 @@ import android.content.Context
 import com.example.tomas.carsecurity.storage.service.LocationService
 import com.example.tomas.carsecurity.storage.service.MessageService
 import com.example.tomas.carsecurity.storage.service.RouteService
+import com.example.tomas.carsecurity.storage.service.UserService
 
 class Storage private constructor(appContext: Context) {
 
@@ -13,6 +14,7 @@ class Storage private constructor(appContext: Context) {
     lateinit var locationService: LocationService
     lateinit var messageService: MessageService
     lateinit var routeService: RouteService
+    lateinit var userService: UserService
 
     // all running on main thread
 
@@ -37,6 +39,7 @@ class Storage private constructor(appContext: Context) {
                 instance!!.locationService = LocationService(instance!!.database)
                 instance!!.messageService = MessageService(instance!!.database)
                 instance!!.routeService = RouteService(instance!!.database)
+                instance!!.userService = UserService(instance!!.database)
             }
 
             return instance!!

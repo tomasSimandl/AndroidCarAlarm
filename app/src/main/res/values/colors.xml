@@ -2,4 +2,5 @@
 <resources>
     <color name="disabled">#FF2330</color>
     <color name="enabled">#119F27</color>
+    <color name="text_error">#A20811</color>
 </resources>

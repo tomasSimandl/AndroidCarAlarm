@@ -2,13 +2,14 @@ package com.example.tomas.carsecurity.communication.network.controller
 
 import android.util.Log
 import com.example.tomas.carsecurity.communication.network.api.EventAPI
+import okhttp3.OkHttpClient
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class EventController(serverUrl: String) {
+class EventController(serverUrl: String, httpClient: OkHttpClient) {
 
     private val tag = "EventController"
     private val eventAPI: EventAPI
@@ -16,6 +17,7 @@ class EventController(serverUrl: String) {
     init {
         Log.d(tag, "Initializing")
         val retrofit = Retrofit.Builder()
+                .client(httpClient)
                 .baseUrl(serverUrl)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
