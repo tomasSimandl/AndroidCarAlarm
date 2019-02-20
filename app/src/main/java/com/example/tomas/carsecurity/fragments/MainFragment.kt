@@ -151,7 +151,7 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
                 }
 
                 handler.post {
-                    progressBar.visibility = ProgressBar.GONE
+                    progressBar?.visibility = ProgressBar.GONE
                     isProgressRun = false
                 }
             }).start()

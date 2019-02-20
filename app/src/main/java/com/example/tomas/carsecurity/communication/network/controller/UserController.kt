@@ -16,7 +16,7 @@ class UserController(serverUrl: String) {
     private val CLIENT_ID = "mobile-app-client"
     private val CLIENT_SECRET = "secret"
     private val LOGIN_GRANT_TYPE = "password"
-    private val REFRESH_GRANT_TYPE = "password"
+    private val REFRESH_GRANT_TYPE = "refresh_token"
     private val SCOPE = "read write"
 
     init {
