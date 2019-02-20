@@ -115,4 +115,21 @@ class CommunicationManager(private val communicationContext: CommunicationContex
         }
     }
 
+    fun sendNetworkGetCars(){
+        for (provider in activeCommunicators) {
+            if (provider is NetworkProvider) {
+                provider.getCars()
+                break
+            }
+        }
+    }
+
+    fun sendNetworkCreateCar(name: String){
+        for (provider in activeCommunicators) {
+            if (provider is NetworkProvider) {
+                provider.createCar(name)
+                break
+            }
+        }
+    }
 }

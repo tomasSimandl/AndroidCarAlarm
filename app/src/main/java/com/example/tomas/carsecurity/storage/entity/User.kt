@@ -26,7 +26,13 @@ data class User(
         var expiresAt: Long,
 
         @ColumnInfo(name = "scope")
-        var scope: String
+        var scope: String,
+
+        @ColumnInfo(name = "car_name")
+        var carName: String = "",
+
+        @ColumnInfo(name = "car_id")
+        var carId: Long = -1
 ) {
 
         constructor(token: Token, username: String, actualLongTime: Long): this (

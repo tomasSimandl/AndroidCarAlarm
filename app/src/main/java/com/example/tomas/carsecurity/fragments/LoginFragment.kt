@@ -1,11 +1,7 @@
 package com.example.tomas.carsecurity.fragments
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.os.Bundle
-import android.os.HandlerThread
 import android.support.v4.app.Fragment
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
@@ -17,15 +13,15 @@ import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.communication.CommunicationManager
 import com.example.tomas.carsecurity.context.CommunicationContext
 import com.example.tomas.carsecurity.storage.Storage
-import com.example.tomas.carsecurity.utils.UtilsEnum
-import kotlinx.android.synthetic.main.content_main.*
+import com.google.gson.internal.LinkedTreeMap
+import kotlinx.android.synthetic.main.dialog_create_car.*
 import kotlinx.android.synthetic.main.login_fragment.*
 import kotlinx.android.synthetic.main.login_fragment.view.*
 
 class LoginFragment : Fragment() {
 
     enum class BroadcastKeys {
-        BroadcastLoginResult, KeySuccess, KeyErrorMessage
+        BroadcastLoginResult, BroadcastGetCarsResult, BroadcastCreateCarsResult, KeySuccess, KeyErrorMessage, KeyCars
     }
 
     private lateinit var communicationManager: CommunicationManager
@@ -59,6 +55,8 @@ class LoginFragment : Fragment() {
 
         val broadcastManager = LocalBroadcastManager.getInstance(requireContext())
         broadcastManager.registerReceiver(receiver, IntentFilter(BroadcastKeys.BroadcastLoginResult.name))
+        broadcastManager.registerReceiver(getCarsReceiver, IntentFilter(BroadcastKeys.BroadcastGetCarsResult.name))
+        broadcastManager.registerReceiver(createCarReceiver, IntentFilter(BroadcastKeys.BroadcastCreateCarsResult.name))
     }
 
     override fun onStop() {
@@ -66,6 +64,8 @@ class LoginFragment : Fragment() {
 
         communicationManager.destroy()
         LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(receiver)
+        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(getCarsReceiver)
+        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(createCarReceiver)
     }
 
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -76,6 +76,8 @@ class LoginFragment : Fragment() {
 
             if (intent.getBooleanExtra(BroadcastKeys.KeySuccess.name, false)) {
                 showLogout(input_username.text.toString())
+                communicationManager.sendNetworkGetCars()
+
             } else {
                 login_error_text_view.visibility = View.VISIBLE
                 login_error_text_view.text = intent.getStringExtra(BroadcastKeys.KeyErrorMessage.name)
@@ -85,7 +87,40 @@ class LoginFragment : Fragment() {
         }
     }
 
-    private fun showLogin(){
+    private val getCarsReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            Log.d(tag, "getCarsReceiver.onReceive was triggered.")
+
+
+            val error = intent.getStringExtra(BroadcastKeys.KeyErrorMessage.name)
+
+            if (error == null || error.isBlank()) {
+                val cars = intent.getSerializableExtra(BroadcastKeys.KeyCars.name) as ArrayList<*>
+                showCarListDialog(cars)
+            } else {
+                // can not communicate with servers show error and logout
+                login_error_text_view.visibility = View.VISIBLE
+                login_error_text_view.text = error
+                logoutButtonAction()
+            }
+        }
+    }
+
+    private val createCarReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            Log.d(tag, "createCarReceiver.onReceive was triggered.")
+
+            val error = intent.getStringExtra(BroadcastKeys.KeyErrorMessage.name)
+
+            if (error != null && error.isNotBlank()) {
+                login_error_text_view.visibility = View.VISIBLE
+                login_error_text_view.text = error
+                logoutButtonAction()
+            }
+        }
+    }
+
+    private fun showLogin() {
         logout_view.post { logout_view.visibility = View.GONE }
         login_view.post { login_view.visibility = View.VISIBLE }
     }
@@ -132,5 +167,60 @@ class LoginFragment : Fragment() {
 
     private fun validInputs(): Boolean {
         return !input_username.text.isBlank() && !input_password.text.isBlank()
+    }
+
+    private fun showCarListDialog(cars: List<*>) {
+        val alertDialog: AlertDialog? = activity?.let {
+
+            val names: List<CharSequence> = cars.map { car -> (car as LinkedTreeMap<*, *>)["name"] as CharSequence }
+
+            AlertDialog.Builder(it)
+                    .setTitle(R.string.select_car)
+                    .setCancelable(false)
+                    .setItems(names.toTypedArray()
+                    ) { _, i ->
+                        // Save selected car to DB in entity user
+                        Thread(Runnable {
+                            val storageUserService = Storage.getInstance(requireContext()).userService
+                            val user = storageUserService.getUser()
+
+                            if (user != null) {
+                                val car = cars[i] as LinkedTreeMap<*, *>
+                                user.carName = car["name"] as String
+                                user.carId = (car["id"] as Double).toLong()
+                                storageUserService.updateUser(user)
+                            }
+                        }).start()
+                    }
+                    .setNeutralButton(R.string.create_new_car) { _, _ -> showCreateCarDialog() }
+                    .create()
+        }
+
+        alertDialog?.show()
+    }
+
+    private fun showCreateCarDialog() {
+        Log.d(tag, "New car will be created")
+
+        val alertDialog: AlertDialog? = activity?.let {
+
+            val inflater = requireActivity().layoutInflater
+
+            AlertDialog.Builder(it)
+                    .setTitle(R.string.create_new_car)
+                    .setCancelable(false)
+                    .setView(inflater.inflate(R.layout.dialog_create_car, null))
+                    .setPositiveButton(R.string.ok) { dialog, _ ->
+                        val name = (dialog as AlertDialog).car_dialog_name.text
+                        if (name.isBlank()) {
+                            showCreateCarDialog()
+                        } else {
+                            communicationManager.sendNetworkCreateCar(name.toString())
+                        }
+                    }
+                    .create()
+        }
+
+        alertDialog?.show()
     }
 }

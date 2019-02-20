@@ -29,6 +29,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonParser
 import com.google.gson.internal.LinkedTreeMap
 import okhttp3.OkHttpClient
+import java.io.Serializable
 import java.net.HttpURLConnection
 import java.util.*
 import kotlin.collections.ArrayList
@@ -43,6 +44,7 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
     private lateinit var eventController: EventController
     private lateinit var locationController: LocationController
     private lateinit var userController: UserController
+    private lateinit var carController: CarController
 
     private val connectivityService = communicationContext.appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
 
@@ -205,6 +207,7 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
             routeController = RouteController(communicationContext.serverUrl, httpClient)
             eventController = EventController(communicationContext.serverUrl, httpClient)
             locationController = LocationController(communicationContext.serverUrl, httpClient)
+            carController = CarController(communicationContext.serverUrl, httpClient)
             userController = UserController(communicationContext.authorizationServerUrl)
             true
         } catch (e: Exception) {
@@ -249,7 +252,8 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
                     note = "Util ${utilsEnum.name} was turned off."
                 }
 
-                val event = EventCreate(messageType, actualTime, 1, note) // TODO (use real car id)
+                val user = Storage.getInstance(communicationContext.appContext).userService.getUser() // TODO ( if user is null delete message )
+                val event = EventCreate(messageType, actualTime, user?.carId ?: 0, note)
                 val eventStr = Gson().toJson(event)
                 val message = Message(communicatorHash = NetworkProvider.hashCode(), message = eventStr)
 
@@ -272,7 +276,9 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
             args.iterator().forEach { item -> note += "$item," }
             if (note.isNotEmpty()) note = note.dropLast(1)
 
-            val event = EventCreate(getEventType(messageType).toLong(), actualTime, 1, note) // TODO (use real car id)
+            val user = Storage.getInstance(communicationContext.appContext).userService.getUser() // TODO ( if user is null delete message )
+
+            val event = EventCreate(getEventType(messageType).toLong(), actualTime, user?.carId ?: 0, note)
             val eventStr = Gson().toJson(event)
             val message = Message(communicatorHash = NetworkProvider.hashCode(), message = eventStr)
 
@@ -333,7 +339,7 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
                 }
                 val userService = Storage.getInstance(communicationContext.appContext).userService
                 if (userService.getUser() != null) {
-                    Log.d(tag, "already loged in")
+                    Log.d(tag, "already logged in")
                     sendLoginBroadcast(false, R.string.err_login_already_login)
                     return@Runnable
                 }
@@ -346,7 +352,7 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
 
                         val token = Token(tokenResponse.body() as LinkedTreeMap<*, *>)
                         userService.saveUser(User(token, username, longTime))
-                        Log.d(tag, "User successfully loged in")
+                        Log.d(tag, "User successfully logged in")
                         sendLoginBroadcast(true, 0)
 
                     } else {
@@ -378,6 +384,106 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
         }
         LocalBroadcastManager.getInstance(communicationContext.appContext).sendBroadcast(intent)
     }
+
+    fun getCars() {
+        val task = Runnable {
+            if (!canSendMessage()) {
+                sendLoginBroadcast(false, R.string.err_login_init_network)
+                return@Runnable
+            }
+
+            try {
+                val carsResponse = carController.getCars()
+                if (carsResponse.isSuccessful) {
+
+                    Log.d(tag, "Parsing get cars response: ${carsResponse.body().toString()}")
+
+                    val list = ArrayList<Serializable>()
+
+                    for (car in carsResponse.body() as Collection<*>) {
+                        if (car is LinkedTreeMap<*, *>) {
+                            list.add(car)
+                        }
+                    }
+                    sendGetCarsBroadcast(list, -1)
+
+                } else {
+                    Log.d(tag, "Can not get cars: $carsResponse")
+                    sendGetCarsBroadcast(arrayListOf(), R.string.err_login_bad_request, carsResponse.code())
+                }
+
+            } catch (e: Exception) {
+                Log.e(tag, "Can not get cars. Cause: ${e.message}")
+                sendGetCarsBroadcast(arrayListOf(), R.string.err_get_cars_failed)
+            }
+        }
+
+        workerThread.postTask(task)
+    }
+
+    private fun sendGetCarsBroadcast(cars: ArrayList<Serializable>, errorMessageResId: Int, vararg args: Any) {
+        val intent = Intent(LoginFragment.BroadcastKeys.BroadcastGetCarsResult.name)
+
+        if (errorMessageResId > 0) {
+            val message = communicationContext.appContext.getString(errorMessageResId, *args)
+            intent.putExtra(LoginFragment.BroadcastKeys.KeyErrorMessage.name, message)
+        } else {
+            intent.putExtra(LoginFragment.BroadcastKeys.KeyCars.name, cars)
+        }
+        LocalBroadcastManager.getInstance(communicationContext.appContext).sendBroadcast(intent)
+    }
+
+    fun createCar(name: String) {
+
+        val task = Runnable {
+
+                if (!canSendMessage()) {
+                    sendLoginBroadcast(false, R.string.err_login_init_network)
+                    return@Runnable
+                }
+
+                try {
+                    val carResponse = carController.createCar(name)
+                    if (carResponse.isSuccessful) {
+
+                        val carId = (carResponse.body() as LinkedTreeMap<*, *>)["car_id"] as String
+
+                        val userService = Storage.getInstance(communicationContext.appContext).userService
+
+                        val user = userService.getUser()
+                        if(user != null ){
+                            user.carName = name
+                            user.carId = carId.toLong()
+                            userService.updateUser(user)
+                            Log.d(tag, "User updated successfully")
+                        }
+
+                        sendCreateCarBroadcast(-1) // success
+
+                    } else {
+                        Log.d(tag, "Can not create car: $carResponse")
+                        sendCreateCarBroadcast(R.string.err_login_bad_request, carResponse.code())
+                    }
+
+                } catch (e: Exception) {
+                    Log.e(tag, "Can not create car. Cause: ${e.message}")
+                    sendCreateCarBroadcast(R.string.err_create_car_failed)
+                }
+        }
+        workerThread.postTask(task)
+    }
+
+    private fun sendCreateCarBroadcast(errorMessageResId: Int, vararg args: Any) {
+        val intent = Intent(LoginFragment.BroadcastKeys.BroadcastCreateCarsResult.name)
+
+        if (errorMessageResId > 0) {
+            val message = communicationContext.appContext.getString(errorMessageResId, *args)
+            intent.putExtra(LoginFragment.BroadcastKeys.KeyErrorMessage.name, message)
+        }
+
+        LocalBroadcastManager.getInstance(communicationContext.appContext).sendBroadcast(intent)
+    }
+
 
     /**
      * Can not run in main thread
