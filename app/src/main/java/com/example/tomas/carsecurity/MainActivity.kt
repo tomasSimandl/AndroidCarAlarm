@@ -1,5 +1,6 @@
 package com.example.tomas.carsecurity
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.NavigationView
@@ -46,7 +47,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         onNavigationItemSelected(nav_view.menu.findItem(R.id.menu_home))
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
 
+        // stop service if it is not foreground service
+        val intent = Intent(applicationContext, MainService::class.java)
+        intent.action = MainService.Actions.ActionTryStop.name
+        applicationContext.startService(intent)
+    }
 
     override fun onBackPressed() {
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {

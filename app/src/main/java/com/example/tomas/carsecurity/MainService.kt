@@ -20,7 +20,8 @@ class MainService : Service(), Observer {
 
     enum class Actions{
         ActionStatus, ActionStatusUI, ActionGetPosition, ActionForegroundStop,
-        ActionSwitchUtil, ActionActivateUtil, ActionDeactivateUtil, ActionAutomaticMode;
+        ActionSwitchUtil, ActionActivateUtil, ActionDeactivateUtil, ActionAutomaticMode,
+        ActionTryStop;
     }
 
     private val tag = "MainService"
@@ -92,6 +93,7 @@ class MainService : Service(), Observer {
                 Actions.ActionDeactivateUtil.name -> utilsManager.deactivateUtil(intent.getSerializableExtra("util") as UtilsEnum)
                 Actions.ActionStatusUI.name -> broadcastSender.informUI(utilsManager.getEnabledUtils())
                 Actions.ActionForegroundStop.name -> stopService(true)
+                Actions.ActionTryStop.name -> if(!isForeground) stopSelf()
                 else -> Log.w(tag, "onStartCommand - invalid action")
             }
         }
@@ -111,12 +113,14 @@ class MainService : Service(), Observer {
     private fun tryStopForeground() {
         if (tasksInQueue.get() == 0 && !utilsManager.isAnyUtilEnabled()) {
             stopForeground(true)
+            isForeground = false
         }
     }
 
     private fun stopService(safely: Boolean){
         if(!safely || (tasksInQueue.get() == 0 && !utilsManager.isAnyUtilEnabled())){
             stopForeground(true)
+            isForeground = false
         }
     }
 
