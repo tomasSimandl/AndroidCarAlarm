@@ -76,6 +76,8 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
 
         if(lastLocation == null) {
             lastLocation = location
+            val dbLocation = DbLocation(location, actualRoute?.uid)
+            utilsHelper.communicationManager.sendLocation(dbLocation, isAlarm = false, cache = true)
             return
         }
 
@@ -97,8 +99,10 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
             lastLocation = null
             utilsHelper.registerObserver(ObservableEnum.LocationProvider, this)
 
-            actualRoute = Route(carId = 1) // TODO (Use real car id)
-            actualRoute!!.uid = Storage.getInstance(context.appContext).routeService.saveRoute(actualRoute!!).toInt()
+            val storage  = Storage.getInstance(context.appContext)
+
+            actualRoute = Route(carId = storage.userService.getUser()?.carId!!) // TODO (it is possible that user is not logged in)
+            actualRoute!!.uid = storage.routeService.saveRoute(actualRoute!!).toInt()
 
             setChanged()
             notifyObservers(true)
@@ -120,7 +124,7 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
             context.utilsContext.unregisterOnPreferenceChanged(this)
 
             if(actualRoute != null) {
-                Storage.getInstance(context.appContext).routeService.finishRoute(actualRoute!!)
+                //Storage.getInstance(context.appContext).routeService.finishRoute(actualRoute!!) // No need to finish route
                 actualRoute = null
             }
 

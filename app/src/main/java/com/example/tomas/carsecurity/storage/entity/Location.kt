@@ -5,6 +5,7 @@ import android.arch.persistence.room.Entity
 import android.arch.persistence.room.ForeignKey
 import android.arch.persistence.room.PrimaryKey
 import android.location.Location
+import com.google.gson.annotations.SerializedName
 
 
 @Entity(tableName = "location",
@@ -35,11 +36,12 @@ data class Location(
         @ColumnInfo(name = "speed")
         var speed: Float = 0F,
 
-        @ColumnInfo(name = "server_route_id")
-        @Transient // Ignored in Retrofit but not in Room
+        @SerializedName("route_id")
+        @ColumnInfo(name = "route_id")
         var routeId: Long? = null,
 
         @ColumnInfo(name = "local_route_id")
+        @Transient // Ignored in Retrofit but not in Room
         var localRouteId: Int? = null
 
 ) {

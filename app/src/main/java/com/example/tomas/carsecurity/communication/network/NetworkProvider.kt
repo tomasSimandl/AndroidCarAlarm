@@ -121,7 +121,7 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
                                     sendLocation(location)
                                 }
 
-                                // Can not remove last route because it is possibility that is stil used
+                                // Can not remove last route because it is possibility that is still used
                                 if (route.uid < maxRouteId && storage.locationService.getLocationsByLocalRouteId(route.uid).isEmpty()) {
                                     storage.routeService.deleteRoute(route)
                                 }
@@ -502,6 +502,7 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
         if (inDB && msg.uid == 0) {
             // should be in DB but msg.uid == 0 => it is not in DB
             Storage.getInstance(communicationContext.appContext).messageService.saveMessage(msg)
+            Log.d(tag, "Event was stored to database.")
         } else if (!inDB && msg.uid != 0) {
             // should not be in DB but msg.uid != 0 => it is in DB
             Storage.getInstance(communicationContext.appContext).messageService.deleteMessage(msg)
@@ -578,7 +579,7 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
 
                 Log.d(tag, "Route was successfully created and stored to DB")
             } else {
-                Log.d(tag, "Creating of route was not successful")
+                Log.d(tag, "Creating of route was not successful: ${response.code()}")
             }
         }
 

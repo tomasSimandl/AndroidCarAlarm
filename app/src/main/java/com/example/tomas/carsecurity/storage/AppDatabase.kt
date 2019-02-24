@@ -11,7 +11,7 @@ import com.example.tomas.carsecurity.storage.entity.Message
 import com.example.tomas.carsecurity.storage.entity.Route
 import com.example.tomas.carsecurity.storage.entity.User
 
-@Database(entities = [Location::class, Message::class, Route::class, User::class], version = 4)
+@Database(entities = [Location::class, Message::class, Route::class, User::class], version = 6)
 abstract class AppDatabase: RoomDatabase() {
 
     abstract fun locationDao(): LocationDao
