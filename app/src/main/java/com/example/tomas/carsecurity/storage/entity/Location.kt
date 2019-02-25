@@ -36,6 +36,9 @@ data class Location(
         @ColumnInfo(name = "speed")
         var speed: Float = 0F,
 
+        @ColumnInfo(name = "distance")
+        var distance: Float = 0F,
+
         @SerializedName("route_id")
         @ColumnInfo(name = "route_id")
         var routeId: Long? = null,
@@ -45,13 +48,14 @@ data class Location(
         var localRouteId: Int? = null
 
 ) {
-    constructor(location: Location, localRouteId: Int? = null) : this() {
-        latitude = location.latitude
-        longitude = location.longitude
-        altitude = location.altitude
-        time = location.time
-        accuracy = location.accuracy
-        speed = location.speed
-        this.localRouteId = localRouteId
-    }
+    constructor(location: Location, localRouteId: Int? = null, distance: Float = 0F) : this(
+            latitude = location.latitude,
+            longitude = location.longitude,
+            altitude = location.altitude,
+            time = location.time,
+            accuracy = location.accuracy,
+            speed = location.speed,
+            localRouteId = localRouteId,
+            distance = distance
+    )
 }

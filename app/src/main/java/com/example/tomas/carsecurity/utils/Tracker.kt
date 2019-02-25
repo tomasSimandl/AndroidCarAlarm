@@ -82,8 +82,8 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
         }
 
         if (location.distanceTo(lastLocation) > context.utilsContext.ignoreDistance) {
+            val dbLocation = DbLocation(location, actualRoute?.uid, location.distanceTo(lastLocation))
             lastLocation = location
-            val dbLocation = DbLocation(location, actualRoute?.uid)
             utilsHelper.communicationManager.sendLocation(dbLocation, isAlarm = false, cache = true)
 
         } else if (location.time - lastLocation!!.time > context.utilsContext.timeout) {
