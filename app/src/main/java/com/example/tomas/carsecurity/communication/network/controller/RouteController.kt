@@ -26,8 +26,8 @@ class RouteController(serverUrl: String, httpClient: OkHttpClient) {
         routeAPI = retrofit.create(RouteAPI::class.java)
     }
 
-    fun createRoute(carId: Long): Response<Any> {
-        val method = routeAPI.createRoute(carId)
+    fun createRoute(carId: Long, routeStartTime: Long): Response<Any> {
+        val method = routeAPI.createRoute(carId, routeStartTime)
 
         Log.d(tag, "Sending message to create route endpoint. URL: ${method.request().url()}")
         return try {

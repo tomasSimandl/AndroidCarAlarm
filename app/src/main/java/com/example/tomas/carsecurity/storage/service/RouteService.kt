@@ -24,9 +24,4 @@ class RouteService (private val database: AppDatabase) {
     fun deleteRoute(route: Route) {
         database.routeDao().delete(route)
     }
-
-    fun finishRoute(route: Route) {
-        route.finished = true
-        database.routeDao().update(route)
-    }
 }

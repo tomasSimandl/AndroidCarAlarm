@@ -565,7 +565,7 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
         if (canUseConnection()) {
             val storage = Storage.getInstance(communicationContext.appContext)
 
-            val response = routeController.createRoute(route.carId)
+            val response = routeController.createRoute(route.carId, route.time)
             if (response.isSuccessful) {
                 val jsonResponse = JsonParser().parse(response.body().toString()).asJsonObject
                 val serverRouteId = jsonResponse["route_id"].asLong
