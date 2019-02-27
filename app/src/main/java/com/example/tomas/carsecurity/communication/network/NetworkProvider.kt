@@ -32,6 +32,7 @@ import okhttp3.OkHttpClient
 import java.io.Serializable
 import java.net.HttpURLConnection
 import java.util.*
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.collections.ArrayList
 
 
@@ -52,6 +53,8 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
 
     private var synchronizeTimer: Timer? = null
     private val loginLock: Any = Any()
+
+    private var isSynchronize: AtomicBoolean = AtomicBoolean(false)
 
     companion object Check : CheckObjByte {
         override fun check(context: Context): Byte {
@@ -88,53 +91,8 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
                 Log.d(tag, "Network connectivity was changed and it is possible to send data.")
 
                 if (synchronizeTimer == null) {
-                    val synchronizeTask = object : TimerTask() {
-                        override fun run() {
-                            if (!canUseConnection()) {
-                                Log.d(tag, "Stopping network synchronization. Can not use connection.")
-                                return
-                            }
-
-                            val storage = Storage.getInstance(communicationContext.appContext)
-
-                            val messages = storage.messageService.getMessages(NetworkProvider.hashCode())
-                            for (message in messages) {
-                                sendEvent(message)
-                            }
-
-                            val routes = storage.routeService.getRoutes()
-                            val routesWithId: MutableList<Route> = ArrayList()
-                            var maxRouteId: Int = Integer.MIN_VALUE
-                            for (route in routes) {
-                                if (route.uid > maxRouteId) maxRouteId = route.uid
-
-                                if (route.serverRouteId != null) {
-                                    routesWithId.add(route)
-                                } else {
-                                    sendRoute(route)
-                                }
-                            }
-
-                            for (route in routesWithId) {
-                                val locations = storage.locationService.getLocationsByLocalRouteId(route.uid)
-                                for (location in locations) {
-                                    sendLocation(location)
-                                }
-
-                                // Can not remove last route because it is possibility that is still used
-                                if (route.uid < maxRouteId && storage.locationService.getLocationsByLocalRouteId(route.uid).isEmpty()) {
-                                    storage.routeService.deleteRoute(route)
-                                }
-                            }
-
-                            val locations = storage.locationService.getLocationsByLocalRouteId(null)
-                            for (location in locations) {
-                                sendLocation(location)
-                            }
-                        }
-                    }
                     synchronizeTimer = Timer("NetworkSynchronize")
-                    synchronizeTimer!!.schedule(synchronizeTask, 1000L, communicationContext.synchronizationInterval)
+                    synchronizeTimer!!.schedule(getSynchronizeTask(), 1000L, communicationContext.synchronizationInterval)
                 }
             } else {
                 Log.d(tag, "Network connectivity was changed. Can not send data.")
@@ -143,6 +101,62 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
                     synchronizeTimer!!.cancel()
                     synchronizeTimer = null
                 }
+            }
+        }
+    }
+
+    private fun getSynchronizeTask(): TimerTask {
+        return object : TimerTask() {
+            override fun run() {
+
+                if (!isSynchronize.getAndSet(true)){
+                    Log.d(tag, "Stopping network synchronization thread. Another thread already running.")
+                    return
+                }
+                if (!canUseConnection()) {
+                    Log.d(tag, "Stopping network synchronization. Can not use connection.")
+                    isSynchronize.set(false)
+                    return
+                }
+
+                val storage = Storage.getInstance(communicationContext.appContext)
+
+                val messages = storage.messageService.getMessages(NetworkProvider.hashCode())
+                for (message in messages) {
+                    sendEvent(message)
+                }
+
+                val routes = storage.routeService.getRoutes()
+                val routesWithId: MutableList<Route> = ArrayList()
+                var maxRouteId: Int = Integer.MIN_VALUE
+                for (route in routes) {
+                    if (route.uid > maxRouteId) maxRouteId = route.uid
+
+                    if (route.serverRouteId != null) {
+                        routesWithId.add(route)
+                    } else {
+                        sendRoute(route)
+                    }
+                }
+
+                for (route in routesWithId) {
+                    val locations = storage.locationService.getLocationsByLocalRouteId(route.uid)
+                    for (location in locations) {
+                        sendLocation(location)
+                    }
+
+                    // Can not remove last route because it is possibility that is still used
+                    if (route.uid < maxRouteId && storage.locationService.getLocationsByLocalRouteId(route.uid).isEmpty()) {
+                        storage.routeService.deleteRoute(route)
+                    }
+                }
+
+                val locations = storage.locationService.getLocationsByLocalRouteId(null)
+                for (location in locations) {
+                    sendLocation(location)
+                }
+
+                isSynchronize.set(false)
             }
         }
     }
