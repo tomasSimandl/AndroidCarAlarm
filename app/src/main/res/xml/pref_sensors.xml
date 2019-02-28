@@ -80,8 +80,9 @@
             sample:msbp_dialogEnabled="false"/>
 
         <ListPreference
-            android:title="@string/pref_sensors_location_update_interval_title"
+            android:title="@string/pref_sensors_location_accuracy_title"
             android:key="@string/key_sensor_location_accuracy_priority"
+            android:summary="@string/pref_sensors_location_accuracy_description"
             android:entries="@array/pref_sensors_location_accuracy_list"
             android:entryValues="@array/pref_sensors_location_accuracy_list_values"
             android:defaultValue="@string/default_sensor_location_accuracy_priority"

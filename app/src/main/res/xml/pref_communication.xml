@@ -10,11 +10,13 @@
 
         <EditTextPreference
             android:key="@string/key_communication_sms_phone_number"
+            android:summary="@string/pref_communication_sms_phone_number_description"
             android:title="@string/pref_communication_sms_phone_number_title" />
 
         <MultiSelectListPreference
             android:key="@string/key_communication_sms_allowed_message_types"
             android:title="@string/pref_communication_sms_message_types_title"
+            android:summary="@string/pref_communication_sms_message_types_description"
             android:dialogTitle="@string/pref_communication_sms_message_types_title"
             android:dependency="@string/key_communication_sms_is_allowed"
             android:entries="@array/pref_communication_sms_messages"
@@ -49,6 +51,7 @@
         <MultiSelectListPreference
             android:key="@string/key_communication_network_allowed_message_types"
             android:title="@string/pref_communication_network_message_types_title"
+            android:summary="@string/pref_communication_network_message_types_description"
             android:dialogTitle="@string/pref_communication_network_message_types_title"
             android:dependency="@string/key_communication_network_is_allowed"
             android:entries="@array/pref_communication_network_messages"

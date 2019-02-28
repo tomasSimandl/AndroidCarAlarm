@@ -68,7 +68,7 @@
     <string name="pref_tools_tracker_switch_description">Allow use of tracker. Does not turn on Tracker system.</string>
 
     <string name="pref_tools_tracker_timeout_title">Timeout</string>
-    <string name="pref_tools_tracker_timeout_description">Timeout before tracker is turned of when car is not moving.</string>
+    <string name="pref_tools_tracker_timeout_description">Timeout before tracker is turned off when car is not moving.</string>
 
     <string name="pref_tools_tracker_ignore_distance_title">Not moving distance</string>
     <string name="pref_tools_tracker_ignore_distance_description">Minimal distance between last and actual position which is accepted (elimination of error when car is not moving).</string>
@@ -105,9 +105,10 @@
     <string name="pref_sensors_location_switch_description"> </string>
 
     <string name="pref_sensors_location_update_interval_title">Location update interval</string>
-    <string name="pref_sensors_location_update_interval_description">How often is stored actual location (Long interval save battery).</string>
+    <string name="pref_sensors_location_update_interval_description">How often is stored actual location. Long interval save battery.</string>
 
     <string name="pref_sensors_location_accuracy_title">Sensor accuracy</string>
+    <string name="pref_sensors_location_accuracy_description">Maximal accuracy of GPS. Precise GPS drains more battery.</string>
     <string-array name="pref_sensors_location_accuracy_list">
         <item>High accuracy</item>
         <item>Balanced power accuracy (±100m)</item>
@@ -123,7 +124,7 @@
     <string name="pref_communication_sms_switch_description"> </string>
 
     <string name="pref_communication_sms_phone_number_title">Phone number</string>
-    <string name="pref_communication_sms_phone_number_description">Contact phone number where all notifications will be send and from which will be accepted commands.</string>
+    <string name="pref_communication_sms_phone_number_description">Contact phone number for calls and sms communication. Commands will be accepted only from this number.</string>
 
     <string name="pref_communication_sms_message_types_title">Sms types</string>
     <string name="pref_communication_sms_message_types_description">Sets which messages are allowed to send or receive via SMS</string>
@@ -159,7 +160,7 @@
     <string name="pref_communication_network_cellular_description">Synchronization with server can be via mobile data.</string>
 
     <string name="pref_communication_network_message_types_title">Additional communication</string>
-    <string name="pref_communication_network_message_types_description">Sets which additional messages are allowed for communication over network</string>
+    <string name="pref_communication_network_message_types_description">Sets which messages are allowed to send over network. All messages from tracker are allowed by default.</string>
 
     <string name="pref_communication_network_update_interval_title">Synchronization interval</string>
     <string name="pref_communication_network_update_interval_description">Sets how often will be synchronize data with server</string>
