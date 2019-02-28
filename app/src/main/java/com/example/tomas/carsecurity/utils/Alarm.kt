@@ -33,16 +33,6 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
 
     override val thisUtilEnum: UtilsEnum = UtilsEnum.Alarm
 
-    private val sendSmsTask = object: TimerTask() {
-        override fun run() {
-            if (lastLocation != null) {
-                utilsHelper.communicationManager.sendLocation(DBLocation(lastLocation!!, null), true)
-            }
-
-            utilsHelper.registerObserver(OEnum.LocationProvider, this@Alarm) // on location update can unregister listener
-        }
-    }
-
     companion object Check: CheckObjString {
         override fun check(context: Context, skipAllow: Boolean): String {
 
@@ -161,7 +151,19 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
 
     private fun scheduleSmsTimer(){
         sendSmsTimer = Timer("SendSmsTimer")
-        sendSmsTimer!!.schedule(sendSmsTask, context.utilsContext.sendLocationInterval.toLong(), context.utilsContext.sendLocationInterval.toLong())
+        sendSmsTimer!!.schedule(getSmsTimerTask(), context.utilsContext.sendLocationInterval.toLong(), context.utilsContext.sendLocationInterval.toLong())
+    }
+
+    private fun getSmsTimerTask(): TimerTask {
+        return object: TimerTask() {
+            override fun run() {
+                if (lastLocation != null) {
+                    utilsHelper.communicationManager.sendLocation(DBLocation(lastLocation!!, null), true)
+                }
+
+                utilsHelper.registerObserver(OEnum.LocationProvider, this@Alarm) // on location update can unregister listener
+            }
+        }
     }
 
     override fun enable() {
