@@ -67,7 +67,8 @@ class SettingsActivity : AppCompatPreferenceActivity() {
      */
     override fun isValidFragment(fragmentName: String): Boolean {
         return PreferenceFragment::class.java.name == fragmentName
-                || ToolsPreferenceFragment::class.java.name == fragmentName
+                || TrackerPreferenceFragment::class.java.name == fragmentName
+                || AlarmPreferenceFragment::class.java.name == fragmentName
                 || SensorsPreferenceFragment::class.java.name == fragmentName
                 || CommunicationPreferenceFragment::class.java.name == fragmentName
                 || PowerSaveModePreferenceFragment::class.java.name == fragmentName
@@ -95,14 +96,14 @@ class SettingsActivity : AppCompatPreferenceActivity() {
 
 
     /**
-     * Class is used for preference screen for Tools/Utils
+     * Class is used for preference screen for Alarm
      */
-    class ToolsPreferenceFragment : MyPreferenceFragment() {
+    class AlarmPreferenceFragment : MyPreferenceFragment() {
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             super.onCreatePreferences(savedInstanceState, rootKey)
 
-            addPreferencesFromResource(R.xml.pref_tools)
+            addPreferencesFromResource(R.xml.pref_alarm)
 
             // ALARM - preference check listener + set value
             registerPreferenceCheck(R.string.key_tool_alarm_is_allowed, Alarm)
@@ -122,7 +123,18 @@ class SettingsActivity : AppCompatPreferenceActivity() {
                     resources.getBoolean(R.bool.default_tool_alarm_is_call_allowed),
                     CallProvider
             )
+        }
+    }
 
+    /**
+     * Class is used for preference screen for Tracker
+     */
+    class TrackerPreferenceFragment : MyPreferenceFragment() {
+
+        override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            super.onCreatePreferences(savedInstanceState, rootKey)
+
+            addPreferencesFromResource(R.xml.pref_tracker)
 
             // TRACKER - preference check listener + set value
             registerPreferenceCheck(R.string.key_tool_tracker_is_allowed, Tracker)

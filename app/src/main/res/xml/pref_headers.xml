@@ -1,9 +1,14 @@
 <preference-headers xmlns:android="http://schemas.android.com/apk/res/android">
 
     <header
-        android:icon="@drawable/ic_developer_board_black_24dp"
-        android:fragment="com.example.tomas.carsecurity.SettingsActivity$ToolsPreferenceFragment"
-        android:title="@string/pref_header_tools" />
+        android:icon="@drawable/ic_security_black_24dp"
+        android:fragment="com.example.tomas.carsecurity.SettingsActivity$AlarmPreferenceFragment"
+        android:title="@string/pref_header_alarm" />
+
+    <header
+        android:icon="@drawable/ic_gps_fixed_black_24dp"
+        android:fragment="com.example.tomas.carsecurity.SettingsActivity$TrackerPreferenceFragment"
+        android:title="@string/pref_header_tracker" />
 
     <header
         android:icon="@drawable/ic_extension_black_24dp"

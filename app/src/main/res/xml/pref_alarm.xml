@@ -64,43 +64,6 @@
 
     </PreferenceCategory>
 
-
-    <PreferenceCategory android:key="tracker_category" android:title="@string/pref_tools_tracker_group_name">
-
-        <SwitchPreference
-            android:defaultValue="@bool/default_tool_tracker_is_allowed"
-            android:key="@string/key_tool_tracker_is_allowed"
-            android:title="@string/pref_tools_tracker_switch_title"
-            android:contentDescription="@string/pref_tools_tracker_switch_description"/>
-
-        <com.pavelsikun.seekbarpreference.SeekBarPreferenceCompat
-            android:key="@string/key_tool_tracker_ignore_distance"
-            android:title="@string/pref_tools_tracker_ignore_distance_title"
-            android:summary="@string/pref_tools_tracker_ignore_distance_description"
-            android:dependency="@string/key_tool_tracker_is_allowed"
-            android:defaultValue="@integer/default_tool_tracker_ignore_distance"
-
-            sample:msbp_minValue="0"
-            sample:msbp_maxValue="20"
-            sample:msbp_interval="1"
-            sample:msbp_measurementUnit="m"
-            sample:msbp_dialogEnabled="false"/>
-
-        <com.pavelsikun.seekbarpreference.SeekBarPreferenceCompat
-            android:key="@string/key_tool_tracker_timeout"
-            android:title="@string/pref_tools_tracker_timeout_title"
-            android:summary="@string/pref_tools_tracker_timeout_description"
-            android:dependency="@string/key_tool_tracker_is_allowed"
-            android:defaultValue="@integer/default_tool_tracker_timeout"
-
-            sample:msbp_minValue="5"
-            sample:msbp_maxValue="300"
-            sample:msbp_interval="5"
-            sample:msbp_measurementUnit="s"
-            sample:msbp_dialogEnabled="false"/>
-
-    </PreferenceCategory>
-
     <!-- NOTE: EditTextPreference accepts EditText attributes. -->
     <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
 
