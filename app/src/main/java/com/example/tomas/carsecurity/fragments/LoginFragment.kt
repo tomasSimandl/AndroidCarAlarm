@@ -153,12 +153,8 @@ class LoginFragment : Fragment() {
         btn_logout.isEnabled = false
 
         Thread(Runnable {
-            val storageUserService = Storage.getInstance(requireContext()).userService
-            val user = storageUserService.getUser()
 
-            if (user != null) {
-                storageUserService.deleteUser(user)
-            }
+            Storage.getInstance(requireContext()).clearAllTables()
 
             btn_logout.post { btn_logout.isEnabled = true }
             showLogin()
