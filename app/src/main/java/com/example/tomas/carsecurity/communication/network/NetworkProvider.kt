@@ -109,6 +109,11 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
         return object : TimerTask() {
             override fun run() {
 
+                if (!communicationContext.isLogin){
+                    Log.d(tag, "Stopping network synchronization thread. User is not login.")
+                    return
+                }
+
                 if (!isSynchronize.getAndSet(true)){
                     Log.d(tag, "Stopping network synchronization thread. Another thread already running.")
                     return
@@ -353,7 +358,7 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
         val task = Runnable {
 
             synchronized(loginLock) {
-                if (!canSendMessage()) {
+                if (!canSendLoginMessage() || !canUseConnection()) {
                     sendLoginBroadcast(false, R.string.err_login_init_network)
                     return@Runnable
                 }
@@ -366,22 +371,19 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
 
                 try {
                     val tokenResponse = userController.login(username, password)
-                    if (tokenResponse.isSuccessful) {
 
-                        Log.d(tag, "Parsing login response: ${tokenResponse.body().toString()}")
+                    Log.d(tag, "Login response with code: ${tokenResponse.code()}")
+                    when (tokenResponse.code()){
+                        200 -> {
+                            Log.d(tag, "Parsing login response: ${tokenResponse.body().toString()}")
 
-                        val token = Token(tokenResponse.body() as LinkedTreeMap<*, *>)
-                        userService.saveUser(User(token, username, longTime))
-                        Log.d(tag, "User successfully logged in")
-                        sendLoginBroadcast(true, 0)
-
-                    } else {
-                        Log.d(tag, "Can not login: $tokenResponse")
-                        if (tokenResponse.code() == 401) {
-                            sendLoginBroadcast(false, R.string.err_login_credentials)
-                        } else {
-                            sendLoginBroadcast(false, R.string.err_login_bad_request, tokenResponse.code())
+                            val token = Token(tokenResponse.body() as LinkedTreeMap<*, *>)
+                            userService.saveUser(User(token, username, longTime))
+                            Log.d(tag, "User successfully logged in")
+                            sendLoginBroadcast(true, 0)
                         }
+                        400, 401, 403 -> sendLoginBroadcast(false, R.string.err_login_credentials)
+                        else -> sendLoginBroadcast(false, R.string.err_login_bad_request, tokenResponse.code())
                     }
 
                 } catch (e: Exception) {
@@ -407,7 +409,7 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
 
     fun getCars() {
         val task = Runnable {
-            if (!canSendMessage()) {
+            if (!canSendMessage() || !canUseConnection()) {
                 sendLoginBroadcast(false, R.string.err_login_init_network)
                 return@Runnable
             }
@@ -429,6 +431,7 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
 
                 } else {
                     Log.d(tag, "Can not get cars: $carsResponse")
+                    logoutIfUnauthorized(carsResponse.code())
                     sendGetCarsBroadcast(arrayListOf(), R.string.err_login_bad_request, carsResponse.code())
                 }
 
@@ -456,22 +459,23 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
     fun createCar(name: String) {
 
         val task = Runnable {
+            if (!canSendMessage() || !canUseConnection()) {
+                sendLoginBroadcast(false, R.string.err_login_init_network)
+                return@Runnable
+            }
 
-                if (!canSendMessage()) {
-                    sendLoginBroadcast(false, R.string.err_login_init_network)
-                    return@Runnable
-                }
+            try {
+                val carResponse = carController.createCar(name)
 
-                try {
-                    val carResponse = carController.createCar(name)
-                    if (carResponse.isSuccessful) {
+                when (carResponse.code()) {
 
+                    200, 201 -> {
                         val carId = (carResponse.body() as LinkedTreeMap<*, *>)["car_id"] as String
 
                         val userService = Storage.getInstance(communicationContext.appContext).userService
 
                         val user = userService.getUser()
-                        if(user != null ){
+                        if (user != null) {
                             user.carName = name
                             user.carId = carId.toLong()
                             userService.updateUser(user)
@@ -479,16 +483,18 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
                         }
 
                         sendCreateCarBroadcast(-1) // success
-
-                    } else {
-                        Log.d(tag, "Can not create car: $carResponse")
-                        sendCreateCarBroadcast(R.string.err_login_bad_request, carResponse.code())
                     }
-
-                } catch (e: Exception) {
-                    Log.e(tag, "Can not create car. Cause: ${e.message}")
-                    sendCreateCarBroadcast(R.string.err_create_car_failed)
+                    else -> {
+                        Log.d(tag, "Can not create car: $carResponse")
+                        logoutIfUnauthorized(carResponse.code())
+                        sendCreateCarBroadcast(R.string.err_create_car_failed)
+                    }
                 }
+
+            } catch (e: Exception) {
+                Log.e(tag, "Can not create car. Cause: ${e.message}")
+                sendCreateCarBroadcast(R.string.err_create_car_failed)
+            }
         }
         workerThread.postTask(task)
     }
@@ -514,8 +520,12 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
 
         if (canUseConnection()) {
             val result = eventController.createEvent(msg.message)
+            Log.d(tag, "SendEvent response: ${result.code()}")
+
             if (result.isSuccessful) {
                 inDB = false
+            } else {
+                if(logoutIfUnauthorized(result.code()))return // Logout and all data cleared nothing to do
             }
         }
 
@@ -555,8 +565,13 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
 
             if (send) {
                 val result = locationController.createLocations(listOf(location))
-                if (result.isSuccessful) inDB = false
-                if (result.code() == HttpURLConnection.HTTP_CONFLICT) inDB = false // already in DB
+                Log.d(tag, "SendLocation response: ${result.code()}")
+                if (result.isSuccessful) {
+                    inDB = false
+                } else{
+                    if (logoutIfUnauthorized(result.code())) return // Logout and all data cleared nothing to do
+                    if (result.code() == HttpURLConnection.HTTP_CONFLICT) inDB = false // already in DB
+                }
             }
         }
 
@@ -586,6 +601,8 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
             val storage = Storage.getInstance(communicationContext.appContext)
 
             val response = routeController.createRoute(route.carId, route.time)
+            Log.d(tag, "SendRoute response: ${response.code()}")
+
             if (response.isSuccessful) {
                 val jsonResponse = JsonParser().parse(response.body().toString()).asJsonObject
                 val serverRouteId = jsonResponse["route_id"].asLong
@@ -599,7 +616,7 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
 
                 Log.d(tag, "Route was successfully created and stored to DB")
             } else {
-                Log.d(tag, "Creating of route was not successful: ${response.code()}")
+                if (logoutIfUnauthorized(response.code())) return // Logout and all data cleared nothing to do
             }
         }
 
@@ -623,7 +640,7 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
         }
     }
 
-    private fun canSendMessage(): Boolean {
+    private fun canSendLoginMessage(): Boolean {
         if (!isInitialized) {
             Log.w(tag, "Can not send message because NetworkProvider is not initialized.")
             return false
@@ -634,6 +651,16 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
             return false
         }
         return true
+    }
+
+    private fun canSendMessage(): Boolean {
+
+        if (!communicationContext.isLogin) {
+            Log.d(tag, "Can not send message. User is not logged in.")
+            return false
+        }
+
+        return canSendLoginMessage()
     }
 
     private fun canUseConnection(): Boolean {
@@ -677,5 +704,14 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
             }
 
         }
+    }
+
+    private fun logoutIfUnauthorized(statusCode: Int): Boolean{
+        if (statusCode == 401 || statusCode == 403){
+            Log.d(tag, "Response status code: $statusCode. Logging out user from application.")
+            communicationContext.isLogin = false
+            return true
+        }
+        return false
     }
 }

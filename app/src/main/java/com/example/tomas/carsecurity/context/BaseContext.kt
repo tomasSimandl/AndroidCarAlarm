@@ -37,6 +37,12 @@ open class BaseContext(val appContext: Context) {
                 appContext.resources.getBoolean(defValueId))
     }
 
+    protected fun putBoolean(resourceKeyId: Int, value: Boolean) {
+        sharedPreferences.edit()
+                .putBoolean(appContext.getString(resourceKeyId), value)
+                .apply()
+    }
+
     protected fun getStringSet(resourceKeyId: Int, defValue: Set<String>?): Set<String>? {
         return sharedPreferences.getStringSet(appContext.getString(resourceKeyId), defValue)
     }

@@ -25,6 +25,7 @@ class LoginFragment : Fragment() {
     }
 
     private lateinit var communicationManager: CommunicationManager
+    private lateinit var communicationContext: CommunicationContext
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -39,7 +40,8 @@ class LoginFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        communicationManager = CommunicationManager.getInstance(CommunicationContext(requireContext()))
+        if(!::communicationContext.isInitialized) communicationContext = CommunicationContext(requireContext())
+        communicationManager = CommunicationManager.getInstance(communicationContext)
 
         login_error_text_view.visibility = View.GONE
 
@@ -76,6 +78,7 @@ class LoginFragment : Fragment() {
 
             if (intent.getBooleanExtra(BroadcastKeys.KeySuccess.name, false)) {
                 showLogout(input_username.text.toString())
+                communicationContext.isLogin = true
                 communicationManager.sendNetworkGetCars()
 
             } else {
@@ -153,9 +156,8 @@ class LoginFragment : Fragment() {
         btn_logout.isEnabled = false
 
         Thread(Runnable {
-
             Storage.getInstance(requireContext()).clearAllTables()
-
+            communicationContext.isLogin = false
             btn_logout.post { btn_logout.isEnabled = true }
             showLogin()
         }).start()

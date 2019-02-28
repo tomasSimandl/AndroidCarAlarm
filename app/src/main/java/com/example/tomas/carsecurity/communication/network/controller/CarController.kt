@@ -31,12 +31,7 @@ class CarController(serverUrl: String, httpClient: OkHttpClient) {
         val method = carAPI.getCars()
 
         Log.d(tag, "Sending message to get cars endpoint. URL: ${method.request().url()}")
-        return try {
-            method.execute()
-        } catch (e: Exception) {
-            Log.d(tag, "Can not send request. Exception: ${e.printStackTrace()}")
-            Response.error(418, ResponseBody.create(null, ""))
-        }
+        return method.execute()
     }
 
     fun createCar(name: String): Response<Any> {
@@ -49,11 +44,6 @@ class CarController(serverUrl: String, httpClient: OkHttpClient) {
 
         val method = carAPI.createCar(requestBody)
         Log.d(tag, "Sending message to create car endpoint. URL: ${method.request().url()}")
-        return try {
-            method.execute()
-        } catch (e: Exception) {
-            Log.d(tag, "Can not send request. Exception: ${e.printStackTrace()}")
-            Response.error(418, ResponseBody.create(null, ""))
-        }
+        return method.execute()
     }
 }

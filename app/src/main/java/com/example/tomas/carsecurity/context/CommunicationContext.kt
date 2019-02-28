@@ -43,6 +43,12 @@ class CommunicationContext(appContext: Context) : BaseContext(appContext) {
         return stringSet?.contains(parameters.joinToString("_")) ?: defIsMsgAllowed
     }
 
+    var isLogin: Boolean
+        get() = getBoolean(R.string.key_communication_network_is_user_login,
+                R.bool.default_communication_network_is_user_login)
+
+        set(value) = putBoolean(R.string.key_communication_network_is_user_login, value)
+
     /**
      * Returns phone number of contact person. Return value from sharedPreferences or empty string.
      */

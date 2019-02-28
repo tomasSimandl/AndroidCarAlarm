@@ -87,7 +87,7 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
             Log.d(tag, "Sending multipart message.")
             smsManager.sendMultipartTextMessage(communicationContext.phoneNumber, null, textParts, null, null)
         } else {
-            Log.d(tag, "Sending message.")
+            Log.d(tag, "Sending message: $text")
             smsManager.sendTextMessage(communicationContext.phoneNumber, null, text, null, null)
         }
         return true

@@ -6,6 +6,7 @@ import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.communication.network.NetworkProvider
 import com.example.tomas.carsecurity.communication.sms.SmsProvider
 import com.example.tomas.carsecurity.context.CommunicationContext
+import com.example.tomas.carsecurity.storage.Storage
 import com.example.tomas.carsecurity.storage.entity.Location
 import com.example.tomas.carsecurity.utils.UtilsEnum
 
@@ -56,6 +57,15 @@ class CommunicationManager private constructor(private val communicationContext:
 
             if (canRegisterProvider(activeCommunicators.find { it is NetworkProvider }, sharedPreferences, key))
                 tryInitializeProvider(NetworkProvider(communicationContext))
+        }
+
+        if (key == communicationContext.appContext.getString(R.string.key_communication_network_is_user_login)) {
+            if(!communicationContext.isLogin) {
+                Thread (Runnable {
+                    Log.d(tag, "User logout. Clearing database.")
+                    Storage.getInstance(communicationContext.appContext).clearAllTables()
+                }).start()
+            }
         }
     }
 

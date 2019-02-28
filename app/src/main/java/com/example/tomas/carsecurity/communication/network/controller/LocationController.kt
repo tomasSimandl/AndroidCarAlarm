@@ -33,7 +33,7 @@ class LocationController(serverUrl: String, httpClient: OkHttpClient) {
             method.execute()
         } catch (e: Exception) {
             Log.d(tag, "Can not send request. Exception: $e")
-            Response.error(418, ResponseBody.create(null, ""))
+            Response.error(408, ResponseBody.create(null, ""))
         }
     }
 }
