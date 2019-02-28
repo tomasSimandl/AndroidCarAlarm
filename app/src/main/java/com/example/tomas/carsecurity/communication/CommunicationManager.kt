@@ -9,11 +9,24 @@ import com.example.tomas.carsecurity.context.CommunicationContext
 import com.example.tomas.carsecurity.storage.entity.Location
 import com.example.tomas.carsecurity.utils.UtilsEnum
 
-class CommunicationManager(private val communicationContext: CommunicationContext)
+class CommunicationManager private constructor(private val communicationContext: CommunicationContext)
     : SharedPreferences.OnSharedPreferenceChangeListener {
 
     private val activeCommunicators: MutableSet<ICommunicationProvider> = HashSet()
     private val tag = "CommunicationManager"
+
+
+    companion object {
+        private var instance: CommunicationManager? = null
+
+        fun getInstance(communicationContext: CommunicationContext): CommunicationManager {
+            if (instance == null){
+                Log.d("CommManager.instance", "Creating new instance of Communication manager.")
+                instance = CommunicationManager(communicationContext)
+            }
+            return instance!!
+        }
+    }
 
 
     init {

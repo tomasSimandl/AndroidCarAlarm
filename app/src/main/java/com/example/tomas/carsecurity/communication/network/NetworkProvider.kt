@@ -36,9 +36,9 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.collections.ArrayList
 
 
-class NetworkProvider(private val communicationContext: CommunicationContext) : ICommunicationProvider, SharedPreferences.OnSharedPreferenceChangeListener, BroadcastReceiver() {
+class NetworkProvider (private val communicationContext: CommunicationContext) :
+        ICommunicationProvider, SharedPreferences.OnSharedPreferenceChangeListener, BroadcastReceiver() {
 
-    // TODO create this class as singleton because is used in service and in login page
     private val tag = "NetworkProvider"
     private lateinit var workerThread: WorkerThread
     private lateinit var routeController: RouteController
@@ -190,6 +190,12 @@ class NetworkProvider(private val communicationContext: CommunicationContext) : 
     }
 
     override fun initialize(): Boolean {
+
+        if(isInitialized) {
+            Log.d(tag,"Already initialized. Nothing to init.")
+            return true
+        }
+
         isInitialized = false
 
         if (check(communicationContext.appContext) == CheckCodes.success) {

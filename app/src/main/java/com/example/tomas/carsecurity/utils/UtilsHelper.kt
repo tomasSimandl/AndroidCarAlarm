@@ -15,7 +15,7 @@ class UtilsHelper (private val context: MyContext): SharedPreferences.OnSharedPr
     private val utilsMap: MutableMap<GeneralUtil, MutableSet<ObservableEnum>> = HashMap()
 
     private val workerThread = WorkerThread("UtilsThread")
-    val communicationManager = CommunicationManager(context.communicationContext)
+    val communicationManager = CommunicationManager.getInstance(context.communicationContext)
 
     init {
         workerThread.start()

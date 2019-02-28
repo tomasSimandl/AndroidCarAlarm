@@ -39,7 +39,7 @@ class LoginFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        communicationManager = CommunicationManager(CommunicationContext(requireContext()))
+        communicationManager = CommunicationManager.getInstance(CommunicationContext(requireContext()))
 
         login_error_text_view.visibility = View.GONE
 
@@ -62,7 +62,7 @@ class LoginFragment : Fragment() {
     override fun onStop() {
         super.onStop()
 
-        communicationManager.destroy()
+        // communicationManager.destroy() CommunicationManager is destroyed at MainService
         LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(receiver)
         LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(getCarsReceiver)
         LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(createCarReceiver)
