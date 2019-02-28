@@ -7,7 +7,7 @@ import com.example.tomas.carsecurity.storage.service.MessageService
 import com.example.tomas.carsecurity.storage.service.RouteService
 import com.example.tomas.carsecurity.storage.service.UserService
 
-class Storage private constructor(appContext: Context) {
+class Storage private constructor(){
 
     private lateinit var database: AppDatabase
 
@@ -25,7 +25,7 @@ class Storage private constructor(appContext: Context) {
         fun getInstance(appContext: Context): Storage {
             // Initialize singleton
             if (instance == null) {
-                instance = Storage(appContext)
+                instance = Storage()
             }
 
             // reopen database if it is not initialized or closed
@@ -48,6 +48,10 @@ class Storage private constructor(appContext: Context) {
         fun destroy() {
             instance?.close()
         }
+    }
+
+    fun clearAllTables(){
+        database.clearAllTables()
     }
 
     fun close() {
