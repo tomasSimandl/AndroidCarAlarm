@@ -1,20 +1,21 @@
 package com.example.tomas.carsecurity
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
 import android.support.v4.view.GravityCompat
-import android.support.v4.view.MenuItemCompat
+import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import android.view.View
 import com.example.tomas.carsecurity.fragments.LoginFragment
 import com.example.tomas.carsecurity.fragments.MainFragment
+import com.example.tomas.carsecurity.storage.Storage
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
+import kotlinx.android.synthetic.main.nav_header_main.view.*
 
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener  {
@@ -36,16 +37,31 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             openSettings()
         }
 
-
         // side panel initialization
         val toggle = ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.navigation_panel_open, R.string.navigation_panel_close)
+
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
 
         nav_view.setNavigationItemSelectedListener(this)
 
         onNavigationItemSelected(nav_view.menu.findItem(R.id.menu_home))
+
+        drawer_layout.addDrawerListener(object : DrawerLayout.SimpleDrawerListener() {
+            override fun onDrawerOpened(drawerView: View) {
+                // display user name
+                Thread (Runnable {
+                    val user = Storage.getInstance(this@MainActivity).userService.getUser()
+                    val text = user?.username ?: ""
+
+                    nav_view.getHeaderView(0).usernameTextView.post {
+                        nav_view.getHeaderView(0).usernameTextView.text = text
+                    }
+                }).start()
+            }
+        })
     }
+
 
     override fun onDestroy() {
         super.onDestroy()
