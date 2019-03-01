@@ -52,10 +52,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 // display user name
                 Thread (Runnable {
                     val user = Storage.getInstance(this@MainActivity).userService.getUser()
-                    val text = user?.username ?: ""
 
-                    nav_view.getHeaderView(0).usernameTextView.post {
-                        nav_view.getHeaderView(0).usernameTextView.text = text
+                    nav_view.post {
+                        val header = nav_view.getHeaderView(0)
+                        if (user == null){
+                            header.usernameTextView.visibility = View.GONE
+                            header.carnameTextView.visibility = View.GONE
+                        } else {
+                            header.usernameTextView.text = user.username
+                            header.carnameTextView.text = user.carName
+                            header.usernameTextView.visibility = View.VISIBLE
+                            header.carnameTextView.visibility = View.VISIBLE
+                        }
                     }
                 }).start()
             }
