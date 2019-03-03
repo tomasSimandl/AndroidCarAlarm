@@ -117,15 +117,12 @@ class CommunicationManager private constructor(private val communicationContext:
         }
     }
 
-    fun sendStatus(battery: Int, powerSaveMode: Boolean, utils: Map<UtilsEnum, Boolean>) {
+    fun sendStatus(communicatorHash: Int, battery: Float, isCharging: Boolean, powerSaveMode: Boolean, utils: Map<UtilsEnum, Boolean>) {
         for (provider in activeCommunicators) {
-            provider.sendStatus(battery, powerSaveMode, utils)
-        }
-    }
-
-    fun sendRoute(localRouteId: Int) {
-        for (provider in activeCommunicators) {
-            provider.sendRoute(localRouteId)
+            if(provider::class.java.hashCode() == communicatorHash) {
+                provider.sendStatus(battery, isCharging, powerSaveMode, utils)
+                break
+            }
         }
     }
 

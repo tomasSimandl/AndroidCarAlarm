@@ -94,6 +94,7 @@ class MainService : Service(), Observer {
                 Actions.ActionStatusUI.name -> broadcastSender.informUI(utilsManager.getEnabledUtils())
                 Actions.ActionForegroundStop.name -> stopService(true)
                 Actions.ActionTryStop.name -> if(!isForeground) stopSelf()
+                Actions.ActionStatus.name -> utilsManager.sendStatus(intent.getIntExtra("communicator", -1))
                 else -> Log.w(tag, "onStartCommand - invalid action")
             }
         }

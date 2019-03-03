@@ -195,7 +195,8 @@
     <string name="sms_alarm">Alarm was triggered at: %s.</string>
     <string name="sms_location">Actual car location is lat: %1$s, long: %2$s https://www.google.com/maps/search/\?api=1&amp;query=%1$s,%2$s</string>
     <string name="sms_battery_warn">Battery capacity is low: %s %%</string>
-    <string name="sms_info_battery">Battery capacity is %s %%</string>
+    <string name="sms_info_battery_charging">Battery is charging and capacity is %s %%</string>
+    <string name="sms_info_battery_not_charging">Battery is not charging and capacity is %s %%</string>
     <string name="sms_power_connected">Power is connected. Battery level is %s %%</string>
     <string name="sms_power_disconnected">Power is disconnected! Battery level is %s %%</string>
     <string name="sms_info_power_save_mode_on">Power save mode: ON </string>

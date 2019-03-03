@@ -27,12 +27,11 @@ class BatteryDetector (private val context: MyContext): GeneralObservable() {
         override fun onReceive(context: Context, intent: Intent) {
             Log.d(tag, """Power action: ${intent.action}""")
 
-            val batteryStatus: Intent? = IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { filter ->
-                context.registerReceiver(null, filter)
-            }
+            val batteryStatus = BatteryUtil.getBatteryStatus(context)
 
-            if(batteryStatus != null) {
-                notifyObservers(intent.action, batteryStatus)
+            if(batteryStatus.first != -1f) {
+                setChanged()
+                notifyObservers(Triple(intent.action, batteryStatus.second, batteryStatus.first))
             }
         }
     }
@@ -45,13 +44,8 @@ class BatteryDetector (private val context: MyContext): GeneralObservable() {
 
         if(action == null) return
 
-        val status: Int = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
-        val isCharging: Boolean = status == BatteryManager.BATTERY_STATUS_CHARGING
-                || status == BatteryManager.BATTERY_STATUS_FULL
-
-
-        val batteryPct: Float? = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) /
-                intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1).toFloat()
+        val isCharging: Boolean = BatteryUtil.batteryIsCharging(intent)
+        val batteryPct: Float = BatteryUtil.batteryPct(intent)
 
         setChanged()
         notifyObservers(Triple(action, isCharging ,batteryPct))

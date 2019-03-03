@@ -79,7 +79,7 @@ class SmsBroadcastReceiver(private val communicationContext: CommunicationContex
             smsBody.startsWith("deactivate", true) -> switchUtil(smsBody.drop(10).trim(), false)
             smsBody == "info" ->
                 if(communicationContext.isMessageAllowed(SmsProvider::class.java.name, MessageType.Status.name, "recv")) {
-                    sendIntent(MainService.Actions.ActionStatus.name)
+                    sendIntentStatus()
                 }
             smsBody == "position" ->
                 if(communicationContext.isMessageAllowed(SmsProvider::class.java.name, MessageType.Location.name, "recv")) {
@@ -106,6 +106,13 @@ class SmsBroadcastReceiver(private val communicationContext: CommunicationContex
         } catch (e: IllegalArgumentException){
             Log.d(tag, "Incoming command had invalid util name")
         }
+    }
+
+    private fun sendIntentStatus(){
+        val intent = Intent(communicationContext.appContext, MainService::class.java)
+        intent.action = MainService.Actions.ActionStatus.name
+        intent.putExtra("communicator", SmsProvider::class.hashCode())
+        communicationContext.appContext.startService(intent)
     }
 
     private fun sendIntent(action: String){

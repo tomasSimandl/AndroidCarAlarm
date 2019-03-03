@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.tomas.carsecurity.MainService
 import com.example.tomas.carsecurity.WorkerThread
 import com.example.tomas.carsecurity.context.MyContext
+import com.example.tomas.carsecurity.sensors.BatteryUtil
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -119,5 +120,20 @@ class UtilsManager(private val context: MyContext, reload: Boolean): Observer, O
         }
 
         return utilsMap[utilEnum] as GeneralUtil
+    }
+
+    fun sendStatus(communicatorHash: Int){
+        Log.d(tag, "Command to send status to communicator with hash: $communicatorHash")
+        val utils: MutableMap<UtilsEnum, Boolean> = HashMap()
+        utilsMap.forEach { utils[it.key] = it.value.isEnabled() }
+
+        val powerSaveMode = context.utilsContext.isPowerSaveMode
+
+        val batteryStatus = BatteryUtil.getBatteryStatus(context.appContext)
+        val isCharging = batteryStatus.second
+        val batteryPct = batteryStatus.first
+
+        utilsHelper.communicationManager.sendStatus(
+                communicatorHash, batteryPct, isCharging, powerSaveMode, utils)
     }
 }

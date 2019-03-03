@@ -16,6 +16,7 @@ import com.example.tomas.carsecurity.communication.ICommunicationProvider
 import com.example.tomas.carsecurity.communication.MessageType
 import com.example.tomas.carsecurity.communication.network.controller.*
 import com.example.tomas.carsecurity.communication.network.dto.EventCreate
+import com.example.tomas.carsecurity.communication.network.dto.StatusCreate
 import com.example.tomas.carsecurity.communication.network.dto.Token
 import com.example.tomas.carsecurity.context.CommunicationContext
 import com.example.tomas.carsecurity.fragments.LoginFragment
@@ -25,6 +26,8 @@ import com.example.tomas.carsecurity.storage.entity.Message
 import com.example.tomas.carsecurity.storage.entity.Route
 import com.example.tomas.carsecurity.storage.entity.User
 import com.example.tomas.carsecurity.utils.UtilsEnum
+import com.google.android.gms.common.GoogleApiAvailability
+import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.gson.Gson
 import com.google.gson.JsonParser
 import com.google.gson.internal.LinkedTreeMap
@@ -46,6 +49,7 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
     private lateinit var locationController: LocationController
     private lateinit var userController: UserController
     private lateinit var carController: CarController
+    private lateinit var statusController: StatusController
 
     private val connectivityService = communicationContext.appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
 
@@ -233,6 +237,7 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
             eventController = EventController(communicationContext.serverUrl, httpClient)
             locationController = LocationController(communicationContext.serverUrl, httpClient)
             carController = CarController(communicationContext.serverUrl, httpClient)
+            statusController = StatusController(communicationContext.serverUrl, httpClient)
             userController = UserController(communicationContext.authorizationServerUrl)
             true
         } catch (e: Exception) {
@@ -346,9 +351,27 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
         return true
     }
 
-    override fun sendStatus(battery: Int, powerSaveMode: Boolean, utils: Map<UtilsEnum, Boolean>): Boolean {
-        if (!canSendMessage()) return false
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun sendStatus(battery: Float, isCharging: Boolean, powerSaveMode: Boolean, utils: Map<UtilsEnum, Boolean>): Boolean {
+        val longTime = Date().time
+
+        val task = Runnable {
+            if (!canSendMessage() || !canUseConnection()) {
+                Log.d(tag, "Can not send status. Message will be destroyed.")
+                return@Runnable
+            }
+
+            val status = StatusCreate(battery, isCharging, powerSaveMode, utils, longTime)
+            val result = statusController.createStatus(status)
+            if(result.isSuccessful){
+                Log.d(tag, "Status message was send successfully")
+            } else {
+                Log.d(tag, "Send of status message ends with status code: ${result.code()}")
+                logoutIfUnauthorized(result.code())
+            }
+        }
+
+        workerThread.postTask(task)
+        return true
     }
 
     fun login(username: String, password: String) {

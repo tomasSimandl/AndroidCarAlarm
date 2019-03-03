@@ -175,18 +175,24 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
         }
     }
 
-    override fun sendStatus(battery: Int, powerSaveMode: Boolean, utils: Map<UtilsEnum, Boolean>): Boolean {
+    override fun sendStatus(battery: Float, isCharging: Boolean, powerSaveMode: Boolean, utils: Map<UtilsEnum, Boolean>): Boolean {
         return if (communicationContext.isMessageAllowed(this.javaClass.name, MessageType.Status.name, "recv")) {
             Log.d(tag, "Sending status SMS message.")
 
-            val batteryInfo = communicationContext.appContext.getString(R.string.sms_info_battery, battery.toString())
-            val powerSaveModeResource = if (powerSaveMode) R.string.sms_info_power_save_mode_on else R.string.sms_info_power_save_mode_off
+            val batteryInfoResource =
+                    if (isCharging) R.string.sms_info_battery_charging
+                    else R.string.sms_info_battery_not_charging
+            val batteryInfo = communicationContext.appContext.getString(batteryInfoResource, battery.toString())
+
+            val powerSaveModeResource =
+                    if (powerSaveMode) R.string.sms_info_power_save_mode_on
+                    else R.string.sms_info_power_save_mode_off
             val powerSaveModeInfo = communicationContext.appContext.getString(powerSaveModeResource)
+
             var utilsInfo = ""
             for (util in utils.keys) {
 
                 val utilResource = if (utils[util] == true) R.string.sms_util_enabled else R.string.sms_util_disabled
-
                 utilsInfo += "\n"
                 utilsInfo += communicationContext.appContext.getString(utilResource, util.name)
             }

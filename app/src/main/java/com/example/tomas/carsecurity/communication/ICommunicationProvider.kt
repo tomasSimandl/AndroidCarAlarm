@@ -14,6 +14,6 @@ interface ICommunicationProvider {
     fun sendEvent(messageType: MessageType, vararg args: String): Boolean
     fun sendUtilSwitch(utilsEnum: UtilsEnum, enabled: Boolean): Boolean
     fun sendLocation(location: Location, isAlarm: Boolean, cache: Boolean = false): Boolean
-    fun sendStatus(battery: Int, powerSaveMode: Boolean, utils: Map<UtilsEnum, Boolean>): Boolean
+    fun sendStatus(battery: Float, isCharging: Boolean, powerSaveMode: Boolean, utils: Map<UtilsEnum, Boolean>): Boolean
     fun sendRoute(localRouteId: Int): Boolean
 }
