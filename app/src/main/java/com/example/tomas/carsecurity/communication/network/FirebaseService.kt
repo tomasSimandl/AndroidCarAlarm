@@ -1,9 +1,11 @@
 package com.example.tomas.carsecurity.communication.network
 
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.example.tomas.carsecurity.MainService
+import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.context.CommunicationContext
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -50,9 +52,13 @@ class FirebaseService : FirebaseMessagingService() {
     }
 
     override fun onNewToken(token: String) {
-        Log.d(tag, "Refresh token: $token")
+        Log.d(tag, "New Firebase refresh token received.")
 
-        // TODO send registration token to server
+        val sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+        sharedPreferences
+                .edit()
+                .putString(getString(R.string.key_communication_network_firebase_token), token)
+                .apply()
     }
 
     private fun sendIntentStatus(){

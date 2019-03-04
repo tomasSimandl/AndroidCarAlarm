@@ -26,8 +26,6 @@ import com.example.tomas.carsecurity.storage.entity.Message
 import com.example.tomas.carsecurity.storage.entity.Route
 import com.example.tomas.carsecurity.storage.entity.User
 import com.example.tomas.carsecurity.utils.UtilsEnum
-import com.google.android.gms.common.GoogleApiAvailability
-import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.gson.Gson
 import com.google.gson.JsonParser
 import com.google.gson.internal.LinkedTreeMap
@@ -50,6 +48,7 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
     private lateinit var userController: UserController
     private lateinit var carController: CarController
     private lateinit var statusController: StatusController
+    private lateinit var firebaseController: FirebaseController
 
     private val connectivityService = communicationContext.appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
 
@@ -113,20 +112,24 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
         return object : TimerTask() {
             override fun run() {
 
-                if (!communicationContext.isLogin){
-                    Log.d(tag, "Stopping network synchronization thread. User is not login.")
-                    return
-                }
-
                 if (!isSynchronize.getAndSet(true)){
                     Log.d(tag, "Stopping network synchronization thread. Another thread already running.")
                     return
                 }
+
                 if (!canUseConnection()) {
                     Log.d(tag, "Stopping network synchronization. Can not use connection.")
                     isSynchronize.set(false)
                     return
                 }
+
+
+                if (!communicationContext.isLogin){
+                    Log.d(tag, "Stopping network synchronization thread. User is not login.")
+                    return
+                }
+
+                sendFirebaseToken()
 
                 val storage = Storage.getInstance(communicationContext.appContext)
 
@@ -195,6 +198,11 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
                 }
                 onNetworkStatusChanged()
             }
+
+            communicationContext.appContext.getString(R.string.key_communication_network_firebase_token) -> {
+                Log.d(tag, "Change of Firebase token was detected.")
+                sendFirebaseToken()
+            }
         }
     }
 
@@ -238,6 +246,7 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
             locationController = LocationController(communicationContext.serverUrl, httpClient)
             carController = CarController(communicationContext.serverUrl, httpClient)
             statusController = StatusController(communicationContext.serverUrl, httpClient)
+            firebaseController = FirebaseController(communicationContext.serverUrl, httpClient)
             userController = UserController(communicationContext.authorizationServerUrl)
             true
         } catch (e: Exception) {
@@ -381,7 +390,7 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
         val task = Runnable {
 
             synchronized(loginLock) {
-                if (!canSendLoginMessage() || !canUseConnection()) {
+                if (!canSendWithoutLogin() || !canUseConnection()) {
                     sendLoginBroadcast(false, R.string.err_login_init_network)
                     return@Runnable
                 }
@@ -648,6 +657,35 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
         }
     }
 
+    private fun sendFirebaseToken(){
+
+        if(communicationContext.firebaseToken.isBlank()){
+            Log.d(tag, "No Firebase token to save")
+            return
+        }
+
+        val task = Runnable {
+            if (!canSendMessage() || !canUseConnection()) {
+                return@Runnable
+            }
+
+            val user = Storage.getInstance(communicationContext.appContext).userService.getUser()
+            if(user == null) {
+                Log.d(tag, "Can not send token. User is not logged in.")
+                return@Runnable
+            }
+
+            val response = firebaseController.saveToken(user.carId, communicationContext.firebaseToken)
+            if(response.isSuccessful) {
+                Log.d(tag, "Firebase token send successfully to server")
+                communicationContext.firebaseToken = ""
+            } else {
+                Log.w(tag, "Send Firebase token failed.")
+            }
+        }
+        workerThread.postTask(task)
+    }
+
     private fun isConnected(): Boolean {
         return connectivityService?.activeNetworkInfo?.isConnected ?: false
     }
@@ -663,7 +701,7 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
         }
     }
 
-    private fun canSendLoginMessage(): Boolean {
+    private fun canSendWithoutLogin(): Boolean {
         if (!isInitialized) {
             Log.w(tag, "Can not send message because NetworkProvider is not initialized.")
             return false
@@ -683,7 +721,7 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
             return false
         }
 
-        return canSendLoginMessage()
+        return canSendWithoutLogin()
     }
 
     private fun canUseConnection(): Boolean {

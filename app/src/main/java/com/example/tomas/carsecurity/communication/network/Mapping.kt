@@ -6,6 +6,7 @@ object Mapping {
     const val EVENT_URL = "event"
     const val STATUS_URL = "status"
     const val LOCATION_URL = "position"
+    const val FIREBASE_TOKEN_URL = "token"
 
     const val LOGIN_URL = "oauth/token"
 }

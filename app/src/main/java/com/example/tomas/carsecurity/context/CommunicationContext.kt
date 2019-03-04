@@ -75,6 +75,10 @@ class CommunicationContext(appContext: Context) : BaseContext(appContext) {
     val synchronizationInterval: Long
         get() = getInt(R.string.key_communication_network_update_interval,
                 R.integer.default_communication_network_update_interval) * 60000L // *60 to second *1000 to milliseconds
+
+    var firebaseToken: String
+        get() = getString(R.string.key_communication_network_firebase_token, R.string.empty)
+        set(value) = putString(R.string.key_communication_network_firebase_token, value)
 }
 
 
