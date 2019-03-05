@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.tomas.carsecurity">
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
     <!-- Permission for recording audio which is used for detecting high amplitude. -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-feature android:name="android.hardware.microphone" android:required="false" />
