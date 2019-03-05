@@ -26,6 +26,8 @@ import com.example.tomas.carsecurity.storage.entity.Message
 import com.example.tomas.carsecurity.storage.entity.Route
 import com.example.tomas.carsecurity.storage.entity.User
 import com.example.tomas.carsecurity.utils.UtilsEnum
+import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.provider.FirebaseInitProvider
 import com.google.gson.Gson
 import com.google.gson.JsonParser
 import com.google.gson.internal.LinkedTreeMap
@@ -369,7 +371,14 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
                 return@Runnable
             }
 
-            val status = StatusCreate(battery, isCharging, powerSaveMode, utils, longTime)
+            val user = Storage.getInstance(communicationContext.appContext).userService.getUser()
+
+            if(user == null){
+                Log.w(tag, "Can not send status. User is null")
+                return@Runnable
+            }
+
+            val status = StatusCreate(battery, isCharging, powerSaveMode, utils, longTime, user.carId)
             val result = statusController.createStatus(status)
             if(result.isSuccessful){
                 Log.d(tag, "Status message was send successfully")
@@ -411,6 +420,10 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
 
                             val token = Token(tokenResponse.body() as LinkedTreeMap<*, *>)
                             userService.saveUser(User(token, username, longTime))
+
+                            // Send Firebase token to server
+                            FirebaseService().updateFirebaseToken(communicationContext.appContext)
+
                             Log.d(tag, "User successfully logged in")
                             sendLoginBroadcast(true, 0)
                         }
@@ -680,7 +693,7 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
                 Log.d(tag, "Firebase token send successfully to server")
                 communicationContext.firebaseToken = ""
             } else {
-                Log.w(tag, "Send Firebase token failed.")
+                Log.w(tag, "Send Firebase token failed. Status code: ${response.code()}")
             }
         }
         workerThread.postTask(task)

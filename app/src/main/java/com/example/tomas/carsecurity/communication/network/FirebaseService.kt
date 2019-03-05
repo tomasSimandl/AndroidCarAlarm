@@ -7,6 +7,7 @@ import android.util.Log
 import com.example.tomas.carsecurity.MainService
 import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.context.CommunicationContext
+import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import java.io.Serializable
@@ -15,10 +16,14 @@ class FirebaseService : FirebaseMessagingService() {
 
     private val tag = "FirebaseService"
 
+    fun updateFirebaseToken(context: Context) {
+        FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener { instanceIdResult ->
+            storeToken(instanceIdResult?.token, context)
+        }
+    }
+
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         // ...
-
-
 
         // TODO(developer): Handle FCM messages here.
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
@@ -47,17 +52,33 @@ class FirebaseService : FirebaseMessagingService() {
         // message, here is where that should be initiated. See sendNotification method below.
 
 
-
         sendIntentStatus()
     }
 
-    override fun onNewToken(token: String) {
+    override fun onNewToken(token: String?) {
         Log.d(tag, "New Firebase refresh token received.")
 
-        val sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+        if (this.applicationContext == null) {
+            Log.d(tag, "Can not store token. Context is not defined.")
+            return
+        }
+
+        storeToken(token, applicationContext)
+    }
+
+    private fun storeToken(token: String?, context: Context){
+
+        if (token == null || token.isBlank()) {
+            Log.d(tag, "New Firebase token is null or blank")
+            return
+        }
+
+        val sharedPreferences = context.getSharedPreferences(
+                context.getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+
         sharedPreferences
                 .edit()
-                .putString(getString(R.string.key_communication_network_firebase_token), token)
+                .putString(context.getString(R.string.key_communication_network_firebase_token), token)
                 .apply()
     }
 

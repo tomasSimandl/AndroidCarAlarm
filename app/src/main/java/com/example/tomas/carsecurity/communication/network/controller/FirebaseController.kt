@@ -24,7 +24,7 @@ class FirebaseController(serverUrl: String, httpClient: OkHttpClient) {
         firebaseAPI = retrofit.create(FirebaseAPI::class.java)
     }
 
-    fun saveToken(carId: Long, token: String): Response<Any> {
+    fun saveToken(carId: Long, token: String): Response<Void> {
         val method = firebaseAPI.saveToken(carId, token)
 
         Log.d(tag, "Sending message to save Firebase token endpoint. URL: ${method.request().url()}")

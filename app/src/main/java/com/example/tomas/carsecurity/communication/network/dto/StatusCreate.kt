@@ -15,5 +15,8 @@ data class StatusCreate(
 
         val utils: Map<UtilsEnum, Boolean>,
 
-        val time: Long
+        val time: Long,
+
+        @SerializedName("car_id")
+        val carId: Long
 )
