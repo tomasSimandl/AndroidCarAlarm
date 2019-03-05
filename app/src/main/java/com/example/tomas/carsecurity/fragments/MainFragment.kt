@@ -94,7 +94,7 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
             if (intent.hasExtra(BroadcastKeys.KeyShowMessage.name)) {
 
                 // Show alert dialog
-                AlertDialog.Builder(context)
+                AlertDialog.Builder(this@MainFragment.requireActivity())
                         .setMessage(intent.getStringExtra(BroadcastKeys.KeyShowMessage.name))
                         .setTitle(R.string.error_msg_title)
                         .setPositiveButton(R.string.ok, null)
