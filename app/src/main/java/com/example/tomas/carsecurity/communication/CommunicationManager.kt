@@ -126,30 +126,43 @@ class CommunicationManager private constructor(private val communicationContext:
         }
     }
 
-    fun sendNetworkLogin(username: String, password: String){
+    fun sendNetworkLogin(username: String, password: String): Boolean {
         for (provider in activeCommunicators) {
             if(provider is NetworkProvider){
                 provider.login(username, password)
-                break
+                return true
             }
         }
+        return false
     }
 
-    fun sendNetworkGetCars(){
+    fun networkLoginSuccess(): Boolean {
+        for (provider in activeCommunicators) {
+            if (provider is NetworkProvider) {
+                provider.loginSuccess()
+                return true
+            }
+        }
+        return false
+    }
+
+    fun sendNetworkGetCars(): Boolean {
         for (provider in activeCommunicators) {
             if (provider is NetworkProvider) {
                 provider.getCars()
-                break
+                return true
             }
         }
+        return false
     }
 
-    fun sendNetworkCreateCar(name: String){
+    fun sendNetworkCreateCar(name: String): Boolean {
         for (provider in activeCommunicators) {
             if (provider is NetworkProvider) {
                 provider.createCar(name)
-                break
+                return true
             }
         }
+        return false
     }
 }

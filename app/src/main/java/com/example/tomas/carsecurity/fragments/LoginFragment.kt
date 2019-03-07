@@ -79,14 +79,16 @@ class LoginFragment : Fragment() {
             if (intent.getBooleanExtra(BroadcastKeys.KeySuccess.name, false)) {
                 showLogout(input_username.text.toString())
                 communicationContext.isLogin = true
-                communicationManager.sendNetworkGetCars()
+                if(!communicationManager.sendNetworkGetCars()){
+                    showError(requireContext().getString(R.string.err_login_init_network))
+                    logoutButtonAction()
+                }
+
+                btn_login.isEnabled = true
 
             } else {
-                login_error_text_view.visibility = View.VISIBLE
-                login_error_text_view.text = intent.getStringExtra(BroadcastKeys.KeyErrorMessage.name)
+                showError(intent.getStringExtra(BroadcastKeys.KeyErrorMessage.name))
             }
-
-            btn_login.isEnabled = true
         }
     }
 
@@ -102,8 +104,7 @@ class LoginFragment : Fragment() {
                 showCarListDialog(cars)
             } else {
                 // can not communicate with servers show error and logout
-                login_error_text_view.visibility = View.VISIBLE
-                login_error_text_view.text = error
+                showError(error)
                 logoutButtonAction()
             }
         }
@@ -115,9 +116,10 @@ class LoginFragment : Fragment() {
 
             val error = intent.getStringExtra(BroadcastKeys.KeyErrorMessage.name)
 
-            if (error != null && error.isNotBlank()) {
-                login_error_text_view.visibility = View.VISIBLE
-                login_error_text_view.text = error
+            if (error == null || error.isBlank()) {
+                communicationManager.networkLoginSuccess()
+            } else {
+                showError(error)
                 logoutButtonAction()
             }
         }
@@ -142,14 +144,14 @@ class LoginFragment : Fragment() {
         login_error_text_view.visibility = View.GONE
 
         if (!validInputs()) {
-            login_error_text_view.text = requireContext().getText(R.string.err_login_invalid_inputs)
-            login_error_text_view.visibility = View.VISIBLE
-            btn_login.isEnabled = true
+            showError(requireContext().getText(R.string.err_login_invalid_inputs).toString())
             return
         }
 
         // show spinner
-        communicationManager.sendNetworkLogin(input_username.text.toString(), input_password.text.toString())
+        if(!communicationManager.sendNetworkLogin(input_username.text.toString(), input_password.text.toString())){
+            showError(requireContext().getString(R.string.err_login_init_network))
+        }
     }
 
     private fun logoutButtonAction() {
@@ -187,6 +189,7 @@ class LoginFragment : Fragment() {
                                 user.carName = car["name"] as String
                                 user.carId = (car["id"] as Double).toLong()
                                 storageUserService.updateUser(user)
+                                communicationManager.networkLoginSuccess()
                             }
                         }).start()
                     }
@@ -213,12 +216,21 @@ class LoginFragment : Fragment() {
                         if (name.isBlank()) {
                             showCreateCarDialog()
                         } else {
-                            communicationManager.sendNetworkCreateCar(name.toString())
+                            if(!communicationManager.sendNetworkCreateCar(name.toString())){
+                                showError(requireContext().getString(R.string.err_login_init_network))
+                                logoutButtonAction()
+                            }
                         }
                     }
                     .create()
         }
 
         alertDialog?.show()
+    }
+
+    private fun showError(text: String){
+        login_error_text_view.text = text
+        login_error_text_view.visibility = View.VISIBLE
+        btn_login.isEnabled = true
     }
 }

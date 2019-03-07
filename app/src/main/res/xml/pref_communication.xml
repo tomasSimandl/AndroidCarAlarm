@@ -32,14 +32,10 @@
             android:contentDescription="@string/pref_communication_network_switch_description"/>
 
         <EditTextPreference
-            android:key="@string/key_communication_network_server_url"
-            android:title="@string/pref_communication_network_server_url_title"
-            android:dialogMessage="@string/pref_communication_network_server_url_description"/>
-
-        <EditTextPreference
-            android:key="@string/key_communication_network_auth_server_url"
-            android:title="@string/pref_communication_network_auth_server_url_title"
-            android:dialogMessage="@string/pref_communication_network_auth_server_url_description"/>
+            android:key="@string/key_communication_network_url"
+            android:title="@string/pref_communication_network_url_title"
+            android:dialogMessage="@string/pref_communication_network_url_description"
+            android:defaultValue="@string/default_communication_network_url"/>
 
         <CheckBoxPreference
             android:key="@string/key_communication_network_cellular"

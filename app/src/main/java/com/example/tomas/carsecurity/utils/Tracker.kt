@@ -95,13 +95,21 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
     override fun enable() {
         assert(Thread.currentThread().name == "UtilsThread")
         if (!isEnabled && canRun()){
+
+            val storage  = Storage.getInstance(context.appContext)
+            val user = storage.userService.getUser()
+            if(user == null){
+                Log.d(tag, "Can not enable tracker. User is not logged in.")
+                setChanged()
+                notifyObservers(context.appContext.getString(R.string.error_tracker_not_log_in))
+                return
+            }
+
             isEnabled = true
             lastLocation = null
             utilsHelper.registerObserver(ObservableEnum.LocationProvider, this)
 
-            val storage  = Storage.getInstance(context.appContext)
-
-            actualRoute = Route(carId = storage.userService.getUser()?.carId!!) // TODO (it is possible that user is not logged in)
+            actualRoute = Route(carId = user.carId)
             actualRoute!!.uid = storage.routeService.saveRoute(actualRoute!!).toInt()
 
             setChanged()
@@ -110,9 +118,9 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
             context.utilsContext.registerOnPreferenceChanged(this)
 
             Log.d(tag, "Tracker system is enabled.")
+            utilsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, true)
         }
 
-        utilsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, true)
     }
 
     override fun disable(force: Boolean) {
@@ -132,9 +140,9 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
             notifyObservers(false)
 
             Log.d(tag, "Tracker system is disabled.")
+            utilsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, false)
         }
 
-        utilsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, false)
     }
 
     override fun isEnabled(): Boolean {

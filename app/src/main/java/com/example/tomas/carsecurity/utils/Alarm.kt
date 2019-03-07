@@ -185,9 +185,10 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
 
             Log.d(tag, "Alarm system is enabled")
             context.utilsContext.registerOnPreferenceChanged(this)
+
+            utilsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, true)
         }
 
-        utilsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, true)
     }
 
     override fun disable(force: Boolean) {
@@ -211,9 +212,10 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
             notifyObservers(false)
 
             Log.d(tag, "Alarm system disabled")
+
+            utilsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, false)
         }
 
-        utilsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, false)
     }
 
     override fun isEnabled(): Boolean {

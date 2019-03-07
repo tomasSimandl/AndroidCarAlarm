@@ -178,7 +178,7 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
 
         when (key) {
-            communicationContext.appContext.getString(R.string.key_communication_network_server_url) -> {
+            communicationContext.appContext.getString(R.string.key_communication_network_url) -> {
                 Log.d(tag, "Servers url was changed. Reinitializing Controllers")
                 if (!initControllers()) {
                     isInitialized = false
@@ -421,9 +421,6 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
                             val token = Token(tokenResponse.body() as LinkedTreeMap<*, *>)
                             userService.saveUser(User(token, username, longTime))
 
-                            // Send Firebase token to server
-                            FirebaseService().updateFirebaseToken(communicationContext.appContext)
-
                             Log.d(tag, "User successfully logged in")
                             sendLoginBroadcast(true, 0)
                         }
@@ -439,6 +436,12 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
         }
 
         workerThread.postTask(task)
+    }
+
+    fun loginSuccess(){
+        // Send Firebase token to server
+        FirebaseService().updateFirebaseToken(communicationContext.appContext)
+        sendFirebaseToken()
     }
 
     private fun sendLoginBroadcast(success: Boolean, errorMessageResId: Int, vararg args: Any) {
@@ -685,6 +688,11 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
             val user = Storage.getInstance(communicationContext.appContext).userService.getUser()
             if(user == null) {
                 Log.d(tag, "Can not send token. User is not logged in.")
+                return@Runnable
+            }
+
+            if (user.carId == -1L){
+                Log.d(tag, "Can not send token. User did not select car yet.")
                 return@Runnable
             }
 

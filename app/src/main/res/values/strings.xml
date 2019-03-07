@@ -18,7 +18,7 @@
     <string name="input_password">Password</string>
     <string name="login_user_text">You are logged in as a %s</string>
     <string name="err_login_invalid_inputs">Username and password can not be empty.</string>
-    <string name="err_login_failed">Login failed please try it again later.</string>
+    <string name="err_login_failed">Login failed server is unreachable.</string>
     <string name="err_login_already_login">User is already logged in.</string>
     <string name="err_login_init_network">Can not initialize network provider.</string>
     <string name="err_login_credentials">Invalid credentials.</string>
@@ -150,11 +150,8 @@
     <string name="pref_communication_network_switch_title">Allow network communication</string>
     <string name="pref_communication_network_switch_description"> </string>
 
-    <string name="pref_communication_network_server_url_title">Server url</string>
-    <string name="pref_communication_network_server_url_description">Url address of server on which can be store and manage settings and Tracker data. Url must starts with \'http\'/\'https\' and must ends with \'/\'</string>
-
-    <string name="pref_communication_network_auth_server_url_title">Authorization server url</string>
-    <string name="pref_communication_network_auth_server_url_description">Url address of authorization server on which can be user authenticated. Url must starts with \'http\'/\'https\' and must ends with \'/\'</string>
+    <string name="pref_communication_network_url_title">Server url</string>
+    <string name="pref_communication_network_url_description">Url address of server on which can be store and manage settings and Tracker data. Url must starts with \'http\' or \'https\'</string>
 
     <string name="pref_communication_network_cellular_title">Mobile data Synchronization</string>
     <string name="pref_communication_network_cellular_description">Synchronization with server can be via mobile data.</string>
@@ -232,6 +229,7 @@
     <string name="error_tracker_location_not_permitted">Tracker needs to get device location for creating of log book but application is not permitted to get device location. Please request for permissions in communication setting.</string>
     <string name="error_tracker_location_not_allowed">Tracker needs to get device location for creating of log book but sensor is disabled by user. Enable Alarm in Tools setting.</string>
     <string name="error_tracker_location_invalid_params">Invalid parameters are set to invalid value please change it in setting.</string>
+    <string name="error_tracker_not_log_in">You are not logged in application. Please login first in Login page.</string>
 
     <string name="error_check_codes_hw_not_supported">hardware is not supported</string>
     <string name="error_check_codes_not_permitted">hardware permission denied</string>

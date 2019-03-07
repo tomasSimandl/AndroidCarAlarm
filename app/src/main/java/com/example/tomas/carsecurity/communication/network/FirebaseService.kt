@@ -1,20 +1,23 @@
 package com.example.tomas.carsecurity.communication.network
 
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.example.tomas.carsecurity.MainService
 import com.example.tomas.carsecurity.R
-import com.example.tomas.carsecurity.context.CommunicationContext
+import com.example.tomas.carsecurity.storage.Storage
+import com.example.tomas.carsecurity.utils.UtilsEnum
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import java.io.Serializable
 
 class FirebaseService : FirebaseMessagingService() {
 
     private val tag = "FirebaseService"
+
+    enum class Commands {
+        Status, Activate, Deactivate
+    }
 
     fun updateFirebaseToken(context: Context) {
         FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener { instanceIdResult ->
@@ -23,36 +26,35 @@ class FirebaseService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        // ...
 
-        // TODO(developer): Handle FCM messages here.
-        // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
-        Log.d(tag, "From: ${remoteMessage.from}")
+        val user = Storage.getInstance(this).userService.getUser()
+        if (user == null){
+            Log.d(tag, "Can not response on Firebase message. User is not login")
+            return
+        }
 
-        // Check if message contains a data payload.
-        if (remoteMessage.data.isNotEmpty()) {
-            Log.d(tag, "Message data payload: ${remoteMessage.data}")
+        if (user.username != remoteMessage.data["username"]) {
+            Log.d(tag, "Can not response on Firebase message. Request from invalid user.")
+            return
+        }
 
-            if (/* Check if data needs to be processed by long running job */ true) {
-                // For long-running tasks (10 seconds or more) use Firebase Job Dispatcher.
-//                scheduleJob()
-            } else {
-                // Handle message within 10 seconds
-//                handleNow()
+        val commandRaw = remoteMessage.data["command"]
+        if (commandRaw == null || commandRaw.isBlank()){
+            Log.w(tag, "Incoming Firebase message has no command.")
+            return
+        }
+
+        try {
+            Log.d(tag, "Firebase command: $commandRaw")
+            val command = Commands.valueOf(commandRaw)
+            when (command) {
+                Commands.Status -> sendIntentStatus()
+                Commands.Activate -> switchUtil(remoteMessage.data["tool"], true)
+                Commands.Deactivate -> switchUtil(remoteMessage.data["tool"], false)
             }
-
+        } catch (e: IllegalArgumentException){
+            Log.w(tag, "Can not get data from incoming message")
         }
-
-        // Check if message contains a notification payload.
-        if (remoteMessage.notification != null) {
-            Log.d(tag, "Message Notification Body: ${remoteMessage.notification!!.body.toString()}")
-        }
-
-        // Also if you intend on generating your own notifications as a result of a received FCM
-        // message, here is where that should be initiated. See sendNotification method below.
-
-
-        sendIntentStatus()
     }
 
     override fun onNewToken(token: String?) {
@@ -80,6 +82,19 @@ class FirebaseService : FirebaseMessagingService() {
                 .edit()
                 .putString(context.getString(R.string.key_communication_network_firebase_token), token)
                 .apply()
+    }
+
+    private fun switchUtil(tool: String?, activate: Boolean){
+
+        if (tool == null || tool.isBlank()) throw IllegalArgumentException()
+        val utilEnum = UtilsEnum.valueOf(tool)
+
+        val intent = Intent(this, MainService::class.java)
+        intent.action = if(activate) MainService.Actions.ActionActivateUtil.name
+                        else MainService.Actions.ActionDeactivateUtil.name
+        intent.putExtra("util", utilEnum)
+        this.startService(intent)
+
     }
 
     private fun sendIntentStatus(){
