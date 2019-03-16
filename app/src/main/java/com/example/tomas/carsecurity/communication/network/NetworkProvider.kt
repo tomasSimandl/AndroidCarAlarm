@@ -26,8 +26,6 @@ import com.example.tomas.carsecurity.storage.entity.Message
 import com.example.tomas.carsecurity.storage.entity.Route
 import com.example.tomas.carsecurity.storage.entity.User
 import com.example.tomas.carsecurity.utils.UtilsEnum
-import com.google.firebase.iid.FirebaseInstanceId
-import com.google.firebase.provider.FirebaseInitProvider
 import com.google.gson.Gson
 import com.google.gson.JsonParser
 import com.google.gson.internal.LinkedTreeMap
@@ -155,9 +153,7 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
 
                 for (route in routesWithId) {
                     val locations = storage.locationService.getLocationsByLocalRouteId(route.uid)
-                    for (location in locations) {
-                        sendLocation(location)
-                    }
+                    sendLocations(locations)
 
                     // Can not remove last route because it is possibility that is still used
                     if (route.uid < maxRouteId && storage.locationService.getLocationsByLocalRouteId(route.uid).isEmpty()) {
@@ -166,9 +162,7 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
                 }
 
                 val locations = storage.locationService.getLocationsByLocalRouteId(null)
-                for (location in locations) {
-                    sendLocation(location)
-                }
+                sendLocations(locations)
 
                 isSynchronize.set(false)
             }
@@ -353,7 +347,7 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
             if (cache) {
                 Storage.getInstance(communicationContext.appContext).locationService.saveLocation(location)
             } else {
-                sendLocation(location)
+                sendLocations(listOf(location))
             }
         }
         workerThread.postTask(task)
@@ -597,51 +591,73 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
         }
     }
 
-    /**
-     * Can not run in main thread
-     */
-    private fun sendLocation(location: Location) {
+    private fun prepareLocation(locations: List<Location>): List<Location>{
 
-        var inDB = true
-        var update = false
-        var send = true
         val storage = Storage.getInstance(communicationContext.appContext)
+        // routes ids cache <localRouteId, remoteRouteId>
+        val routes = HashMap<Int, Long?>()
+        val locationsToSend = ArrayList<Location>()
 
-        if (canUseConnection()) {
+        for (location in locations){
 
-            if (location.localRouteId != null && location.routeId == null) {
-                val route = storage.routeService.getRoute(location.localRouteId!!)
-                if (route.serverRouteId == null) {
-                    Log.w(tag, "Can not send position because route was not created yet.")
-                    inDB = true
-                    send = false
-                } else {
-                    location.routeId = route.serverRouteId
-                    update = true
-                }
+            if(location.uid == 0){
+                // if location is not in db store it in db
+                storage.locationService.saveLocation(location)
             }
 
-            if (send) {
-                val result = locationController.createLocations(listOf(location))
-                Log.d(tag, "SendLocation response: ${result.code()}")
-                if (result.isSuccessful) {
-                    inDB = false
-                } else{
-                    if (logoutIfUnauthorized(result.code())) return // Logout and all data cleared nothing to do
-                    if (result.code() == HttpURLConnection.HTTP_CONFLICT) inDB = false // already in DB
+            if (location.localRouteId != null && location.routeId == null) {
+                // try set remote route id to location
+                val routeId: Long? = if (routes.containsKey(location.localRouteId!!)) {
+                    routes[location.localRouteId!!]
+                } else {
+                    val route = storage.routeService.getRoute(location.localRouteId!!)
+                    routes[location.localRouteId!!] = route.serverRouteId
+                    route.serverRouteId
                 }
+
+
+                if (routeId == null) {
+                    Log.w(tag, "Can not send position because route was not created yet.")
+                } else {
+                    location.routeId = routeId
+                    locationsToSend.add(location)
+                    storage.locationService.updateLocation(location)
+                }
+
+            } else if (location.routeId != null ){
+                locationsToSend.add(location)
             }
         }
 
-        if (inDB && location.uid != 0 && update) {
-            // should be in DB it is in DB but need to be updated
-            storage.locationService.updateLocation(location)
-        } else if (inDB && location.uid == 0) {
-            // should be in DB but location.uid == 0 => it is not in DB
-            storage.locationService.saveLocation(location)
-        } else if (!inDB && location.uid != 0) {
-            // should not be in DB but location.uid != 0 => it is in DB
-            storage.locationService.deleteLocations(listOf(location))
+        return locationsToSend
+    }
+
+    /**
+     * Can not run in main thread
+     */
+    private fun sendLocations(locations: List<Location>) {
+
+        var removePositions = false
+
+        if (canUseConnection()) {
+
+            val locationsToSend = prepareLocation(locations)
+
+            if (locationsToSend.isNotEmpty()) {
+                val result = locationController.createLocations(locationsToSend)
+                Log.d(tag, "SendLocations response: ${result.code()}")
+                if (result.isSuccessful) {
+                    removePositions = true
+                } else{
+                    if (logoutIfUnauthorized(result.code())) return // Logout and all data cleared nothing to do
+                    if (result.code() == HttpURLConnection.HTTP_CONFLICT) removePositions = true
+                }
+
+                if (removePositions){
+                    val storage = Storage.getInstance(communicationContext.appContext)
+                    storage.locationService.deleteLocations(locationsToSend)
+                }
+            }
         }
     }
 
