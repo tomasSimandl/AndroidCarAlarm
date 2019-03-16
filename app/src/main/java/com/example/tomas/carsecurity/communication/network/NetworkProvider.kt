@@ -293,8 +293,13 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
                     note = "Util ${utilsEnum.name} was turned off."
                 }
 
-                val user = Storage.getInstance(communicationContext.appContext).userService.getUser() // TODO ( if user is null delete message )
-                val event = EventCreate(messageType, actualTime, user?.carId ?: 0, note)
+                val user = Storage.getInstance(communicationContext.appContext).userService.getUser()
+                val carId = user?.carId ?: -1L
+                if (carId == -1L){
+                    Log.d(tag, "Util switch Network message will not be send. Car is not set.")
+                    return@Runnable
+                }
+                val event = EventCreate(messageType, actualTime, carId, note)
                 val eventStr = Gson().toJson(event)
                 val message = Message(communicatorHash = NetworkProvider.hashCode(), message = eventStr)
 
@@ -317,9 +322,14 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
             args.iterator().forEach { item -> note += "$item," }
             if (note.isNotEmpty()) note = note.dropLast(1)
 
-            val user = Storage.getInstance(communicationContext.appContext).userService.getUser() // TODO ( if user is null delete message )
+            val user = Storage.getInstance(communicationContext.appContext).userService.getUser()
+            val carId = user?.carId ?: -1L
+            if (carId == -1L){
+                Log.d(tag, "Event message will not be send. Car is not set.")
+                return@Runnable
+            }
 
-            val event = EventCreate(getEventType(messageType).toLong(), actualTime, user?.carId ?: 0, note)
+            val event = EventCreate(getEventType(messageType).toLong(), actualTime, carId, note)
             val eventStr = Gson().toJson(event)
             val message = Message(communicatorHash = NetworkProvider.hashCode(), message = eventStr)
 
