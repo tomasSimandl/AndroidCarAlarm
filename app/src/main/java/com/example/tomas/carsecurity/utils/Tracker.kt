@@ -18,6 +18,7 @@ import com.example.tomas.carsecurity.storage.entity.Location as DbLocation
 
 class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelper) : GeneralUtil(utilsHelper), SharedPreferences.OnSharedPreferenceChangeListener {
 
+    // TODO disable tracker when user logout
     private val tag = "utils.Tracker"
 
     private var lastLocation: Location? = null

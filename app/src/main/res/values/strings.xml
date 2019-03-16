@@ -200,7 +200,6 @@
     <string name="sms_info_power_save_mode_off">Power save mode: OFF </string>
 
     <!-- ============================= STRINGS OF NETWORK MESSAGES ============================= -->
-    <!--TODO rewrite string -->
     <string name="network_util_enabled">%s is enabled</string>
     <string name="network_util_disabled">%s is disabled</string>
     <string name="network_alarm">Alarm was triggered at: %s.</string>

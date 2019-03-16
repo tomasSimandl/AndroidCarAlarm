@@ -105,7 +105,7 @@ class MoveDetector(private val context: MyContext) : GeneralObservable(), Sensor
      * Method is automatically triggered when accuracy of accelerometer was changed.
      */
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        // TODO do something
+        Log.d(tag, "Accuracy of location sensor was changed.")
     }
 
     /**
