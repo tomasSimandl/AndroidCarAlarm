@@ -14,6 +14,8 @@ import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.WorkerThread
 import com.example.tomas.carsecurity.communication.ICommunicationProvider
 import com.example.tomas.carsecurity.communication.MessageType
+import com.example.tomas.carsecurity.communication.network.config.TokenAuthenticator
+import com.example.tomas.carsecurity.communication.network.config.TokenInterceptor
 import com.example.tomas.carsecurity.communication.network.controller.*
 import com.example.tomas.carsecurity.communication.network.dto.EventCreate
 import com.example.tomas.carsecurity.communication.network.dto.StatusCreate
@@ -243,7 +245,7 @@ class NetworkProvider (private val communicationContext: CommunicationContext) :
             carController = CarController(communicationContext.serverUrl, httpClient)
             statusController = StatusController(communicationContext.serverUrl, httpClient)
             firebaseController = FirebaseController(communicationContext.serverUrl, httpClient)
-            userController = UserController(communicationContext.authorizationServerUrl)
+            userController = UserController(communicationContext.authorizationServerUrl, communicationContext.appContext)
             true
         } catch (e: Exception) {
             Log.e(tag, "Can not initialize Controllers: $e")

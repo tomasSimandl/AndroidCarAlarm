@@ -7,8 +7,20 @@ import retrofit2.http.FormUrlEncoded
 import retrofit2.http.Header
 import retrofit2.http.POST
 
+/**
+ * Retrofit API for outgoing network requests related to User.
+ */
 interface UserAPI {
 
+    /**
+     * Prepare login request to server.
+     *
+     * @param credentials barer authorization
+     * @param grantType request grant type by OAuth 2.0
+     * @param username of user
+     * @param password of user
+     * @param scope when logged user request an access
+     */
     @FormUrlEncoded
     @POST(Mapping.LOGIN_URL)
     fun login(
@@ -19,6 +31,13 @@ interface UserAPI {
             @Field("scope") scope: String
     ): Call<Any>
 
+    /**
+     * Prepare refresh OAuth token request to server.
+     *
+     * @param credentials barer authorization
+     * @param grantType requested grant type by OAuth 2.0
+     * @param refreshToken OAuth 2.0 refresh token given by server at login
+     */
     @FormUrlEncoded
     @POST(Mapping.LOGIN_URL)
     fun refreshToken(

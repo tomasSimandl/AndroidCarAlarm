@@ -11,11 +11,23 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+/**
+ * Provide communication with servers status endpoint over Retrofit API.
+ *
+ * @param serverUrl url address of requested server
+ * @param httpClient configured client over which can communicate with server. Authorization to
+ *                  server should be already configured.
+ */
 class StatusController(serverUrl: String, httpClient: OkHttpClient) {
 
+    /** Logger tag. */
     private val tag = "StatusController"
+    /** Retrofit API for communication over Status endpoint. */
     private val statusAPI: StatusAPI
 
+    /**
+     * Initialization of Retrofit API for communication over Status endpoint.
+     */
     init {
         Log.d(tag, "Initializing")
         val retrofit = Retrofit.Builder()
@@ -27,6 +39,13 @@ class StatusController(serverUrl: String, httpClient: OkHttpClient) {
         statusAPI = retrofit.create(StatusAPI::class.java)
     }
 
+    /**
+     * Endpoint for sending status to server.
+     *
+     * @param status object which reperesent new status which will be sent to server.
+     * @return on success return status code 201, otherwise json with error message.
+     *          All responses are wrapped in Response object.
+     */
     fun createStatus(status: StatusCreate): Response<Void> {
         val method = statusAPI.createStatus(status)
 

@@ -8,11 +8,23 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+/**
+ * Provide communication with server Firebase endpoint over Retrofit API.
+ *
+ * @param serverUrl url address of requested server
+ * @param httpClient configured client over which can communicate with server. Authorization to
+ *                  server should be already configured.
+ */
 class FirebaseController(serverUrl: String, httpClient: OkHttpClient) {
 
+    /** Logger tag */
     private val tag = "FirebaseController"
+    /** Retrofit API for communication over Firebase endpoint */
     private val firebaseAPI: FirebaseAPI
 
+    /**
+     * Initialization of Retrofit API for communication over Firebase endpoint.
+     */
     init {
         Log.d(tag, "Initializing")
         val retrofit = Retrofit.Builder()
@@ -24,6 +36,14 @@ class FirebaseController(serverUrl: String, httpClient: OkHttpClient) {
         firebaseAPI = retrofit.create(FirebaseAPI::class.java)
     }
 
+    /**
+     * Endpoint for saving Firebase token of this device to server.
+     *
+     * @param carId car id which is associated with this device.
+     * @param token Firebase token of this device over which can server target this device.
+     * @return on success return status code 201, otherwise json with error message.
+     *          All responses are wrapped in Response object.
+     */
     fun saveToken(carId: Long, token: String): Response<Void> {
         val method = firebaseAPI.saveToken(carId, token)
 

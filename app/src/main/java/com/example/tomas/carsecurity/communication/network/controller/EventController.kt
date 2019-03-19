@@ -9,11 +9,23 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+/**
+ * Provide communication with server event endpoint over Retrofit API.
+ *
+ * @param serverUrl url address of requested server
+ * @param httpClient configured client over which can communicate with server. Authorization to
+ *                  server should be already configured.
+ */
 class EventController(serverUrl: String, httpClient: OkHttpClient) {
 
+    /** Logger tag */
     private val tag = "EventController"
+    /** Retrofit API for communication over Event endpoint */
     private val eventAPI: EventAPI
 
+    /**
+     * Initialization of Retrofit API for communication over Event endpoint
+     */
     init {
         Log.d(tag, "Initializing")
         val retrofit = Retrofit.Builder()
@@ -25,6 +37,13 @@ class EventController(serverUrl: String, httpClient: OkHttpClient) {
         eventAPI = retrofit.create(EventAPI::class.java)
     }
 
+    /**
+     * Endpoint for creating new event on server.
+     *
+     * @param event object which represents object to create.
+     * @return on success return status code 201, otherwise json with error message.
+     *          All responses are wrapped in Response object.
+     */
     fun createEvent(event: String): Response<Void> {
         val requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), event)
         val method = eventAPI.createEvent(requestBody)
