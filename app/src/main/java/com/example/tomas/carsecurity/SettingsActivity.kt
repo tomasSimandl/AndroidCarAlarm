@@ -3,6 +3,7 @@ package com.example.tomas.carsecurity
 import android.Manifest
 import android.annotation.TargetApi
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Build
@@ -204,10 +205,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
                     SmsProvider,
                     getString(R.string.pref_communication_sms_permission_message),
                     arrayOf(Manifest.permission.SEND_SMS, Manifest.permission.READ_SMS, Manifest.permission.RECEIVE_SMS))
-            setValueToPreference(
-                    R.string.key_communication_sms_is_allowed,
-                    resources.getBoolean(R.bool.default_communication_sms_is_allowed),
-                    SmsProvider)
+            setValueToSmsSwitch()
 
             // Network - preference check listener + set value
             registerPreferenceCheck(
@@ -215,11 +213,26 @@ class SettingsActivity : AppCompatPreferenceActivity() {
                     NetworkProvider,
                     getString(R.string.pref_communication_network_permission_message),
                     arrayOf(Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE))
-            setValueToPreference(
-                    R.string.key_communication_network_is_allowed,
-                    resources.getBoolean(R.bool.default_communication_network_is_allowed),
-                    NetworkProvider)
+            setValueToNetworkSwitch()
         }
+
+        override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
+            when (key) {
+                getString(R.string.key_communication_sms_phone_number) -> setValueToSmsSwitch()
+                getString(R.string.key_communication_network_url) -> setValueToNetworkSwitch()
+            }
+        }
+
+        private fun setValueToSmsSwitch() =
+                setValueToPreference(
+                    R.string.key_communication_sms_is_allowed,
+                    resources.getBoolean(R.bool.default_communication_sms_is_allowed),
+                    SmsProvider)
+
+        private fun setValueToNetworkSwitch() = setValueToPreference(
+                R.string.key_communication_network_is_allowed,
+                resources.getBoolean(R.bool.default_communication_network_is_allowed),
+                NetworkProvider)
     }
 
     /**
