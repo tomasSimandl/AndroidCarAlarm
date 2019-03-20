@@ -12,7 +12,7 @@ import android.support.v4.app.NotificationCompat
 import android.util.Log
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.tools.ToolsEnum
-import com.example.tomas.carsecurity.tools.UtilsManager
+import com.example.tomas.carsecurity.tools.ToolsManager
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -29,7 +29,7 @@ class MainService : Service(), Observer {
 
     private lateinit var workerThread: WorkerThread
     private lateinit var broadcastSender: BroadcastSender
-    private lateinit var utilsManager: UtilsManager
+    private lateinit var toolsManager: ToolsManager
     private lateinit var context: MyContext
 
     private var isForeground = false
@@ -37,7 +37,7 @@ class MainService : Service(), Observer {
 
 
     override fun update(observable: Observable, args: Any) {
-        if(observable is UtilsManager) {
+        if(observable is ToolsManager) {
             when(args){
                 is Pair<*, *> ->
                     if(args.first is ToolsEnum && args.second is Boolean){
@@ -69,9 +69,9 @@ class MainService : Service(), Observer {
         if (! ::context.isInitialized) context = MyContext(applicationContext, workerThread.looper)
         if (! ::broadcastSender.isInitialized) broadcastSender = BroadcastSender(applicationContext)
         // intent is null when application is restarted when system kill service
-        if (! ::utilsManager.isInitialized) {
-            utilsManager = UtilsManager(context, intent == null)
-            utilsManager.addObserver(this)
+        if (! ::toolsManager.isInitialized) {
+            toolsManager = ToolsManager(context, intent == null)
+            toolsManager.addObserver(this)
         }
 
         if(intent != null){
@@ -88,13 +88,13 @@ class MainService : Service(), Observer {
             tasksInQueue.decrementAndGet()
 
             when(intent.action) {
-                Actions.ActionSwitchUtil.name -> utilsManager.switchUtil(intent.getSerializableExtra("util") as ToolsEnum)
-                Actions.ActionActivateUtil.name -> utilsManager.activateUtil(intent.getSerializableExtra("util") as ToolsEnum)
-                Actions.ActionDeactivateUtil.name -> utilsManager.deactivateUtil(intent.getSerializableExtra("util") as ToolsEnum)
-                Actions.ActionStatusUI.name -> broadcastSender.informUI(utilsManager.getEnabledUtils())
+                Actions.ActionSwitchUtil.name -> toolsManager.switchUtil(intent.getSerializableExtra("util") as ToolsEnum)
+                Actions.ActionActivateUtil.name -> toolsManager.activateUtil(intent.getSerializableExtra("util") as ToolsEnum)
+                Actions.ActionDeactivateUtil.name -> toolsManager.deactivateUtil(intent.getSerializableExtra("util") as ToolsEnum)
+                Actions.ActionStatusUI.name -> broadcastSender.informUI(toolsManager.getEnabledUtils())
                 Actions.ActionForegroundStop.name -> stopService(true)
                 Actions.ActionTryStop.name -> if(!isForeground) stopSelf()
-                Actions.ActionStatus.name -> utilsManager.sendStatus(intent.getIntExtra("communicator", -1))
+                Actions.ActionStatus.name -> toolsManager.sendStatus(intent.getIntExtra("communicator", -1))
                 else -> Log.w(tag, "onStartCommand - invalid action")
             }
         }
@@ -108,18 +108,18 @@ class MainService : Service(), Observer {
         Log.d(tag, "Destroying")
         if (::context.isInitialized) context.destroy()
         if (::workerThread.isInitialized) workerThread.quit()
-        if (::utilsManager.isInitialized) utilsManager.destroy()
+        if (::toolsManager.isInitialized) toolsManager.destroy()
     }
 
     private fun tryStopForeground() {
-        if (tasksInQueue.get() == 0 && !utilsManager.isAnyUtilEnabled()) {
+        if (tasksInQueue.get() == 0 && !toolsManager.isAnyUtilEnabled()) {
             stopForeground(true)
             isForeground = false
         }
     }
 
     private fun stopService(safely: Boolean){
-        if(!safely || (tasksInQueue.get() == 0 && !utilsManager.isAnyUtilEnabled())){
+        if(!safely || (tasksInQueue.get() == 0 && !toolsManager.isAnyUtilEnabled())){
             stopForeground(true)
             isForeground = false
         }

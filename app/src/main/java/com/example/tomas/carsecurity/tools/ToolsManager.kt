@@ -8,9 +8,9 @@ import com.example.tomas.carsecurity.sensors.BatteryUtil
 import java.util.*
 import kotlin.collections.HashMap
 
-class UtilsManager(private val context: MyContext, reload: Boolean): Observer, Observable() {
+class ToolsManager(private val context: MyContext, reload: Boolean): Observer, Observable() {
 
-    private val tag = "tools.UtilsManager"
+    private val tag = "tools.ToolsManager"
 
     private val utilsHelper = ToolsHelper(context)
 
