@@ -2,27 +2,27 @@
 
     <header
         android:icon="@drawable/ic_security_black_24dp"
-        android:fragment="com.example.tomas.carsecurity.activities.SettingsActivity$AlarmPreferenceFragment"
+        android:fragment="com.example.tomas.carsecurity.fragments.preferences.AlarmPreferenceFragment"
         android:title="@string/pref_header_alarm" />
 
     <header
         android:icon="@drawable/ic_gps_fixed_black_24dp"
-        android:fragment="com.example.tomas.carsecurity.activities.SettingsActivity$TrackerPreferenceFragment"
+        android:fragment="com.example.tomas.carsecurity.fragments.preferences.TrackerPreferenceFragment"
         android:title="@string/pref_header_tracker" />
 
     <header
         android:icon="@drawable/ic_extension_black_24dp"
-        android:fragment="com.example.tomas.carsecurity.activities.SettingsActivity$SensorsPreferenceFragment"
+        android:fragment="com.example.tomas.carsecurity.fragments.preferences.SensorsPreferenceFragment"
         android:title="@string/pref_header_sensors" />
 
     <header
         android:icon="@drawable/ic_swap_horiz_black_24dp"
-        android:fragment="com.example.tomas.carsecurity.activities.SettingsActivity$CommunicationPreferenceFragment"
+        android:fragment="com.example.tomas.carsecurity.fragments.preferences.CommunicationPreferenceFragment"
         android:title="@string/pref_header_communication" />
 
     <header
         android:icon="@drawable/ic_battery_alert_green_24dp"
-        android:fragment="com.example.tomas.carsecurity.activities.SettingsActivity$PowerSaveModePreferenceFragment"
+        android:fragment="com.example.tomas.carsecurity.fragments.preferences.PowerSaveModePreferenceFragment"
         android:title="@string/pref_header_power_save_mode" />
 
 </preference-headers>
