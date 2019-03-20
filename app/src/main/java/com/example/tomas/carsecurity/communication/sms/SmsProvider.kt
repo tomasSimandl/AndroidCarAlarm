@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.support.v4.content.ContextCompat
+import android.telephony.PhoneNumberUtils
 import android.telephony.SmsManager
 import android.util.Log
 import com.example.tomas.carsecurity.CheckCodes
@@ -45,7 +46,7 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
                     || ContextCompat.checkSelfPermission(context, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED
                     || ContextCompat.checkSelfPermission(context, Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED) {
                 CheckCodes.permissionDenied
-            } else if (CommunicationContext(context).phoneNumber.isBlank()) {
+            } else if (!PhoneNumberUtils.isGlobalPhoneNumber(CommunicationContext(context).phoneNumber)) {
                 CheckCodes.invalidParameters
             } else if (!CommunicationContext(context).isProviderAllowed(SmsProvider::class.java.name)) {
                 CheckCodes.notAllowed
@@ -111,8 +112,8 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
             return false
         }
 
-        if (Strings.isEmptyOrWhitespace(communicationContext.phoneNumber) || Strings.isEmptyOrWhitespace(text)) {
-            Log.d(tag, "Empty phone number or text of message is empty")
+        if (!PhoneNumberUtils.isGlobalPhoneNumber(communicationContext.phoneNumber) || Strings.isEmptyOrWhitespace(text)) {
+            Log.d(tag, "Invalid phone number or text of message is empty")
             return false
         }
 
