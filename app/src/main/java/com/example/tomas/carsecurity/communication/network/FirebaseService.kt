@@ -6,7 +6,7 @@ import android.util.Log
 import com.example.tomas.carsecurity.MainService
 import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.storage.Storage
-import com.example.tomas.carsecurity.utils.UtilsEnum
+import com.example.tomas.carsecurity.tools.UtilsEnum
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage

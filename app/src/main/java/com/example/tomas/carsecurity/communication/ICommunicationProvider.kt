@@ -1,7 +1,7 @@
 package com.example.tomas.carsecurity.communication
 
 import com.example.tomas.carsecurity.storage.entity.Location
-import com.example.tomas.carsecurity.utils.UtilsEnum
+import com.example.tomas.carsecurity.tools.UtilsEnum
 
 /**
  * Represent API of all communication providers.

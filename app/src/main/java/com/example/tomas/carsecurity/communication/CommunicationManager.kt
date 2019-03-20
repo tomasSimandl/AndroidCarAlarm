@@ -8,7 +8,7 @@ import com.example.tomas.carsecurity.communication.network.NetworkProvider
 import com.example.tomas.carsecurity.communication.sms.SmsProvider
 import com.example.tomas.carsecurity.context.CommunicationContext
 import com.example.tomas.carsecurity.storage.entity.Location
-import com.example.tomas.carsecurity.utils.UtilsEnum
+import com.example.tomas.carsecurity.tools.UtilsEnum
 
 /**
  * Class manage all communication providers which are supported by application.

@@ -11,7 +11,7 @@ import android.util.Log
 import com.example.tomas.carsecurity.MainService
 import com.example.tomas.carsecurity.communication.MessageType
 import com.example.tomas.carsecurity.context.CommunicationContext
-import com.example.tomas.carsecurity.utils.UtilsEnum
+import com.example.tomas.carsecurity.tools.UtilsEnum
 import com.google.android.gms.common.util.Strings
 
 /**

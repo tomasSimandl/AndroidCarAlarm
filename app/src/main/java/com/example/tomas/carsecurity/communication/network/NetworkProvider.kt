@@ -28,7 +28,7 @@ import com.example.tomas.carsecurity.storage.entity.Location
 import com.example.tomas.carsecurity.storage.entity.Message
 import com.example.tomas.carsecurity.storage.entity.Route
 import com.example.tomas.carsecurity.storage.entity.User
-import com.example.tomas.carsecurity.utils.UtilsEnum
+import com.example.tomas.carsecurity.tools.UtilsEnum
 import com.google.gson.Gson
 import com.google.gson.JsonParser
 import com.google.gson.internal.LinkedTreeMap

@@ -17,7 +17,7 @@ import android.widget.ProgressBar
 import com.example.tomas.carsecurity.MainService
 import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.context.UtilsContext
-import com.example.tomas.carsecurity.utils.UtilsEnum
+import com.example.tomas.carsecurity.tools.UtilsEnum
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.content_main.view.*
 

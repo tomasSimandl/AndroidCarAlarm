@@ -5,7 +5,7 @@ import android.content.Intent
 import android.support.v4.content.LocalBroadcastManager
 import android.util.Log
 import com.example.tomas.carsecurity.fragments.MainFragment
-import com.example.tomas.carsecurity.utils.UtilsEnum
+import com.example.tomas.carsecurity.tools.UtilsEnum
 
 class BroadcastSender(private val context: Context) {
 

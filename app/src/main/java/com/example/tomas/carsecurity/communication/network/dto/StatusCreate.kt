@@ -1,6 +1,6 @@
 package com.example.tomas.carsecurity.communication.network.dto
 
-import com.example.tomas.carsecurity.utils.UtilsEnum
+import com.example.tomas.carsecurity.tools.UtilsEnum
 import com.google.gson.annotations.SerializedName
 
 /**

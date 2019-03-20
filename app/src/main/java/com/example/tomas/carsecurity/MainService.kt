@@ -11,8 +11,8 @@ import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
 import android.util.Log
 import com.example.tomas.carsecurity.context.MyContext
-import com.example.tomas.carsecurity.utils.UtilsEnum
-import com.example.tomas.carsecurity.utils.UtilsManager
+import com.example.tomas.carsecurity.tools.UtilsEnum
+import com.example.tomas.carsecurity.tools.UtilsManager
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 

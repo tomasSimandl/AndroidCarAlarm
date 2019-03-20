@@ -1,4 +1,4 @@
-package com.example.tomas.carsecurity.utils
+package com.example.tomas.carsecurity.tools
 
 import android.content.SharedPreferences
 import android.util.Log

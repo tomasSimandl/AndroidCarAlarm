@@ -1,4 +1,4 @@
-package com.example.tomas.carsecurity.utils
+package com.example.tomas.carsecurity.tools
 
 import com.example.tomas.carsecurity.context.MyContext
 

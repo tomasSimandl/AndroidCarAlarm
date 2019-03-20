@@ -14,7 +14,7 @@ import com.example.tomas.carsecurity.communication.ICommunicationProvider
 import com.example.tomas.carsecurity.communication.MessageType
 import com.example.tomas.carsecurity.context.CommunicationContext
 import com.example.tomas.carsecurity.storage.entity.Location
-import com.example.tomas.carsecurity.utils.UtilsEnum
+import com.example.tomas.carsecurity.tools.UtilsEnum
 import com.google.android.gms.common.util.Strings
 import java.util.*
 

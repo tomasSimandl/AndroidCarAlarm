@@ -17,8 +17,8 @@ import com.example.tomas.carsecurity.preferenceFragments.MyPreferenceFragment
 import com.example.tomas.carsecurity.sensors.LocationProvider
 import com.example.tomas.carsecurity.sensors.MoveDetector
 import com.example.tomas.carsecurity.sensors.SoundDetector
-import com.example.tomas.carsecurity.utils.Alarm
-import com.example.tomas.carsecurity.utils.Tracker
+import com.example.tomas.carsecurity.tools.Alarm
+import com.example.tomas.carsecurity.tools.Tracker
 
 
 class SettingsActivity : AppCompatPreferenceActivity() {
