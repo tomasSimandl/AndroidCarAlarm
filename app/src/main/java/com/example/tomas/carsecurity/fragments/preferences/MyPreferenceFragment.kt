@@ -1,4 +1,4 @@
-package com.example.tomas.carsecurity.preferenceFragments
+package com.example.tomas.carsecurity.fragments.preferences
 
 import android.Manifest
 import android.content.Context

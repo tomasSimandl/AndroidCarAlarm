@@ -13,7 +13,7 @@ import android.support.v14.preference.PreferenceFragment
 import android.view.MenuItem
 import com.example.tomas.carsecurity.communication.network.NetworkProvider
 import com.example.tomas.carsecurity.communication.sms.SmsProvider
-import com.example.tomas.carsecurity.preferenceFragments.MyPreferenceFragment
+import com.example.tomas.carsecurity.fragments.preferences.MyPreferenceFragment
 import com.example.tomas.carsecurity.sensors.LocationProvider
 import com.example.tomas.carsecurity.sensors.MoveDetector
 import com.example.tomas.carsecurity.sensors.SoundDetector
