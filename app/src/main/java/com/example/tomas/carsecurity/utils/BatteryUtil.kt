@@ -1,4 +1,4 @@
-package com.example.tomas.carsecurity.sensors
+package com.example.tomas.carsecurity.utils
 
 import android.content.Context
 import android.content.Intent

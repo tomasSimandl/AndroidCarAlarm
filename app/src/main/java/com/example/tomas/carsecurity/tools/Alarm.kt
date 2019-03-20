@@ -13,6 +13,7 @@ import com.example.tomas.carsecurity.context.UtilsContext
 import com.example.tomas.carsecurity.sensors.LocationProvider
 import com.example.tomas.carsecurity.sensors.MoveDetector
 import com.example.tomas.carsecurity.sensors.SoundDetector
+import com.example.tomas.carsecurity.utils.CallProvider
 import com.example.tomas.carsecurity.storage.entity.Location as DBLocation
 import java.util.*
 import com.example.tomas.carsecurity.ObservableEnum as OEnum

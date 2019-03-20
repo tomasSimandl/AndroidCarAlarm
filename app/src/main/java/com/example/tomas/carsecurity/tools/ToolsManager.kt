@@ -4,7 +4,7 @@ import android.util.Log
 import com.example.tomas.carsecurity.MainService
 import com.example.tomas.carsecurity.WorkerThread
 import com.example.tomas.carsecurity.context.MyContext
-import com.example.tomas.carsecurity.sensors.BatteryUtil
+import com.example.tomas.carsecurity.utils.BatteryUtil
 import java.util.*
 import kotlin.collections.HashMap
 

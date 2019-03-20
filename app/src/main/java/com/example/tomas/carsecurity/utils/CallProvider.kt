@@ -1,4 +1,4 @@
-package com.example.tomas.carsecurity
+package com.example.tomas.carsecurity.utils
 
 import android.Manifest
 import android.content.Context
@@ -7,6 +7,8 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.support.v4.content.ContextCompat
 import android.util.Log
+import com.example.tomas.carsecurity.CheckCodes
+import com.example.tomas.carsecurity.CheckObjByte
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.context.UtilsContext
 
