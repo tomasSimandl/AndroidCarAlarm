@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.util.Log
-import com.example.tomas.carsecurity.GeneralObservable
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.utils.BatteryUtil
 

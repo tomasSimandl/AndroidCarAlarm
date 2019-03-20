@@ -10,7 +10,6 @@ import android.os.Handler
 import android.util.Log
 import com.example.tomas.carsecurity.CheckCodes
 import com.example.tomas.carsecurity.CheckObjByte
-import com.example.tomas.carsecurity.GeneralObservable
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.context.SensorContext
 

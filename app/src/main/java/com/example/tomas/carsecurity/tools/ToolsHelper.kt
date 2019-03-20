@@ -2,7 +2,7 @@ package com.example.tomas.carsecurity.tools
 
 import android.content.SharedPreferences
 import android.util.Log
-import com.example.tomas.carsecurity.GeneralObservable
+import com.example.tomas.carsecurity.sensors.GeneralObservable
 import com.example.tomas.carsecurity.ObservableEnum
 import com.example.tomas.carsecurity.WorkerThread
 import com.example.tomas.carsecurity.communication.CommunicationManager

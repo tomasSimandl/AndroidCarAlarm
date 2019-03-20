@@ -1,4 +1,4 @@
-package com.example.tomas.carsecurity
+package com.example.tomas.carsecurity.sensors
 
 import java.util.*
 

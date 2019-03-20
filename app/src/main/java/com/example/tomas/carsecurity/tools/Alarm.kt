@@ -10,6 +10,7 @@ import com.example.tomas.carsecurity.communication.MessageType
 import com.example.tomas.carsecurity.communication.sms.SmsProvider
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.context.UtilsContext
+import com.example.tomas.carsecurity.sensors.GeneralObservable
 import com.example.tomas.carsecurity.sensors.LocationProvider
 import com.example.tomas.carsecurity.sensors.MoveDetector
 import com.example.tomas.carsecurity.sensors.SoundDetector

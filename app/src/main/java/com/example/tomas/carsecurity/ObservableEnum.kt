@@ -3,6 +3,7 @@ package com.example.tomas.carsecurity
 import android.content.Context
 import android.util.Log
 import com.example.tomas.carsecurity.context.MyContext
+import com.example.tomas.carsecurity.sensors.GeneralObservable
 
 enum class ObservableEnum {
     MoveDetector, SoundDetector, LocationProvider, BatteryDetector;
