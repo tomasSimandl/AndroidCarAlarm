@@ -17,7 +17,7 @@ import com.example.tomas.carsecurity.storage.entity.Location as DBLocation
 import java.util.*
 import com.example.tomas.carsecurity.ObservableEnum as OEnum
 
-class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper) : GeneralTool(utilsHelper), SharedPreferences.OnSharedPreferenceChangeListener  {
+class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper) : GeneralTool(toolsHelper), SharedPreferences.OnSharedPreferenceChangeListener  {
 
     private val tag = "tools.Alarm"
 
@@ -68,7 +68,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
                     }
             }
         }
-        utilsHelper.runOnUtilThread(task)
+        toolsHelper.runOnUtilThread(task)
     }
 
     override fun action(observable: Observable, args: Any?) {
@@ -84,7 +84,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
         Log.d(tag, """Location update: $location""")
         this.lastLocation = location
         if (context.utilsContext.sendLocationInterval > context.utilsContext.disableSendLocationInterval) {
-            utilsHelper.unregisterObservable(OEnum.LocationProvider, this)
+            toolsHelper.unregisterObservable(OEnum.LocationProvider, this)
         }
     }
 
@@ -112,7 +112,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
 
             val timerTask = object : TimerTask() {
                 override fun run() {
-                    utilsHelper.runOnUtilThread( // runOnUtilThread because timer run in own thread.
+                    toolsHelper.runOnUtilThread( // runOnUtilThread because timer run in own thread.
                             Runnable {
                                 isAlarm = true
                                 onAlarm()
@@ -128,7 +128,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
         Log.d(tag, "Alarm was activated.")
 
         // send alarm to communication providers
-        utilsHelper.communicationManager.sendEvent(MessageType.Alarm, Calendar.getInstance().time.toString())
+        toolsHelper.communicationManager.sendEvent(MessageType.Alarm, Calendar.getInstance().time.toString())
 
         if(context.utilsContext.isCallAllow) {
             CallProvider(context).createCall()
@@ -144,7 +144,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
 
         // start send location loop
         if (context.communicationContext.isMessageAllowed(SmsProvider::class.java.name, MessageType.AlarmLocation.name, "send")) {
-            utilsHelper.registerObserver(OEnum.LocationProvider, this)
+            toolsHelper.registerObserver(OEnum.LocationProvider, this)
             scheduleSmsTimer()
         }
     }
@@ -158,10 +158,10 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
         return object: TimerTask() {
             override fun run() {
                 if (lastLocation != null) {
-                    utilsHelper.communicationManager.sendLocation(DBLocation(lastLocation!!, null), true)
+                    toolsHelper.communicationManager.sendLocation(DBLocation(lastLocation!!, null), true)
                 }
 
-                utilsHelper.registerObserver(OEnum.LocationProvider, this@Alarm) // on location update can unregister listener
+                toolsHelper.registerObserver(OEnum.LocationProvider, this@Alarm) // on location update can unregister listener
             }
         }
     }
@@ -177,8 +177,8 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
             sendSmsTimer = null
             timer = null
 
-            utilsHelper.registerObserver(OEnum.MoveDetector, this)
-            utilsHelper.registerObserver(OEnum.SoundDetector, this)
+            toolsHelper.registerObserver(OEnum.MoveDetector, this)
+            toolsHelper.registerObserver(OEnum.SoundDetector, this)
 
             setChanged()
             notifyObservers(true)
@@ -186,7 +186,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
             Log.d(tag, "Alarm system is enabled")
             context.utilsContext.registerOnPreferenceChanged(this)
 
-            utilsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, true)
+            toolsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, true)
         }
 
     }
@@ -200,7 +200,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
             mediaPlayer = null
             isEnabled = false
 
-            utilsHelper.unregisterAllObservables(this)
+            toolsHelper.unregisterAllObservables(this)
             timer?.cancel()
             sendSmsTimer?.cancel()
             lastLocation = null
@@ -213,7 +213,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
 
             Log.d(tag, "Alarm system disabled")
 
-            utilsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, false)
+            toolsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, false)
         }
 
     }

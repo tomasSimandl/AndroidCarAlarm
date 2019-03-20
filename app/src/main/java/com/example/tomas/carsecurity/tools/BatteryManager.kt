@@ -9,7 +9,7 @@ import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.sensors.BatteryDetector
 import java.util.*
 
-class BatteryManager (private val context: MyContext, private val utilsHelper: UtilsHelper): GeneralTool(utilsHelper), SharedPreferences.OnSharedPreferenceChangeListener {
+class BatteryManager (private val context: MyContext, private val toolsHelper: ToolsHelper): GeneralTool(toolsHelper), SharedPreferences.OnSharedPreferenceChangeListener {
 
     override val thisUtilEnum: ToolsEnum = ToolsEnum.Battery
     private val tag = "BatteryManager"
@@ -26,7 +26,7 @@ class BatteryManager (private val context: MyContext, private val utilsHelper: U
                 context.appContext.getString(R.string.key_tool_battery_mode_is_allowed) -> changePowerSaveMode()
             }
         }
-        utilsHelper.runOnUtilThread(task)
+        toolsHelper.runOnUtilThread(task)
     }
 
     override fun action(observable: Observable, args: Any?) {
@@ -49,7 +49,7 @@ class BatteryManager (private val context: MyContext, private val utilsHelper: U
 
         if (percent <= context.utilsContext.batteryCriticalLevel) {
             if (!shouldBeSaveMode) {
-                utilsHelper.communicationManager.sendEvent(MessageType.BatteryWarn, percent.toString(), "% of battery")
+                toolsHelper.communicationManager.sendEvent(MessageType.BatteryWarn, percent.toString(), "% of battery")
                 shouldBeSaveMode = true
                 changePowerSaveMode()
             }
@@ -71,12 +71,12 @@ class BatteryManager (private val context: MyContext, private val utilsHelper: U
 
     private fun batteryConnected(percent: Int, charging: Boolean) {
         Log.d(tag, """Battery power is connected. Capacity: $percent Charging: $charging""")
-        utilsHelper.communicationManager.sendEvent(MessageType.PowerConnected, percent.toString(), "% of battery")
+        toolsHelper.communicationManager.sendEvent(MessageType.PowerConnected, percent.toString(), "% of battery")
     }
 
     private fun batteryDisconnected(percent: Int, charging: Boolean) {
         Log.d(tag, """Battery power is disconnected. Capacity: $percent Charging: $charging""")
-        utilsHelper.communicationManager.sendEvent(MessageType.PowerDisconnected, percent.toString(), "% of battery")
+        toolsHelper.communicationManager.sendEvent(MessageType.PowerDisconnected, percent.toString(), "% of battery")
     }
 
 
@@ -84,7 +84,7 @@ class BatteryManager (private val context: MyContext, private val utilsHelper: U
         if (!enabled) {
 
             enabled = true
-            utilsHelper.registerObserver(ObservableEnum.BatteryDetector, this)
+            toolsHelper.registerObserver(ObservableEnum.BatteryDetector, this)
             context.utilsContext.registerOnPreferenceChanged(this)
         }
     }
@@ -94,7 +94,7 @@ class BatteryManager (private val context: MyContext, private val utilsHelper: U
 
             enabled = false
             context.utilsContext.unregisterOnPreferenceChanged(this)
-            utilsHelper.unregisterAllObservables(this)
+            toolsHelper.unregisterAllObservables(this)
         }
     }
 

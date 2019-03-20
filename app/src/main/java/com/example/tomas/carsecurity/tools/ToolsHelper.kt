@@ -8,8 +8,8 @@ import com.example.tomas.carsecurity.WorkerThread
 import com.example.tomas.carsecurity.communication.CommunicationManager
 import com.example.tomas.carsecurity.context.MyContext
 
-class UtilsHelper (private val context: MyContext): SharedPreferences.OnSharedPreferenceChangeListener {
-    private val tag = "tools.UtilsHelper"
+class ToolsHelper (private val context: MyContext): SharedPreferences.OnSharedPreferenceChangeListener {
+    private val tag = "tools.ToolsHelper"
 
     private val observablesMap: MutableMap<ObservableEnum, GeneralObservable> = HashMap()
     private val utilsMap: MutableMap<GeneralTool, MutableSet<ObservableEnum>> = HashMap()

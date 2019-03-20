@@ -12,7 +12,7 @@ class UtilsManager(private val context: MyContext, reload: Boolean): Observer, O
 
     private val tag = "tools.UtilsManager"
 
-    private val utilsHelper = UtilsHelper(context)
+    private val utilsHelper = ToolsHelper(context)
 
     private val toolsMap: MutableMap<ToolsEnum, GeneralTool> = HashMap()
 

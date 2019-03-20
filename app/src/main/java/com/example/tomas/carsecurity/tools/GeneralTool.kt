@@ -3,7 +3,7 @@ package com.example.tomas.carsecurity.tools
 import java.util.*
 
 
-abstract class GeneralTool(private val utilsHelper: UtilsHelper) : Observer, Observable() {
+abstract class GeneralTool(private val toolsHelper: ToolsHelper) : Observer, Observable() {
 
     abstract val thisUtilEnum: ToolsEnum
 
@@ -15,7 +15,7 @@ abstract class GeneralTool(private val utilsHelper: UtilsHelper) : Observer, Obs
             val task = Runnable {
                 this.action(observable, args)
             }
-            utilsHelper.runOnUtilThread(task)
+            toolsHelper.runOnUtilThread(task)
         }
     }
 

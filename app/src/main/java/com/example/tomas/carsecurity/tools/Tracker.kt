@@ -16,7 +16,7 @@ import com.example.tomas.carsecurity.storage.entity.Route
 import java.util.*
 import com.example.tomas.carsecurity.storage.entity.Location as DbLocation
 
-class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelper) : GeneralTool(utilsHelper), SharedPreferences.OnSharedPreferenceChangeListener {
+class Tracker(private val context: MyContext, private val toolsHelper: ToolsHelper) : GeneralTool(toolsHelper), SharedPreferences.OnSharedPreferenceChangeListener {
 
     // TODO disable tracker when user logout
     private val tag = "tools.Tracker"
@@ -60,7 +60,7 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
                 // todo restart timer
             }
         }
-        utilsHelper.runOnUtilThread(task)
+        toolsHelper.runOnUtilThread(task)
     }
 
     override fun action(observable: Observable, args: Any?) {
@@ -78,14 +78,14 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
         if(lastLocation == null) {
             lastLocation = location
             val dbLocation = DbLocation(location, actualRoute?.uid)
-            utilsHelper.communicationManager.sendLocation(dbLocation, isAlarm = false, cache = true)
+            toolsHelper.communicationManager.sendLocation(dbLocation, isAlarm = false, cache = true)
             return
         }
 
         if (location.distanceTo(lastLocation) > context.utilsContext.ignoreDistance) {
             val dbLocation = DbLocation(location, actualRoute?.uid, location.distanceTo(lastLocation))
             lastLocation = location
-            utilsHelper.communicationManager.sendLocation(dbLocation, isAlarm = false, cache = true)
+            toolsHelper.communicationManager.sendLocation(dbLocation, isAlarm = false, cache = true)
 
         } else if (location.time - lastLocation!!.time > context.utilsContext.timeout) {
             Log.d(tag, "Time not moving time interval passed. Tracker will be stopped.")
@@ -108,7 +108,7 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
 
             isEnabled = true
             lastLocation = null
-            utilsHelper.registerObserver(ObservableEnum.LocationProvider, this)
+            toolsHelper.registerObserver(ObservableEnum.LocationProvider, this)
 
             actualRoute = Route(carId = user.carId)
             actualRoute!!.uid = storage.routeService.saveRoute(actualRoute!!).toInt()
@@ -119,7 +119,7 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
             context.utilsContext.registerOnPreferenceChanged(this)
 
             Log.d(tag, "Tracker system is enabled.")
-            utilsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, true)
+            toolsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, true)
         }
 
     }
@@ -128,7 +128,7 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
         assert(Thread.currentThread().name == "UtilsThread")
         if(isEnabled) {
             isEnabled = false
-            utilsHelper.unregisterAllObservables(this)
+            toolsHelper.unregisterAllObservables(this)
 
             context.utilsContext.unregisterOnPreferenceChanged(this)
 
@@ -141,7 +141,7 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
             notifyObservers(false)
 
             Log.d(tag, "Tracker system is disabled.")
-            utilsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, false)
+            toolsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, false)
         }
 
     }
