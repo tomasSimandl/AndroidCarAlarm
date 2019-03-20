@@ -8,7 +8,7 @@ import com.example.tomas.carsecurity.utils.BatteryUtil
 import java.util.*
 import kotlin.collections.HashMap
 
-class ToolsManager(private val context: MyContext, reload: Boolean): Observer, Observable() {
+class ToolsManager(private val context: MyContext): Observer, Observable() {
 
     private val tag = "tools.ToolsManager"
 
@@ -21,10 +21,6 @@ class ToolsManager(private val context: MyContext, reload: Boolean): Observer, O
 
     init {
         activateDefaultUtils()
-
-        if (reload) {
-            // TODO use reload for loading from ServiceState
-        }
     }
 
     private fun activateDefaultUtils(){

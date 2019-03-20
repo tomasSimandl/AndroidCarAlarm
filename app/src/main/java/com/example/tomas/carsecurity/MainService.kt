@@ -72,7 +72,7 @@ class MainService : Service(), Observer {
         if (! ::UIBroadcastsSender.isInitialized) UIBroadcastsSender = UIBroadcastsSender(applicationContext)
         // intent is null when application is restarted when system kill service
         if (! ::toolsManager.isInitialized) {
-            toolsManager = ToolsManager(context, intent == null)
+            toolsManager = ToolsManager(context)
             toolsManager.addObserver(this)
         }
 
