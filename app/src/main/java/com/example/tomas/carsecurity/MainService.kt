@@ -11,7 +11,7 @@ import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
 import android.util.Log
 import com.example.tomas.carsecurity.context.MyContext
-import com.example.tomas.carsecurity.tools.UtilsEnum
+import com.example.tomas.carsecurity.tools.ToolsEnum
 import com.example.tomas.carsecurity.tools.UtilsManager
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
@@ -40,8 +40,8 @@ class MainService : Service(), Observer {
         if(observable is UtilsManager) {
             when(args){
                 is Pair<*, *> ->
-                    if(args.first is UtilsEnum && args.second is Boolean){
-                        broadcastSender.informUI(args.first as UtilsEnum, args.second as Boolean)
+                    if(args.first is ToolsEnum && args.second is Boolean){
+                        broadcastSender.informUI(args.first as ToolsEnum, args.second as Boolean)
                         if(args.second == true){
                             startForeground()
                         } else {
@@ -88,9 +88,9 @@ class MainService : Service(), Observer {
             tasksInQueue.decrementAndGet()
 
             when(intent.action) {
-                Actions.ActionSwitchUtil.name -> utilsManager.switchUtil(intent.getSerializableExtra("util") as UtilsEnum)
-                Actions.ActionActivateUtil.name -> utilsManager.activateUtil(intent.getSerializableExtra("util") as UtilsEnum)
-                Actions.ActionDeactivateUtil.name -> utilsManager.deactivateUtil(intent.getSerializableExtra("util") as UtilsEnum)
+                Actions.ActionSwitchUtil.name -> utilsManager.switchUtil(intent.getSerializableExtra("util") as ToolsEnum)
+                Actions.ActionActivateUtil.name -> utilsManager.activateUtil(intent.getSerializableExtra("util") as ToolsEnum)
+                Actions.ActionDeactivateUtil.name -> utilsManager.deactivateUtil(intent.getSerializableExtra("util") as ToolsEnum)
                 Actions.ActionStatusUI.name -> broadcastSender.informUI(utilsManager.getEnabledUtils())
                 Actions.ActionForegroundStop.name -> stopService(true)
                 Actions.ActionTryStop.name -> if(!isForeground) stopSelf()

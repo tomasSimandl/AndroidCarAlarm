@@ -4,7 +4,7 @@ import android.content.Context
 import com.example.tomas.carsecurity.R
 
 /**
- * Context contains data which are which are connected with utils package class and they are stored
+ * Context contains data which are which are connected with tools package class and they are stored
  * in shared preferences or in resources.
  */
 class UtilsContext(appContext: Context): BaseContext(appContext) {

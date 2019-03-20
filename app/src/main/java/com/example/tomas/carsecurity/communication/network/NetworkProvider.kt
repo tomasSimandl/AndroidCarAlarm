@@ -28,7 +28,7 @@ import com.example.tomas.carsecurity.storage.entity.Location
 import com.example.tomas.carsecurity.storage.entity.Message
 import com.example.tomas.carsecurity.storage.entity.Route
 import com.example.tomas.carsecurity.storage.entity.User
-import com.example.tomas.carsecurity.tools.UtilsEnum
+import com.example.tomas.carsecurity.tools.ToolsEnum
 import com.google.gson.Gson
 import com.google.gson.JsonParser
 import com.google.gson.internal.LinkedTreeMap
@@ -346,26 +346,26 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
      *
      * Request is send in workerThread thread.
      *
-     * @param utilsEnum enum which identifies util which was changed
+     * @param toolsEnum enum which identifies util which was changed
      * @param enabled indicates if util was activate - true or deactivate - false
      */
-    override fun sendUtilSwitch(utilsEnum: UtilsEnum, enabled: Boolean): Boolean {
+    override fun sendUtilSwitch(toolsEnum: ToolsEnum, enabled: Boolean): Boolean {
         val actualTime = Calendar.getInstance().timeInMillis
 
         val task = Runnable {
             if (!canSendMessage()) return@Runnable
 
             if (communicationContext.isMessageAllowed(this.javaClass.name, "Tool_State_Changed_send")) {
-                Log.d(tag, "Sending util switch network message of util: ${utilsEnum.name}.")
+                Log.d(tag, "Sending util switch network message of util: ${toolsEnum.name}.")
 
                 val messageType: Long
                 val note: String
                 if (enabled) {
                     messageType = communicationContext.appContext.resources.getInteger(R.integer.event_util_switch_on).toLong()
-                    note = "Util ${utilsEnum.name} was turned on."
+                    note = "Util ${toolsEnum.name} was turned on."
                 } else {
                     messageType = communicationContext.appContext.resources.getInteger(R.integer.event_util_switch_off).toLong()
-                    note = "Util ${utilsEnum.name} was turned off."
+                    note = "Util ${toolsEnum.name} was turned off."
                 }
 
                 val user = Storage.getInstance(communicationContext.appContext).userService.getUser()
@@ -380,7 +380,7 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
 
                 sendEvent(message)
             } else {
-                Log.d(tag, "Util switch Network message is not allowed for util ${utilsEnum.name}.")
+                Log.d(tag, "Util switch Network message is not allowed for util ${toolsEnum.name}.")
             }
         }
         workerThread.postTask(task)
@@ -481,10 +481,10 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
      * @param battery capacity level, 0 - empty, 1 - fully charged.
      * @param isCharging indicates if device is connected to external power source
      * @param powerSaveMode indicates if device is in power save mode
-     * @param utils list of activated utils
+     * @param tools list of activated tools
      * @return true
      */
-    override fun sendStatus(battery: Float, isCharging: Boolean, powerSaveMode: Boolean, utils: Map<UtilsEnum, Boolean>): Boolean {
+    override fun sendStatus(battery: Float, isCharging: Boolean, powerSaveMode: Boolean, tools: Map<ToolsEnum, Boolean>): Boolean {
         val longTime = Date().time
 
         val task = Runnable {
@@ -500,7 +500,7 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
                 return@Runnable
             }
 
-            val status = StatusCreate(battery, isCharging, powerSaveMode, utils, longTime, user.carId)
+            val status = StatusCreate(battery, isCharging, powerSaveMode, tools, longTime, user.carId)
             val result = statusController.createStatus(status)
             if (result.isSuccessful) {
                 Log.d(tag, "Status message was send successfully")

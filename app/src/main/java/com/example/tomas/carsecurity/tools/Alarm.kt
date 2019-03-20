@@ -19,7 +19,7 @@ import com.example.tomas.carsecurity.ObservableEnum as OEnum
 
 class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper) : GeneralTool(utilsHelper), SharedPreferences.OnSharedPreferenceChangeListener  {
 
-    private val tag = "utils.Alarm"
+    private val tag = "tools.Alarm"
 
     private var isEnabled = false
     private var isAlarm = false
@@ -31,7 +31,7 @@ class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper
     private var sendSmsTimer: Timer? = null
     private var mediaPlayer: MediaPlayer? = null
 
-    override val thisUtilEnum: UtilsEnum = UtilsEnum.Alarm
+    override val thisUtilEnum: ToolsEnum = ToolsEnum.Alarm
 
     companion object Check: CheckObjString {
         override fun check(context: Context, skipAllow: Boolean): String {

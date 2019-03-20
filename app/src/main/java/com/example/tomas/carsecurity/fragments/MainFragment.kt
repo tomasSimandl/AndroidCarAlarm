@@ -17,7 +17,7 @@ import android.widget.ProgressBar
 import com.example.tomas.carsecurity.MainService
 import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.context.UtilsContext
-import com.example.tomas.carsecurity.tools.UtilsEnum
+import com.example.tomas.carsecurity.tools.ToolsEnum
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.content_main.view.*
 
@@ -50,11 +50,11 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
 
         view.actionAlarm.setOnClickListener {
             canShowProgress = true
-            sendIntentSwitchUtil(UtilsEnum.Alarm)
+            sendIntentSwitchUtil(ToolsEnum.Alarm)
         }
 
         view.actionTracker.setOnClickListener {
-            sendIntentSwitchUtil(UtilsEnum.Tracker)
+            sendIntentSwitchUtil(ToolsEnum.Tracker)
         }
 
         return view
@@ -105,7 +105,7 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
                 val utilEnabled = intent.getBooleanExtra(BroadcastKeys.KeyUtilActivated.name, false)
 
                 when (utilName) {
-                    UtilsEnum.Alarm.name -> {
+                    ToolsEnum.Alarm.name -> {
                         if (utilEnabled && canShowProgress) {
                             runProgress(context)
                         } else {
@@ -113,7 +113,7 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
                         }
                         changeColor(actionAlarm, utilEnabled)
                     }
-                    UtilsEnum.Tracker.name -> changeColor(actionTracker, utilEnabled)
+                    ToolsEnum.Tracker.name -> changeColor(actionTracker, utilEnabled)
                 }
             }
         }
@@ -182,7 +182,7 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
         applicationContext.startService(intent)
     }
 
-    private fun sendIntentSwitchUtil(util: UtilsEnum) {
+    private fun sendIntentSwitchUtil(util: ToolsEnum) {
         val applicationContext: Context = requireContext()
 
         val intent = Intent(applicationContext, MainService::class.java)

@@ -10,14 +10,14 @@ import kotlin.collections.HashMap
 
 class UtilsManager(private val context: MyContext, reload: Boolean): Observer, Observable() {
 
-    private val tag = "utils.UtilsManager"
+    private val tag = "tools.UtilsManager"
 
     private val utilsHelper = UtilsHelper(context)
 
-    private val utilsMap: MutableMap<UtilsEnum, GeneralTool> = HashMap()
+    private val toolsMap: MutableMap<ToolsEnum, GeneralTool> = HashMap()
 
     // Utils which are activate in all application runtime even if service is not foreground
-    private val defaultUtils = arrayOf(UtilsEnum.Battery)
+    private val defaultUtils = arrayOf(ToolsEnum.Battery)
 
     init {
         activateDefaultUtils()
@@ -36,12 +36,12 @@ class UtilsManager(private val context: MyContext, reload: Boolean): Observer, O
     fun destroy(){
         Log.d(tag, "Destroy")
 
-        for(util in utilsMap.values){
+        for(util in toolsMap.values){
             util.deleteObservers()
             if(util.isEnabled()) util.disable(true)
         }
 
-        // destroy after all utils are disabled
+        // destroy after all tools are disabled
         utilsHelper.destroy()
     }
 
@@ -76,7 +76,7 @@ class UtilsManager(private val context: MyContext, reload: Boolean): Observer, O
         }
     }
 
-    fun switchUtil(utilEnum: UtilsEnum) {
+    fun switchUtil(utilEnum: ToolsEnum) {
         // tasks are running sequentially in one thread
         val tool: GeneralTool = getGenericUtil(utilEnum)
 
@@ -87,45 +87,45 @@ class UtilsManager(private val context: MyContext, reload: Boolean): Observer, O
         }
     }
 
-    fun activateUtil(utilEnum: UtilsEnum) {
+    fun activateUtil(utilEnum: ToolsEnum) {
         getGenericUtil(utilEnum).enable()
     }
 
-    fun deactivateUtil(utilEnum: UtilsEnum) {
+    fun deactivateUtil(utilEnum: ToolsEnum) {
         getGenericUtil(utilEnum).disable()
     }
 
     fun isAnyUtilEnabled(): Boolean{
-        for (util in utilsMap.values){
+        for (util in toolsMap.values){
             if(!defaultUtils.contains(util.thisUtilEnum) && util.isEnabled()) return true
         }
         return false
     }
 
-    fun getEnabledUtils() : Set<UtilsEnum> {
-        val enabledUtils: MutableSet<UtilsEnum> = HashSet()
+    fun getEnabledUtils() : Set<ToolsEnum> {
+        val enabledUtils: MutableSet<ToolsEnum> = HashSet()
 
-        for (util in utilsMap.keys){
-            if(utilsMap[util]?.isEnabled() == true) {
+        for (util in toolsMap.keys){
+            if(toolsMap[util]?.isEnabled() == true) {
                 enabledUtils.add(util)
             }
         }
         return enabledUtils
     }
 
-    private fun getGenericUtil(utilEnum: UtilsEnum): GeneralTool{
-        if(utilsMap[utilEnum] == null){
-            utilsMap[utilEnum] = utilEnum.getInstance(context, utilsHelper)
-            utilsMap[utilEnum]!!.addObserver(this)
+    private fun getGenericUtil(utilEnum: ToolsEnum): GeneralTool{
+        if(toolsMap[utilEnum] == null){
+            toolsMap[utilEnum] = utilEnum.getInstance(context, utilsHelper)
+            toolsMap[utilEnum]!!.addObserver(this)
         }
 
-        return utilsMap[utilEnum] as GeneralTool
+        return toolsMap[utilEnum] as GeneralTool
     }
 
     fun sendStatus(communicatorHash: Int){
         Log.d(tag, "Command to send status to communicator with hash: $communicatorHash")
-        val utils: MutableMap<UtilsEnum, Boolean> = HashMap()
-        utilsMap.forEach { utils[it.key] = it.value.isEnabled() }
+        val tools: MutableMap<ToolsEnum, Boolean> = HashMap()
+        toolsMap.forEach { tools[it.key] = it.value.isEnabled() }
 
         val powerSaveMode = context.utilsContext.isPowerSaveMode
 
@@ -134,6 +134,6 @@ class UtilsManager(private val context: MyContext, reload: Boolean): Observer, O
         val batteryPct = batteryStatus.first
 
         utilsHelper.communicationManager.sendStatus(
-                communicatorHash, batteryPct, isCharging, powerSaveMode, utils)
+                communicatorHash, batteryPct, isCharging, powerSaveMode, tools)
     }
 }

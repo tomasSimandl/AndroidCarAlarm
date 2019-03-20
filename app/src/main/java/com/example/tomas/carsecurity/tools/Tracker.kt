@@ -19,7 +19,7 @@ import com.example.tomas.carsecurity.storage.entity.Location as DbLocation
 class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelper) : GeneralTool(utilsHelper), SharedPreferences.OnSharedPreferenceChangeListener {
 
     // TODO disable tracker when user logout
-    private val tag = "utils.Tracker"
+    private val tag = "tools.Tracker"
 
     private var lastLocation: Location? = null
     private var isEnabled = false
@@ -27,7 +27,7 @@ class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelp
 
     //private lateinit var timer: Timer
 
-    override val thisUtilEnum: UtilsEnum = UtilsEnum.Tracker
+    override val thisUtilEnum: ToolsEnum = ToolsEnum.Tracker
 
     companion object Check : CheckObjString {
         override fun check(context: Context, skipAllow: Boolean): String {

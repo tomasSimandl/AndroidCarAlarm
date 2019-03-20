@@ -8,7 +8,7 @@ import com.example.tomas.carsecurity.communication.network.NetworkProvider
 import com.example.tomas.carsecurity.communication.sms.SmsProvider
 import com.example.tomas.carsecurity.context.CommunicationContext
 import com.example.tomas.carsecurity.storage.entity.Location
-import com.example.tomas.carsecurity.tools.UtilsEnum
+import com.example.tomas.carsecurity.tools.ToolsEnum
 
 /**
  * Class manage all communication providers which are supported by application.
@@ -147,7 +147,7 @@ class CommunicationManager private constructor(private val communicationContext:
      * @param util enum which identify which util was changed
      * @param enabled true - util activation, false util - deactivation
      */
-    fun sendUtilSwitch(util: UtilsEnum, enabled: Boolean) {
+    fun sendUtilSwitch(util: ToolsEnum, enabled: Boolean) {
         for (provider in activeCommunicators) {
             provider.sendUtilSwitch(util, enabled)
         }
@@ -186,12 +186,12 @@ class CommunicationManager private constructor(private val communicationContext:
      * @param battery battery cappacity level
      * @param isCharging identification if device is connected to external source of power
      * @param powerSaveMode identification if device is in power save mode
-     * @param utils list of active communication providers
+     * @param tools list of active communication providers
      */
-    fun sendStatus(communicatorHash: Int, battery: Float, isCharging: Boolean, powerSaveMode: Boolean, utils: Map<UtilsEnum, Boolean>) {
+    fun sendStatus(communicatorHash: Int, battery: Float, isCharging: Boolean, powerSaveMode: Boolean, tools: Map<ToolsEnum, Boolean>) {
         for (provider in activeCommunicators) {
             if (provider::class.java.hashCode() == communicatorHash) {
-                provider.sendStatus(battery, isCharging, powerSaveMode, utils)
+                provider.sendStatus(battery, isCharging, powerSaveMode, tools)
                 break
             }
         }

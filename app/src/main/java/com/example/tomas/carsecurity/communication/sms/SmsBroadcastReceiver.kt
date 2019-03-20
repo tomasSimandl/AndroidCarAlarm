@@ -11,7 +11,7 @@ import android.util.Log
 import com.example.tomas.carsecurity.MainService
 import com.example.tomas.carsecurity.communication.MessageType
 import com.example.tomas.carsecurity.context.CommunicationContext
-import com.example.tomas.carsecurity.tools.UtilsEnum
+import com.example.tomas.carsecurity.tools.ToolsEnum
 import com.google.android.gms.common.util.Strings
 
 /**
@@ -114,7 +114,7 @@ class SmsBroadcastReceiver(private val communicationContext: CommunicationContex
             return
         }
         try {
-            val util = UtilsEnum.valueOf(smsBody)
+            val util = ToolsEnum.valueOf(smsBody)
 
             val intent = Intent(communicationContext.appContext, MainService::class.java)
             intent.action = if (activate) MainService.Actions.ActionActivateUtil.name else MainService.Actions.ActionDeactivateUtil.name

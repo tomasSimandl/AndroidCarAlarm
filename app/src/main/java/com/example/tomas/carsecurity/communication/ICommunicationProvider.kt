@@ -1,7 +1,7 @@
 package com.example.tomas.carsecurity.communication
 
 import com.example.tomas.carsecurity.storage.entity.Location
-import com.example.tomas.carsecurity.tools.UtilsEnum
+import com.example.tomas.carsecurity.tools.ToolsEnum
 
 /**
  * Represent API of all communication providers.
@@ -38,11 +38,11 @@ interface ICommunicationProvider {
     /**
      * Send information message thant util was activate or deactivate
      *
-     * @param utilsEnum identification which utils status was changed
+     * @param toolsEnum identification which tools status was changed
      * @param enabled true - util was activated, false - util was deactivated
      * @return true on success, false otherwise
      */
-    fun sendUtilSwitch(utilsEnum: UtilsEnum, enabled: Boolean): Boolean
+    fun sendUtilSwitch(toolsEnum: ToolsEnum, enabled: Boolean): Boolean
 
     /**
      * Send message with input location.
@@ -59,10 +59,10 @@ interface ICommunicationProvider {
      *
      * @param battery percentage status of battery level
      * @param isCharging indication if device is connected to external source of power
-     * @param utils list of activated utils
+     * @param tools list of activated tools
      * @return true on success, false otherwise
      */
-    fun sendStatus(battery: Float, isCharging: Boolean, powerSaveMode: Boolean, utils: Map<UtilsEnum, Boolean>): Boolean
+    fun sendStatus(battery: Float, isCharging: Boolean, powerSaveMode: Boolean, tools: Map<ToolsEnum, Boolean>): Boolean
 
     /**
      * Send create route request.

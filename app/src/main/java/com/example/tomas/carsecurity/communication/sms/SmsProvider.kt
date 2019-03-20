@@ -14,7 +14,7 @@ import com.example.tomas.carsecurity.communication.ICommunicationProvider
 import com.example.tomas.carsecurity.communication.MessageType
 import com.example.tomas.carsecurity.context.CommunicationContext
 import com.example.tomas.carsecurity.storage.entity.Location
-import com.example.tomas.carsecurity.tools.UtilsEnum
+import com.example.tomas.carsecurity.tools.ToolsEnum
 import com.google.android.gms.common.util.Strings
 import java.util.*
 
@@ -131,25 +131,25 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
     /**
      * Send information about activation or deactivation of util. Text of SMS is from resources.
      *
-     * @param utilsEnum enum which identifies util which was changed
+     * @param toolsEnum enum which identifies util which was changed
      * @param enabled indicates if util was activate - true or deactivate - false
      * @return true when message was successfully send to SmsManager, false otherwise.
      */
-    override fun sendUtilSwitch(utilsEnum: UtilsEnum, enabled: Boolean): Boolean {
+    override fun sendUtilSwitch(toolsEnum: ToolsEnum, enabled: Boolean): Boolean {
 
-        return if (communicationContext.isMessageAllowed(this.javaClass.name, utilsEnum.name, MessageType.UtilSwitch.name, "send")) {
-            Log.d(tag, "Sending util switch SMS message of util: ${utilsEnum.name}.")
+        return if (communicationContext.isMessageAllowed(this.javaClass.name, toolsEnum.name, MessageType.UtilSwitch.name, "send")) {
+            Log.d(tag, "Sending util switch SMS message of util: ${toolsEnum.name}.")
 
             val text = if (enabled)
-                communicationContext.appContext.getString(R.string.sms_util_enabled, utilsEnum.name)
+                communicationContext.appContext.getString(R.string.sms_util_enabled, toolsEnum.name)
             else
-                communicationContext.appContext.getString(R.string.sms_util_disabled, utilsEnum.name)
+                communicationContext.appContext.getString(R.string.sms_util_disabled, toolsEnum.name)
 
-            Log.d(tag, """Sending sms util switch message of util: ${utilsEnum.name}""")
+            Log.d(tag, """Sending sms util switch message of util: ${toolsEnum.name}""")
             sendMessage(text)
 
         } else {
-            Log.d(tag, "Util switch SMS message is not allowed for util ${utilsEnum.name}.")
+            Log.d(tag, "Util switch SMS message is not allowed for util ${toolsEnum.name}.")
             false
         }
     }
@@ -260,10 +260,10 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
      *
      * @param battery percentage status of battery level
      * @param isCharging indication if device is connected to external source of power
-     * @param utils list of activated utils
+     * @param tools list of activated tools
      * @return true when message was successfully send to SmsManager, false otherwise.
      */
-    override fun sendStatus(battery: Float, isCharging: Boolean, powerSaveMode: Boolean, utils: Map<UtilsEnum, Boolean>): Boolean {
+    override fun sendStatus(battery: Float, isCharging: Boolean, powerSaveMode: Boolean, tools: Map<ToolsEnum, Boolean>): Boolean {
         return if (communicationContext.isMessageAllowed(this.javaClass.name, MessageType.Status.name, "recv")) {
             Log.d(tag, "Sending status SMS message.")
 
@@ -278,9 +278,9 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
             val powerSaveModeInfo = communicationContext.appContext.getString(powerSaveModeResource)
 
             var utilsInfo = ""
-            for (util in utils.keys) {
+            for (util in tools.keys) {
 
-                val utilResource = if (utils[util] == true) R.string.sms_util_enabled else R.string.sms_util_disabled
+                val utilResource = if (tools[util] == true) R.string.sms_util_enabled else R.string.sms_util_disabled
                 utilsInfo += "\n"
                 utilsInfo += communicationContext.appContext.getString(utilResource, util.name)
             }

@@ -1,6 +1,6 @@
 package com.example.tomas.carsecurity.communication.network.dto
 
-import com.example.tomas.carsecurity.tools.UtilsEnum
+import com.example.tomas.carsecurity.tools.ToolsEnum
 import com.google.gson.annotations.SerializedName
 
 /**
@@ -19,8 +19,8 @@ data class StatusCreate(
         @SerializedName("is_power_save_mode")
         val powerSaveMode: Boolean,
 
-        /** Map with activated utils */
-        val utils: Map<UtilsEnum, Boolean>,
+        /** Map with activated tools */
+        val tools: Map<ToolsEnum, Boolean>,
 
         /** Time when status was created in milliseconds since epoch. */
         val time: Long,
