@@ -14,14 +14,21 @@ import com.example.tomas.carsecurity.context.CommunicationContext
 import com.example.tomas.carsecurity.utils.UtilsEnum
 import com.google.android.gms.common.util.Strings
 
-
+/**
+ * Class is used for receiving incoming SMS messages.
+ */
 class SmsBroadcastReceiver(private val communicationContext: CommunicationContext) : BroadcastReceiver() {
 
+    /** Logger tag */
     private val tag = "SmsBroadcastReceiver"
 
+    /**
+     * Method is automatically called when new SMS message was received. Phone number of sender and text of SMS is
+     * extract from input intent and forwarded to processMessage method.
+     */
     override fun onReceive(context: Context, intent: Intent) {
 
-        if (intent.action == Telephony.Sms.Intents.SMS_RECEIVED_ACTION){
+        if (intent.action == Telephony.Sms.Intents.SMS_RECEIVED_ACTION) {
 
             var smsSender = ""
             var smsBody = ""
@@ -50,21 +57,27 @@ class SmsBroadcastReceiver(private val communicationContext: CommunicationContex
                             message = SmsMessage.createFromPdu(pdus[i] as ByteArray) // Deprecated in API 23 (i use it only on api < 19)
 
                             smsBody += message.messageBody
-                            smsSender = message.originatingAddress
+                            smsSender = message.originatingAddress ?: ""
                         }
                     }
                 }
             }
-
             processMessage(smsSender.trim(), smsBody.trim())
         }
     }
 
-    private fun processMessage(smsSender: String, smsBody: String){
+    /**
+     * Method decode incoming message and decide which command should be perform.
+     * When phone number is not the phone number given by user in setting message is ignored.
+     *
+     * @param smsSender phone number of sender
+     * @param smsBody whole body of sms
+     */
+    private fun processMessage(smsSender: String, smsBody: String) {
 
         val phoneNumber = communicationContext.phoneNumber
 
-        if(Strings.isEmptyOrWhitespace(phoneNumber)){
+        if (Strings.isEmptyOrWhitespace(phoneNumber)) {
             Log.w(tag, "Contact phone number is not set.")
             return
         }
@@ -78,18 +91,25 @@ class SmsBroadcastReceiver(private val communicationContext: CommunicationContex
             smsBody.startsWith("activate", true) -> switchUtil(smsBody.drop(8).trim(), true)
             smsBody.startsWith("deactivate", true) -> switchUtil(smsBody.drop(10).trim(), false)
             smsBody == "info" ->
-                if(communicationContext.isMessageAllowed(SmsProvider::class.java.name, MessageType.Status.name, "recv")) {
+                if (communicationContext.isMessageAllowed(SmsProvider::class.java.name, MessageType.Status.name, "recv")) {
                     sendIntentStatus()
                 }
             smsBody == "position" ->
-                if(communicationContext.isMessageAllowed(SmsProvider::class.java.name, MessageType.Location.name, "recv")) {
+                if (communicationContext.isMessageAllowed(SmsProvider::class.java.name, MessageType.Location.name, "recv")) {
                     sendIntent(MainService.Actions.ActionGetPosition.name)
                 }
         }
     }
 
-    private fun switchUtil(smsBody: String, activate: Boolean){
-        if(!communicationContext.isMessageAllowed(SmsProvider::class.java.name, MessageType.UtilSwitch.name, "recv")){
+    /**
+     * Method check if incoming command is allowed and than send intent to MainService with activate or deactivate
+     * util command.
+     *
+     * @param smsBody sms message body which should include only util name
+     * @param activate specify if it is activation command - true or deactivation command - false
+     */
+    private fun switchUtil(smsBody: String, activate: Boolean) {
+        if (!communicationContext.isMessageAllowed(SmsProvider::class.java.name, MessageType.UtilSwitch.name, "recv")) {
             Log.d(tag, "Util switch command is not allowed.")
             return
         }
@@ -97,25 +117,34 @@ class SmsBroadcastReceiver(private val communicationContext: CommunicationContex
             val util = UtilsEnum.valueOf(smsBody)
 
             val intent = Intent(communicationContext.appContext, MainService::class.java)
-            intent.action = if(activate) MainService.Actions.ActionActivateUtil.name else MainService.Actions.ActionDeactivateUtil.name
+            intent.action = if (activate) MainService.Actions.ActionActivateUtil.name else MainService.Actions.ActionDeactivateUtil.name
             intent.putExtra("util", util)
             communicationContext.appContext.startService(intent)
 
             Log.d(tag, "Intent was sent.")
 
-        } catch (e: IllegalArgumentException){
+        } catch (e: IllegalArgumentException) {
             Log.d(tag, "Incoming command had invalid util name")
         }
     }
 
-    private fun sendIntentStatus(){
+    /**
+     * Method send intent to MainService with Send status action. To message is appended information defines which
+     * provider should respond.
+     */
+    private fun sendIntentStatus() {
         val intent = Intent(communicationContext.appContext, MainService::class.java)
         intent.action = MainService.Actions.ActionStatus.name
         intent.putExtra("communicator", SmsProvider::class.hashCode())
         communicationContext.appContext.startService(intent)
     }
 
-    private fun sendIntent(action: String){
+    /**
+     * Method send intent to MainService with given action.
+     *
+     * @param action string which represents action which should be perform.
+     */
+    private fun sendIntent(action: String) {
         val intent = Intent(communicationContext.appContext, MainService::class.java)
         intent.action = action
         communicationContext.appContext.startService(intent)

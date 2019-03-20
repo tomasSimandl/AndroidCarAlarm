@@ -18,13 +18,25 @@ import com.example.tomas.carsecurity.utils.UtilsEnum
 import com.google.android.gms.common.util.Strings
 import java.util.*
 
+/**
+ * Class is used for sending SMS messages to phone number which is taken from SharedPreferences.
+ */
 class SmsProvider(private val communicationContext: CommunicationContext) : ICommunicationProvider {
 
+    /** Logger tag */
     private val tag = "SmsProvider"
+
+    /** Sms Manager used for sending SMS messages */
     private lateinit var smsManager: SmsManager
+    /** Sms Broadcast receiver used for receiving and handling SMS messages */
     private lateinit var smsBroadcastReceiver: SmsBroadcastReceiver
+
+    /** Indication if provider is successfully initialized. */
     private var isInitialize = false
 
+    /**
+     * Object is used for check if SmsProvider can be initialized.
+     */
     companion object Check : CheckObjByte {
         override fun check(context: Context): Byte {
             return if (!context.packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
@@ -43,7 +55,13 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
         }
     }
 
+    /**
+     * Method for initialization of SmsProvider. On success initialization method return true.
+     *
+     * @return true on success, false otherwise
+     */
     override fun initialize(): Boolean {
+        Log.d(tag, "init")
         if (check(communicationContext.appContext) == CheckCodes.success) {
 
             smsManager = SmsManager.getDefault()
@@ -52,24 +70,41 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
             val intentFilter = IntentFilter("android.provider.Telephony.SMS_RECEIVED")
             communicationContext.appContext.registerReceiver(smsBroadcastReceiver, intentFilter)
             isInitialize = true
+            Log.d(tag, "init success")
             return true
         }
+        Log.d(tag, "init failed")
         isInitialize = false
         return false
     }
 
+    /**
+     * Method destroy all initialized data in SmsProvider. This method should be called before this instance is destroy.
+     */
     override fun destroy() {
+        Log.d(tag, "destroy")
         if (isInitialize) {
             communicationContext.appContext.unregisterReceiver(smsBroadcastReceiver)
             isInitialize = false
         }
     }
 
+    /**
+     * Return if SmsProvider is successfully initialized.
+     *
+     * @return if SmsProvider is successfully initialized.
+     */
     override fun isInitialize(): Boolean {
         return isInitialize
     }
 
-
+    /**
+     * Method send input text over SMS to phone number specified in SharedPreferences. If message is too long, it is
+     * divided to smaller messages.
+     *
+     * @param text of SMS which should be send
+     * @return true when message was successfully send to SmsManager, false otherwise.
+     */
     private fun sendMessage(text: String): Boolean {
         if (check(communicationContext.appContext) != CheckCodes.success) {
             Log.d(tag, "Can not send SMS. Permission not granted or unsupported hardware")
@@ -93,6 +128,13 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
         return true
     }
 
+    /**
+     * Send information about activation or deactivation of util. Text of SMS is from resources.
+     *
+     * @param utilsEnum enum which identifies util which was changed
+     * @param enabled indicates if util was activate - true or deactivate - false
+     * @return true when message was successfully send to SmsManager, false otherwise.
+     */
     override fun sendUtilSwitch(utilsEnum: UtilsEnum, enabled: Boolean): Boolean {
 
         return if (communicationContext.isMessageAllowed(this.javaClass.name, utilsEnum.name, MessageType.UtilSwitch.name, "send")) {
@@ -112,6 +154,13 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
         }
     }
 
+    /**
+     * Send event given by message type and message arguments to server.
+     *
+     * @param messageType is type of event message which should be send over SMS.
+     * @param args are arguments to message which is taken from resources.
+     * @return true when message was successfully send to SmsManager, false otherwise.
+     */
     override fun sendEvent(messageType: MessageType, vararg args: String): Boolean {
         return when (messageType) {
             MessageType.Alarm -> sendAlarm()
@@ -125,6 +174,11 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
         }
     }
 
+    /**
+     * Send SMS indicates that alarm was activated.
+     *
+     * @return true when message was successfully send to SmsManager, false otherwise.
+     */
     private fun sendAlarm(): Boolean{
         return if(communicationContext.isMessageAllowed(this.javaClass.name, MessageType.Alarm.name, "send")){
             Log.d(tag, "Sending alarm sms message.")
@@ -135,6 +189,12 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
         }
     }
 
+    /**
+     * Send SMS with actual battery capacity.
+     *
+     * @param capacity percents of actual battery capacity
+     * @return true when message was successfully send to SmsManager, false otherwise.
+     */
     private fun sendBatteryWarn(capacity: String): Boolean {
         return if(communicationContext.isMessageAllowed(this.javaClass.name, MessageType.BatteryWarn.name, "send")){
             Log.d(tag, "Sending battery warning sms message.")
@@ -145,6 +205,12 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
         }
     }
 
+    /**
+     * Send information message that device was connected to external source of power.
+     *
+     * @param capacity percents of actual battery capacity
+     * @return true when message was successfully send to SmsManager, false otherwise.
+     */
     private fun sendPowerConnected(capacity: String): Boolean {
         return if(communicationContext.isMessageAllowed(this.javaClass.name, MessageType.PowerConnected.name, "send")){
             Log.d(tag, "Sending power connected warning sms message.")
@@ -155,6 +221,12 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
         }
     }
 
+    /**
+     * Send information message that device was disconnected from external source of power.
+     *
+     * @param capacity percents of actual battery capacity
+     * @return true when message was successfully send to SmsManager, false otherwise.
+     */
     private fun sendPowerDisconnected(capacity: String): Boolean {
         return if(communicationContext.isMessageAllowed(this.javaClass.name, MessageType.PowerDisconnected.name, "send")){
             Log.d(tag, "Sending power disconnected warning sms message.")
@@ -165,6 +237,14 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
         }
     }
 
+    /**
+     * Send SMS with input location.
+     *
+     * @param location actual device location which will be sent
+     * @param isAlarm indication if device is in alarm mode
+     * @param cache not used in this implementation
+     * @return true when message was successfully send to SmsManager, false otherwise.
+     */
     override fun sendLocation(location: Location, isAlarm: Boolean, cache: Boolean): Boolean {
         return if (communicationContext.isMessageAllowed(this.javaClass.name, if (isAlarm) MessageType.AlarmLocation.name else MessageType.Location.name, "send")) {
             Log.d(tag, "Sending SMS message with actual device location.")
@@ -175,6 +255,14 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
         }
     }
 
+    /**
+     * Send actual status with SMS composed from input parameters.
+     *
+     * @param battery percentage status of battery level
+     * @param isCharging indication if device is connected to external source of power
+     * @param utils list of activated utils
+     * @return true when message was successfully send to SmsManager, false otherwise.
+     */
     override fun sendStatus(battery: Float, isCharging: Boolean, powerSaveMode: Boolean, utils: Map<UtilsEnum, Boolean>): Boolean {
         return if (communicationContext.isMessageAllowed(this.javaClass.name, MessageType.Status.name, "recv")) {
             Log.d(tag, "Sending status SMS message.")
@@ -204,6 +292,9 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
         }
     }
 
+    /**
+     * Method is not implemented in this version of implementation.
+     */
     override fun sendRoute(localRouteId: Int): Boolean {
         // Method is not implemented
         return true
