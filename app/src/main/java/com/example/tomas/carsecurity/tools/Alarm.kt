@@ -17,7 +17,7 @@ import com.example.tomas.carsecurity.storage.entity.Location as DBLocation
 import java.util.*
 import com.example.tomas.carsecurity.ObservableEnum as OEnum
 
-class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper) : GeneralUtil(utilsHelper), SharedPreferences.OnSharedPreferenceChangeListener  {
+class Alarm(private val context: MyContext, private val utilsHelper: UtilsHelper) : GeneralTool(utilsHelper), SharedPreferences.OnSharedPreferenceChangeListener  {
 
     private val tag = "utils.Alarm"
 

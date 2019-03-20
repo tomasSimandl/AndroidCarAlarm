@@ -16,7 +16,7 @@ import com.example.tomas.carsecurity.storage.entity.Route
 import java.util.*
 import com.example.tomas.carsecurity.storage.entity.Location as DbLocation
 
-class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelper) : GeneralUtil(utilsHelper), SharedPreferences.OnSharedPreferenceChangeListener {
+class Tracker(private val context: MyContext, private val utilsHelper: UtilsHelper) : GeneralTool(utilsHelper), SharedPreferences.OnSharedPreferenceChangeListener {
 
     // TODO disable tracker when user logout
     private val tag = "utils.Tracker"

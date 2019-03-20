@@ -14,7 +14,7 @@ class UtilsManager(private val context: MyContext, reload: Boolean): Observer, O
 
     private val utilsHelper = UtilsHelper(context)
 
-    private val utilsMap: MutableMap<UtilsEnum, GeneralUtil> = HashMap()
+    private val utilsMap: MutableMap<UtilsEnum, GeneralTool> = HashMap()
 
     // Utils which are activate in all application runtime even if service is not foreground
     private val defaultUtils = arrayOf(UtilsEnum.Battery)
@@ -50,7 +50,7 @@ class UtilsManager(private val context: MyContext, reload: Boolean): Observer, O
         val task = Runnable {
             assert(Thread.currentThread().name == "MainServiceThread")
 
-            if (observable is GeneralUtil) {
+            if (observable is GeneralTool) {
                 when (args) {
                     is Boolean -> {
                         setChanged()
@@ -78,12 +78,12 @@ class UtilsManager(private val context: MyContext, reload: Boolean): Observer, O
 
     fun switchUtil(utilEnum: UtilsEnum) {
         // tasks are running sequentially in one thread
-        val util: GeneralUtil = getGenericUtil(utilEnum)
+        val tool: GeneralTool = getGenericUtil(utilEnum)
 
-        if (util.isEnabled()) {
-            util.disable()
+        if (tool.isEnabled()) {
+            tool.disable()
         } else {
-            util.enable()
+            tool.enable()
         }
     }
 
@@ -113,13 +113,13 @@ class UtilsManager(private val context: MyContext, reload: Boolean): Observer, O
         return enabledUtils
     }
 
-    private fun getGenericUtil(utilEnum: UtilsEnum): GeneralUtil{
+    private fun getGenericUtil(utilEnum: UtilsEnum): GeneralTool{
         if(utilsMap[utilEnum] == null){
             utilsMap[utilEnum] = utilEnum.getInstance(context, utilsHelper)
             utilsMap[utilEnum]!!.addObserver(this)
         }
 
-        return utilsMap[utilEnum] as GeneralUtil
+        return utilsMap[utilEnum] as GeneralTool
     }
 
     fun sendStatus(communicatorHash: Int){

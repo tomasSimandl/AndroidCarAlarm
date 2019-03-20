@@ -12,7 +12,7 @@ class UtilsHelper (private val context: MyContext): SharedPreferences.OnSharedPr
     private val tag = "utils.UtilsHelper"
 
     private val observablesMap: MutableMap<ObservableEnum, GeneralObservable> = HashMap()
-    private val utilsMap: MutableMap<GeneralUtil, MutableSet<ObservableEnum>> = HashMap()
+    private val utilsMap: MutableMap<GeneralTool, MutableSet<ObservableEnum>> = HashMap()
 
     private val workerThread = WorkerThread("UtilsThread")
     val communicationManager = CommunicationManager.getInstance(context.communicationContext)
@@ -57,13 +57,13 @@ class UtilsHelper (private val context: MyContext): SharedPreferences.OnSharedPr
         workerThread.postTask(runnable)
     }
 
-    fun registerObserver(observableEnum: ObservableEnum, util: GeneralUtil): Boolean{
+    fun registerObserver(observableEnum: ObservableEnum, tool: GeneralTool): Boolean{
         synchronized(this) {
 
-            Log.d(tag, """Registering observer $util to observable $observableEnum""")
+            Log.d(tag, """Registering observer $tool to observable $observableEnum""")
 
-            if (utilsMap[util]?.contains(observableEnum) == true) {
-                Log.d(tag, """Observer $util is already registered in $observableEnum""")
+            if (utilsMap[tool]?.contains(observableEnum) == true) {
+                Log.d(tag, """Observer $tool is already registered in $observableEnum""")
                 return true // already registered
             }
 
@@ -73,42 +73,42 @@ class UtilsHelper (private val context: MyContext): SharedPreferences.OnSharedPr
                 observablesMap[observableEnum] = observable
             }
 
-            observable.addObserver(util)
+            observable.addObserver(tool)
 
 
-            if (utilsMap[util] == null) {
-                utilsMap[util] = HashSet()
+            if (utilsMap[tool] == null) {
+                utilsMap[tool] = HashSet()
             }
-            utilsMap[util]!!.add(observableEnum)
+            utilsMap[tool]!!.add(observableEnum)
 
             return true
         }
     }
 
-    fun unregisterAllObservables(util: GeneralUtil){
+    fun unregisterAllObservables(tool: GeneralTool){
         synchronized(this) {
-            Log.d(tag, """Un-registering observer $util from all observables.""")
+            Log.d(tag, """Un-registering observer $tool from all observables.""")
 
-            val enums = utilsMap[util] ?: return
+            val enums = utilsMap[tool] ?: return
 
             for (observable in enums) {
-                observablesMap[observable]?.deleteObserver(util)
+                observablesMap[observable]?.deleteObserver(tool)
             }
             enums.clear()
         }
     }
 
-    fun unregisterObservable(observableEnum: ObservableEnum, util: GeneralUtil) {
+    fun unregisterObservable(observableEnum: ObservableEnum, tool: GeneralTool) {
         synchronized(this) {
-            Log.d(tag, """Un-registering observer $util from observable $observableEnum""")
+            Log.d(tag, """Un-registering observer $tool from observable $observableEnum""")
 
-            if (utilsMap[util]?.contains(observableEnum) != true) {
-                Log.d(tag, """Observer $util is not registered in observable $observableEnum""")
+            if (utilsMap[tool]?.contains(observableEnum) != true) {
+                Log.d(tag, """Observer $tool is not registered in observable $observableEnum""")
                 return
             }
 
-            observablesMap[observableEnum]?.deleteObserver(util)
-            Log.d(tag, """Observer $util was un-registered from observable $observableEnum""")
+            observablesMap[observableEnum]?.deleteObserver(tool)
+            Log.d(tag, """Observer $tool was un-registered from observable $observableEnum""")
         }
     }
 }

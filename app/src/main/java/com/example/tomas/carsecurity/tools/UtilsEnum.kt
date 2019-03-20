@@ -5,7 +5,7 @@ import com.example.tomas.carsecurity.context.MyContext
 enum class UtilsEnum {
     Alarm, Tracker, Battery;
 
-    fun getInstance(context: MyContext, utilsHelper: UtilsHelper): GeneralUtil{
+    fun getInstance(context: MyContext, utilsHelper: UtilsHelper): GeneralTool{
         return when (this){
             Alarm -> Alarm(context, utilsHelper)
             Tracker -> Tracker(context, utilsHelper)

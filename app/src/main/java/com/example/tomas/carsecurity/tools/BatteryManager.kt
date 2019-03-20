@@ -9,7 +9,7 @@ import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.sensors.BatteryDetector
 import java.util.*
 
-class BatteryManager (private val context: MyContext, private val utilsHelper: UtilsHelper): GeneralUtil(utilsHelper), SharedPreferences.OnSharedPreferenceChangeListener {
+class BatteryManager (private val context: MyContext, private val utilsHelper: UtilsHelper): GeneralTool(utilsHelper), SharedPreferences.OnSharedPreferenceChangeListener {
 
     override val thisUtilEnum: UtilsEnum = UtilsEnum.Battery
     private val tag = "BatteryManager"

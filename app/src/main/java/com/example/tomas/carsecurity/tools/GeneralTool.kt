@@ -3,7 +3,7 @@ package com.example.tomas.carsecurity.tools
 import java.util.*
 
 
-abstract class GeneralUtil(private val utilsHelper: UtilsHelper) : Observer, Observable() {
+abstract class GeneralTool(private val utilsHelper: UtilsHelper) : Observer, Observable() {
 
     abstract val thisUtilEnum: UtilsEnum
 
