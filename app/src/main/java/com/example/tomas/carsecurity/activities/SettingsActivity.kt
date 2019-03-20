@@ -1,4 +1,4 @@
-package com.example.tomas.carsecurity
+package com.example.tomas.carsecurity.activities
 
 import android.Manifest
 import android.annotation.TargetApi
@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.preference.PreferenceActivity
 import android.support.v14.preference.PreferenceFragment
 import android.view.MenuItem
+import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.communication.network.NetworkProvider
 import com.example.tomas.carsecurity.communication.sms.SmsProvider
 import com.example.tomas.carsecurity.fragments.preferences.MyPreferenceFragment
@@ -226,7 +227,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
 
         private fun setValueToSmsSwitch() =
                 setValueToPreference(
-                    R.string.key_communication_sms_is_allowed,
+                        R.string.key_communication_sms_is_allowed,
                     resources.getBoolean(R.bool.default_communication_sms_is_allowed),
                     SmsProvider)
 

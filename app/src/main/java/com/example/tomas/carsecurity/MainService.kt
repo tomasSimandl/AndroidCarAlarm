@@ -10,6 +10,7 @@ import android.os.IBinder
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
 import android.util.Log
+import com.example.tomas.carsecurity.activities.MainActivity
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.tools.ToolsEnum
 import com.example.tomas.carsecurity.tools.ToolsManager

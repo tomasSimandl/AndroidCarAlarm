@@ -1,4 +1,4 @@
-package com.example.tomas.carsecurity
+package com.example.tomas.carsecurity.activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -10,6 +10,8 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import android.view.View
+import com.example.tomas.carsecurity.MainService
+import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.fragments.LoginFragment
 import com.example.tomas.carsecurity.fragments.MainFragment
 import com.example.tomas.carsecurity.storage.Storage
