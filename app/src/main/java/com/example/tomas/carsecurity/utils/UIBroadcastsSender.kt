@@ -1,4 +1,4 @@
-package com.example.tomas.carsecurity
+package com.example.tomas.carsecurity.utils
 
 import android.content.Context
 import android.content.Intent
@@ -7,9 +7,9 @@ import android.util.Log
 import com.example.tomas.carsecurity.fragments.MainFragment
 import com.example.tomas.carsecurity.tools.ToolsEnum
 
-class BroadcastSender(private val context: Context) {
+class UIBroadcastsSender(private val context: Context) {
 
-    private val tag = "BroadcastSender"
+    private val tag = "UIBroadcastsSender"
 
     fun informUI(utilEnum: ToolsEnum, enabled: Boolean) {
         Log.d(tag, """Sending information about util to UI. Util: ${utilEnum.name} is ${if(enabled) "enabled" else "disabled"}.""")

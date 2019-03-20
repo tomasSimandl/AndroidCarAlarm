@@ -13,6 +13,7 @@ import android.util.Log
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.tools.ToolsEnum
 import com.example.tomas.carsecurity.tools.ToolsManager
+import com.example.tomas.carsecurity.utils.UIBroadcastsSender
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -28,7 +29,7 @@ class MainService : Service(), Observer {
     private val notificationId = 973920 // random number
 
     private lateinit var workerThread: WorkerThread
-    private lateinit var broadcastSender: BroadcastSender
+    private lateinit var UIBroadcastsSender: UIBroadcastsSender
     private lateinit var toolsManager: ToolsManager
     private lateinit var context: MyContext
 
@@ -41,7 +42,7 @@ class MainService : Service(), Observer {
             when(args){
                 is Pair<*, *> ->
                     if(args.first is ToolsEnum && args.second is Boolean){
-                        broadcastSender.informUI(args.first as ToolsEnum, args.second as Boolean)
+                        UIBroadcastsSender.informUI(args.first as ToolsEnum, args.second as Boolean)
                         if(args.second == true){
                             startForeground()
                         } else {
@@ -49,7 +50,7 @@ class MainService : Service(), Observer {
                         }
                     }
                 is Actions -> processAction(Intent(args.name))
-                is String -> broadcastSender.showMessage(args)
+                is String -> UIBroadcastsSender.showMessage(args)
             }
         }
     }
@@ -67,7 +68,7 @@ class MainService : Service(), Observer {
         }
 
         if (! ::context.isInitialized) context = MyContext(applicationContext, workerThread.looper)
-        if (! ::broadcastSender.isInitialized) broadcastSender = BroadcastSender(applicationContext)
+        if (! ::UIBroadcastsSender.isInitialized) UIBroadcastsSender = UIBroadcastsSender(applicationContext)
         // intent is null when application is restarted when system kill service
         if (! ::toolsManager.isInitialized) {
             toolsManager = ToolsManager(context, intent == null)
@@ -91,7 +92,7 @@ class MainService : Service(), Observer {
                 Actions.ActionSwitchUtil.name -> toolsManager.switchUtil(intent.getSerializableExtra("util") as ToolsEnum)
                 Actions.ActionActivateUtil.name -> toolsManager.activateUtil(intent.getSerializableExtra("util") as ToolsEnum)
                 Actions.ActionDeactivateUtil.name -> toolsManager.deactivateUtil(intent.getSerializableExtra("util") as ToolsEnum)
-                Actions.ActionStatusUI.name -> broadcastSender.informUI(toolsManager.getEnabledUtils())
+                Actions.ActionStatusUI.name -> UIBroadcastsSender.informUI(toolsManager.getEnabledUtils())
                 Actions.ActionForegroundStop.name -> stopService(true)
                 Actions.ActionTryStop.name -> if(!isForeground) stopSelf()
                 Actions.ActionStatus.name -> toolsManager.sendStatus(intent.getIntExtra("communicator", -1))
