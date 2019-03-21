@@ -85,6 +85,9 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
     /** Lock to avoid sending of two login request at the same time */
     private val loginLock: Any = Any()
 
+    /** Maximal number of locations which are sends over one request. */
+    private val locationChunkSize: Int
+
     /**
      * Indication if network synchronization task is already running. Can happen when there is lots
      * of data to synchronize and synchronize interval is short.
@@ -116,6 +119,24 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
                 CheckCodes.success
             }
         }
+    }
+
+    /**
+     * Loads maximal size of location request [locationChunkSize] from properties. Default value is 30 and
+     * range of number is <1, 1000>
+     */
+    init {
+        var chunks = 30
+        try {
+            val properties = Properties()
+            properties.load(communicationContext.appContext.assets.open("config.properties"))
+            chunks = properties["send.locations.max.chunk.size"] as Int
+
+        } catch (e: Exception){
+            Log.w(tag, "Can not load configuration from properties. Default configuration will be used.")
+        }
+
+        locationChunkSize = chunks.coerceIn(1, 1000)
     }
 
     /**
@@ -195,7 +216,8 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
 
                 for (route in routesWithId) {
                     val locations = storage.locationService.getLocationsByLocalRouteId(route.uid)
-                    sendLocations(locations)
+                    // send routes locations in package by 50 locations
+                    locations.chunked(locationChunkSize).forEach { sendLocations(it) }
 
                     // Can not remove last route because it is possibility that is still used
                     if (route.uid < maxRouteId && storage.locationService.getLocationsByLocalRouteId(route.uid).isEmpty()) {
@@ -203,8 +225,9 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
                     }
                 }
 
+                // send locations in package by 50 locations
                 val locations = storage.locationService.getLocationsByLocalRouteId(null)
-                sendLocations(locations)
+                locations.chunked(locationChunkSize).forEach { sendLocations(it) }
 
                 isSynchronize.set(false)
             }
