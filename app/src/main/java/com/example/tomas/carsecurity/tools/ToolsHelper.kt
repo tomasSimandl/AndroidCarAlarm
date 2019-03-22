@@ -12,7 +12,7 @@ class ToolsHelper (private val context: MyContext): SharedPreferences.OnSharedPr
     private val tag = "tools.ToolsHelper"
 
     private val observablesMap: MutableMap<ObservableEnum, GeneralObservable> = HashMap()
-    private val utilsMap: MutableMap<GeneralTool, MutableSet<ObservableEnum>> = HashMap()
+    private val toolsMap: MutableMap<GeneralTool, MutableSet<ObservableEnum>> = HashMap()
 
     private val workerThread = WorkerThread("UtilsThread")
     val communicationManager = CommunicationManager.getInstance(context.communicationContext)
@@ -42,7 +42,7 @@ class ToolsHelper (private val context: MyContext): SharedPreferences.OnSharedPr
                     }
                 }
 
-                for (util in utilsMap.keys) {
+                for (util in toolsMap.keys) {
                     if (util.isEnabled() && !util.canEnable()) {
                         util.disable()
                     }
@@ -62,7 +62,7 @@ class ToolsHelper (private val context: MyContext): SharedPreferences.OnSharedPr
 
             Log.d(tag, """Registering observer $tool to observable $observableEnum""")
 
-            if (utilsMap[tool]?.contains(observableEnum) == true) {
+            if (toolsMap[tool]?.contains(observableEnum) == true) {
                 Log.d(tag, """Observer $tool is already registered in $observableEnum""")
                 return true // already registered
             }
@@ -76,10 +76,10 @@ class ToolsHelper (private val context: MyContext): SharedPreferences.OnSharedPr
             observable.addObserver(tool)
 
 
-            if (utilsMap[tool] == null) {
-                utilsMap[tool] = HashSet()
+            if (toolsMap[tool] == null) {
+                toolsMap[tool] = HashSet()
             }
-            utilsMap[tool]!!.add(observableEnum)
+            toolsMap[tool]!!.add(observableEnum)
 
             return true
         }
@@ -89,7 +89,7 @@ class ToolsHelper (private val context: MyContext): SharedPreferences.OnSharedPr
         synchronized(this) {
             Log.d(tag, """Un-registering observer $tool from all observables.""")
 
-            val enums = utilsMap[tool] ?: return
+            val enums = toolsMap[tool] ?: return
 
             for (observable in enums) {
                 observablesMap[observable]?.deleteObserver(tool)
@@ -102,7 +102,7 @@ class ToolsHelper (private val context: MyContext): SharedPreferences.OnSharedPr
         synchronized(this) {
             Log.d(tag, """Un-registering observer $tool from observable $observableEnum""")
 
-            if (utilsMap[tool]?.contains(observableEnum) != true) {
+            if (toolsMap[tool]?.contains(observableEnum) != true) {
                 Log.d(tag, """Observer $tool is not registered in observable $observableEnum""")
                 return
             }

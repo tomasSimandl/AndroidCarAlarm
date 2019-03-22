@@ -12,7 +12,7 @@ class ToolsManager(private val context: MyContext): Observer, Observable() {
 
     private val tag = "tools.ToolsManager"
 
-    private val utilsHelper = ToolsHelper(context)
+    private val toolsHelper = ToolsHelper(context)
 
     private val toolsMap: MutableMap<ToolsEnum, GeneralTool> = HashMap()
 
@@ -38,7 +38,7 @@ class ToolsManager(private val context: MyContext): Observer, Observable() {
         }
 
         // destroy after all tools are disabled
-        utilsHelper.destroy()
+        toolsHelper.destroy()
     }
 
     override fun update(observable: Observable, args: Any) {
@@ -111,7 +111,7 @@ class ToolsManager(private val context: MyContext): Observer, Observable() {
 
     private fun getGenericUtil(utilEnum: ToolsEnum): GeneralTool{
         if(toolsMap[utilEnum] == null){
-            toolsMap[utilEnum] = utilEnum.getInstance(context, utilsHelper)
+            toolsMap[utilEnum] = utilEnum.getInstance(context, toolsHelper)
             toolsMap[utilEnum]!!.addObserver(this)
         }
 
@@ -129,7 +129,7 @@ class ToolsManager(private val context: MyContext): Observer, Observable() {
         val isCharging = batteryStatus.second
         val batteryPct = batteryStatus.first
 
-        utilsHelper.communicationManager.sendStatus(
+        toolsHelper.communicationManager.sendStatus(
                 communicatorHash, batteryPct, isCharging, powerSaveMode, tools)
     }
 }
