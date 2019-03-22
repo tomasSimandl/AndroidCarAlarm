@@ -77,14 +77,12 @@ class LoginFragment : Fragment() {
             input_password.text.clear()
 
             if (intent.getBooleanExtra(BroadcastKeys.KeySuccess.name, false)) {
-                showLogout(input_username.text.toString())
                 communicationContext.isLogin = true
                 if(!communicationManager.sendNetworkGetCars()){
                     showError(requireContext().getString(R.string.err_login_init_network))
                     logoutButtonAction()
+                    btn_login.isEnabled = true
                 }
-
-                btn_login.isEnabled = true
 
             } else {
                 showError(intent.getStringExtra(BroadcastKeys.KeyErrorMessage.name))
@@ -102,6 +100,8 @@ class LoginFragment : Fragment() {
             if (error == null || error.isBlank()) {
                 val cars = intent.getSerializableExtra(BroadcastKeys.KeyCars.name) as ArrayList<*>
                 showCarListDialog(cars)
+                showLogout(input_username.text.toString())
+                btn_login.isEnabled = true
             } else {
                 // can not communicate with servers show error and logout
                 showError(error)
@@ -156,6 +156,7 @@ class LoginFragment : Fragment() {
 
     private fun logoutButtonAction() {
         btn_logout.isEnabled = false
+        btn_login.isEnabled = true
 
         Thread(Runnable {
             Storage.getInstance(requireContext()).clearAllTables()
