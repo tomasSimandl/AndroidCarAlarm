@@ -19,7 +19,6 @@ import com.example.tomas.carsecurity.storage.entity.Location as DbLocation
 
 class Tracker(private val context: MyContext, private val toolsHelper: ToolsHelper) : GeneralTool(toolsHelper), SharedPreferences.OnSharedPreferenceChangeListener {
 
-    // TODO disable tracker when user logout
     private val tag = "tools.Tracker"
 
     private var lastLocation: Location? = null
@@ -52,7 +51,6 @@ class Tracker(private val context: MyContext, private val toolsHelper: ToolsHelp
                 CheckCodes.notAllowed -> return context.getString(R.string.error_tracker_network_not_allowed)
                 CheckCodes.invalidParameters -> return context.getString(R.string.error_tracker_network_invalid_params)
             }
-
             return ""
         }
     }
@@ -64,7 +62,11 @@ class Tracker(private val context: MyContext, private val toolsHelper: ToolsHelp
     override fun onSharedPreferenceChanged(p0: SharedPreferences?, key: String?) {
         val task = Runnable {
             when (key) {
-                // todo restart timer
+                context.appContext.getString(R.string.key_communication_network_is_user_login) -> {
+                    if(isEnabled && !context.communicationContext.isLogin) {
+                        disable()
+                    }
+                }
             }
         }
         toolsHelper.runOnUtilThread(task)
@@ -140,7 +142,6 @@ class Tracker(private val context: MyContext, private val toolsHelper: ToolsHelp
             context.toolsContext.unregisterOnPreferenceChanged(this)
 
             if(actualRoute != null) {
-                //Storage.getInstance(context.appContext).routeService.finishRoute(actualRoute!!) // No need to finish route
                 actualRoute = null
             }
 
