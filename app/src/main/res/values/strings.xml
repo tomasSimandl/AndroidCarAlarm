@@ -225,9 +225,13 @@
 
     <string name="error_tracker_disabled">Tracker is disabled by user. Enable it in Tools settings.</string>
     <string name="error_tracker_location_not_supported">Tracker needs to get device location for creating of log book but this device not support location access.</string>
-    <string name="error_tracker_location_not_permitted">Tracker needs to get device location for creating of log book but application is not permitted to get device location. Please request for permissions in communication setting.</string>
-    <string name="error_tracker_location_not_allowed">Tracker needs to get device location for creating of log book but sensor is disabled by user. Enable Alarm in Tools setting.</string>
-    <string name="error_tracker_location_invalid_params">Invalid parameters are set to invalid value please change it in setting.</string>
+    <string name="error_tracker_location_not_permitted">Tracker needs to get device location for creating of log book but application is not permitted to get device location. Please request for permissions in sensors setting.</string>
+    <string name="error_tracker_location_not_allowed">Tracker needs to get device location for creating of log book but sensor is disabled by user. Enable location sensor in Sensors setting.</string>
+    <string name="error_tracker_location_invalid_params">Tracker needs to get device location for creating of log book but parameters of location sensor are set to invalid values please change it in setting.</string>
+    <string name="error_tracker_network_not_supported">Tracker is useless without network communication because data are manage only in web app. Device not supports network access.</string>
+    <string name="error_tracker_network_not_permitted">Tracker is useless without network communication because data are manage only in web app. Application is not permitted to communicate over network. Please request for permissions in communication setting.</string>
+    <string name="error_tracker_network_not_allowed">Tracker is useless without network communication because data are manage only in web app. Network communication is disabled by user. Enable network in Communication setting.</string>
+    <string name="error_tracker_network_invalid_params">Tracker is useless without network communication because data are manage only in web app. Parameters of Network communication are set to invalid values please change it in setting.</string>
     <string name="error_tracker_not_log_in">You are not logged in application. Please login first in Login page.</string>
 
     <string name="error_check_codes_hw_not_supported">hardware is not supported</string>

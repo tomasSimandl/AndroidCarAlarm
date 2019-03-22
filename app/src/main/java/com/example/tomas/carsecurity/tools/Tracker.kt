@@ -8,6 +8,7 @@ import com.example.tomas.carsecurity.CheckCodes
 import com.example.tomas.carsecurity.CheckObjString
 import com.example.tomas.carsecurity.ObservableEnum
 import com.example.tomas.carsecurity.R
+import com.example.tomas.carsecurity.communication.network.NetworkProvider
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.context.ToolsContext
 import com.example.tomas.carsecurity.sensors.LocationProvider
@@ -37,21 +38,27 @@ class Tracker(private val context: MyContext, private val toolsHelper: ToolsHelp
             }
 
             val locationCheck = LocationProvider.check(context)
-
-            return when (locationCheck) {
-                CheckCodes.hardwareNotSupported -> context.getString(R.string.error_tracker_location_not_supported)
-                CheckCodes.permissionDenied -> context.getString(R.string.error_tracker_location_not_permitted)
-                CheckCodes.notAllowed -> context.getString(R.string.error_tracker_location_not_allowed)
-                CheckCodes.invalidParameters -> context.getString(R.string.error_tracker_location_invalid_params)
-                else -> {
-                    "" // TODO check for internet provider
-                }
+            when (locationCheck) {
+                CheckCodes.hardwareNotSupported -> return context.getString(R.string.error_tracker_location_not_supported)
+                CheckCodes.permissionDenied -> return context.getString(R.string.error_tracker_location_not_permitted)
+                CheckCodes.notAllowed -> return context.getString(R.string.error_tracker_location_not_allowed)
+                CheckCodes.invalidParameters -> return context.getString(R.string.error_tracker_location_invalid_params)
             }
+
+            val networkCheck = NetworkProvider.check(context)
+            when (networkCheck) {
+                CheckCodes.hardwareNotSupported -> return context.getString(R.string.error_tracker_network_not_supported)
+                CheckCodes.permissionDenied -> return context.getString(R.string.error_tracker_network_not_permitted)
+                CheckCodes.notAllowed -> return context.getString(R.string.error_tracker_network_not_allowed)
+                CheckCodes.invalidParameters -> return context.getString(R.string.error_tracker_network_invalid_params)
+            }
+
+            return ""
         }
     }
 
     override fun canEnable(): Boolean {
-        return check(context.appContext, false).isEmpty()
+        return check(context.appContext, false).isEmpty() && context.communicationContext.isLogin
     }
 
     override fun onSharedPreferenceChanged(p0: SharedPreferences?, key: String?) {
