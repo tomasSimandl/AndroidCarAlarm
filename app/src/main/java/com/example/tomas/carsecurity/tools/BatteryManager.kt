@@ -47,7 +47,7 @@ class BatteryManager (private val context: MyContext, private val toolsHelper: T
     private fun batteryChanged(percent: Int, charging: Boolean) {
         Log.d(tag, """Battery status changed. Capacity: $percent Charging: $charging""")
 
-        if (percent <= context.utilsContext.batteryCriticalLevel) {
+        if (percent <= context.toolsContext.batteryCriticalLevel) {
             if (!shouldBeSaveMode) {
                 toolsHelper.communicationManager.sendEvent(MessageType.BatteryWarn, percent.toString(), "% of battery")
                 shouldBeSaveMode = true
@@ -62,10 +62,10 @@ class BatteryManager (private val context: MyContext, private val toolsHelper: T
     }
 
     private fun changePowerSaveMode(){
-        if(context.utilsContext.isBatteryModeAllowed && shouldBeSaveMode) {
-            context.utilsContext.enablePowerSaveMode()
+        if(context.toolsContext.isBatteryModeAllowed && shouldBeSaveMode) {
+            context.toolsContext.enablePowerSaveMode()
         } else {
-            context.utilsContext.disablePowerSaveMode()
+            context.toolsContext.disablePowerSaveMode()
         }
     }
 
@@ -85,7 +85,7 @@ class BatteryManager (private val context: MyContext, private val toolsHelper: T
 
             enabled = true
             toolsHelper.registerObserver(ObservableEnum.BatteryDetector, this)
-            context.utilsContext.registerOnPreferenceChanged(this)
+            context.toolsContext.registerOnPreferenceChanged(this)
         }
     }
 
@@ -93,7 +93,7 @@ class BatteryManager (private val context: MyContext, private val toolsHelper: T
         if (force && enabled) {
 
             enabled = false
-            context.utilsContext.unregisterOnPreferenceChanged(this)
+            context.toolsContext.unregisterOnPreferenceChanged(this)
             toolsHelper.unregisterAllObservables(this)
         }
     }

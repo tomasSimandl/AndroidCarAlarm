@@ -7,7 +7,7 @@ import com.example.tomas.carsecurity.storage.Storage
 class MyContext(val appContext: Context, val mainServiceThreadLooper: Looper) {
 
     val sensorContext = SensorContext(appContext)
-    val utilsContext = UtilsContext(appContext)
+    val toolsContext = ToolsContext(appContext)
     val communicationContext = CommunicationContext(appContext)
 
     fun destroy(){

@@ -16,7 +16,7 @@ import android.widget.Button
 import android.widget.ProgressBar
 import com.example.tomas.carsecurity.MainService
 import com.example.tomas.carsecurity.R
-import com.example.tomas.carsecurity.context.UtilsContext
+import com.example.tomas.carsecurity.context.ToolsContext
 import com.example.tomas.carsecurity.tools.ToolsEnum
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.content_main.view.*
@@ -27,7 +27,7 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
         BroadcastUpdateUI, KeyShowMessage, KeyUtilName, KeyUtilActivated
     }
 
-    private lateinit var utilsContext: UtilsContext
+    private lateinit var toolsContext: ToolsContext
     private var isProgressRun = false
     private var canShowProgress = false
 
@@ -35,7 +35,7 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        utilsContext = UtilsContext(requireContext())
+        toolsContext = ToolsContext(requireContext())
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -73,18 +73,18 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
 
         sendIntent(MainService.Actions.ActionStatusUI.name)
 
-        setVisibility(actionAlarm, utilsContext.isAlarmAllowed)
-        setVisibility(actionTracker, utilsContext.isTrackerAllowed)
-        setVisibility(power_save_indication, utilsContext.isPowerSaveMode)
+        setVisibility(actionAlarm, toolsContext.isAlarmAllowed)
+        setVisibility(actionTracker, toolsContext.isTrackerAllowed)
+        setVisibility(power_save_indication, toolsContext.isPowerSaveMode)
 
-        utilsContext.registerOnPreferenceChanged(this)
+        toolsContext.registerOnPreferenceChanged(this)
     }
 
     override fun onStop() {
         super.onStop()
 
         LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(receiver)
-        utilsContext.unregisterOnPreferenceChanged(this)
+        toolsContext.unregisterOnPreferenceChanged(this)
     }
 
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -121,18 +121,18 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
 
     override fun onSharedPreferenceChanged(p0: SharedPreferences?, key: String?) {
         when (key) {
-            getString(R.string.key_tool_alarm_is_allowed) -> setVisibility(actionAlarm, utilsContext.isAlarmAllowed)
-            getString(R.string.key_tool_tracker_is_allowed) -> setVisibility(actionTracker, utilsContext.isTrackerAllowed)
+            getString(R.string.key_tool_alarm_is_allowed) -> setVisibility(actionAlarm, toolsContext.isAlarmAllowed)
+            getString(R.string.key_tool_tracker_is_allowed) -> setVisibility(actionTracker, toolsContext.isTrackerAllowed)
             getString(R.string.key_tool_battery_mode) -> {
-                setVisibility(actionAlarm, utilsContext.isAlarmAllowed)
-                setVisibility(actionTracker, utilsContext.isTrackerAllowed)
-                setVisibility(power_save_indication, utilsContext.isPowerSaveMode)
+                setVisibility(actionAlarm, toolsContext.isAlarmAllowed)
+                setVisibility(actionTracker, toolsContext.isTrackerAllowed)
+                setVisibility(power_save_indication, toolsContext.isPowerSaveMode)
             }
         }
     }
 
     private fun runProgress(context: Context) {
-        progressBar.max = UtilsContext(context).startAlarmInterval / 1000
+        progressBar.max = ToolsContext(context).startAlarmInterval / 1000
         progressBar.progress = 0
 
         if (!isProgressRun) {

@@ -10,7 +10,7 @@ import android.util.Log
 import com.example.tomas.carsecurity.CheckCodes
 import com.example.tomas.carsecurity.CheckObjByte
 import com.example.tomas.carsecurity.context.MyContext
-import com.example.tomas.carsecurity.context.UtilsContext
+import com.example.tomas.carsecurity.context.ToolsContext
 
 class CallProvider (private val context: MyContext) {
 
@@ -22,7 +22,7 @@ class CallProvider (private val context: MyContext) {
                 CheckCodes.hardwareNotSupported
             } else if (ContextCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
                 CheckCodes.permissionDenied
-            } else if (!UtilsContext(context).isCallAllow) {
+            } else if (!ToolsContext(context).isCallAllow) {
                 CheckCodes.notAllowed
             } else {
                 CheckCodes.success

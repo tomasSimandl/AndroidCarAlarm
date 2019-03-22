@@ -20,12 +20,12 @@ class ToolsHelper (private val context: MyContext): SharedPreferences.OnSharedPr
     init {
         workerThread.start()
         workerThread.prepareHandler()
-        context.utilsContext.registerOnPreferenceChanged(this)
+        context.toolsContext.registerOnPreferenceChanged(this)
     }
 
     fun destroy(){
         Log.d(tag, "Destroy")
-        context.utilsContext.unregisterOnPreferenceChanged(this)
+        context.toolsContext.unregisterOnPreferenceChanged(this)
         workerThread.quit()
         communicationManager.destroy()
     }

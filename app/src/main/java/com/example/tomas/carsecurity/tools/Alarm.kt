@@ -9,7 +9,7 @@ import com.example.tomas.carsecurity.*
 import com.example.tomas.carsecurity.communication.MessageType
 import com.example.tomas.carsecurity.communication.sms.SmsProvider
 import com.example.tomas.carsecurity.context.MyContext
-import com.example.tomas.carsecurity.context.UtilsContext
+import com.example.tomas.carsecurity.context.ToolsContext
 import com.example.tomas.carsecurity.sensors.GeneralObservable
 import com.example.tomas.carsecurity.sensors.LocationProvider
 import com.example.tomas.carsecurity.sensors.MoveDetector
@@ -38,7 +38,7 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
     companion object Check: CheckObjString {
         override fun check(context: Context, skipAllow: Boolean): String {
 
-            if(!skipAllow && !UtilsContext(context).isAlarmAllowed){
+            if(!skipAllow && !ToolsContext(context).isAlarmAllowed){
                 return context.getString(R.string.error_alarm_disabled)
             }
 
@@ -85,7 +85,7 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
     private fun onLocationUpdate(location: Location) {
         Log.d(tag, """Location update: $location""")
         this.lastLocation = location
-        if (context.utilsContext.sendLocationInterval > context.utilsContext.disableSendLocationInterval) {
+        if (context.toolsContext.sendLocationInterval > context.toolsContext.disableSendLocationInterval) {
             toolsHelper.unregisterObservable(OEnum.LocationProvider, this)
         }
     }
@@ -102,7 +102,7 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
         }
 
         // detections are ignored because start alarm interval did not passed.
-        if (currentTime - systemEnabledTime < context.utilsContext.startAlarmInterval) {
+        if (currentTime - systemEnabledTime < context.toolsContext.startAlarmInterval) {
             Log.d(tag, "Alarm is waiting for activation")
             return
         }
@@ -122,7 +122,7 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
                 }
             }
             timer = Timer("TimerThread")
-            timer!!.schedule(timerTask, context.utilsContext.alertAlarmInterval.toLong())
+            timer!!.schedule(timerTask, context.toolsContext.alertAlarmInterval.toLong())
         }
     }
 
@@ -132,12 +132,12 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
         // send alarm to communication providers
         toolsHelper.communicationManager.sendEvent(MessageType.Alarm, Calendar.getInstance().time.toString())
 
-        if(context.utilsContext.isCallAllow) {
+        if(context.toolsContext.isCallAllow) {
             CallProvider(context).createCall()
         }
 
         // start siren
-        if (context.utilsContext.isSirenAllow) {
+        if (context.toolsContext.isSirenAllow) {
             mediaPlayer = MediaPlayer.create(context.appContext, R.raw.car_alarm)
             mediaPlayer?.isLooping = true
             mediaPlayer?.start()
@@ -153,7 +153,7 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
 
     private fun scheduleSmsTimer(){
         sendSmsTimer = Timer("SendSmsTimer")
-        sendSmsTimer!!.schedule(getSmsTimerTask(), context.utilsContext.sendLocationInterval.toLong(), context.utilsContext.sendLocationInterval.toLong())
+        sendSmsTimer!!.schedule(getSmsTimerTask(), context.toolsContext.sendLocationInterval.toLong(), context.toolsContext.sendLocationInterval.toLong())
     }
 
     private fun getSmsTimerTask(): TimerTask {
@@ -186,7 +186,7 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
             notifyObservers(true)
 
             Log.d(tag, "Alarm system is enabled")
-            context.utilsContext.registerOnPreferenceChanged(this)
+            context.toolsContext.registerOnPreferenceChanged(this)
 
             toolsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, true)
         }
@@ -208,7 +208,7 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
             lastLocation = null
             systemEnabledTime = -1L
 
-            context.utilsContext.unregisterOnPreferenceChanged(this)
+            context.toolsContext.unregisterOnPreferenceChanged(this)
 
             setChanged()
             notifyObservers(false)

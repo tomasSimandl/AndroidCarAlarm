@@ -7,7 +7,7 @@ import com.example.tomas.carsecurity.R
  * Context contains data which are which are connected with tools package class and they are stored
  * in shared preferences or in resources.
  */
-class UtilsContext(appContext: Context): BaseContext(appContext) {
+class ToolsContext(appContext: Context): BaseContext(appContext) {
 
     fun enablePowerSaveMode(){
         switchBatteryMode(Mode.PowerSaveMode)

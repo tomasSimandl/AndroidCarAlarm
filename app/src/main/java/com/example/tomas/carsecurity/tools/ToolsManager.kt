@@ -123,7 +123,7 @@ class ToolsManager(private val context: MyContext): Observer, Observable() {
         val tools: MutableMap<ToolsEnum, Boolean> = HashMap()
         toolsMap.forEach { tools[it.key] = it.value.isEnabled() }
 
-        val powerSaveMode = context.utilsContext.isPowerSaveMode
+        val powerSaveMode = context.toolsContext.isPowerSaveMode
 
         val batteryStatus = BatteryUtil.getBatteryStatus(context.appContext)
         val isCharging = batteryStatus.second

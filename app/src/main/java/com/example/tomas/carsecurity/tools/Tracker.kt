@@ -9,7 +9,7 @@ import com.example.tomas.carsecurity.CheckObjString
 import com.example.tomas.carsecurity.ObservableEnum
 import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.context.MyContext
-import com.example.tomas.carsecurity.context.UtilsContext
+import com.example.tomas.carsecurity.context.ToolsContext
 import com.example.tomas.carsecurity.sensors.LocationProvider
 import com.example.tomas.carsecurity.storage.Storage
 import com.example.tomas.carsecurity.storage.entity.Route
@@ -32,7 +32,7 @@ class Tracker(private val context: MyContext, private val toolsHelper: ToolsHelp
     companion object Check : CheckObjString {
         override fun check(context: Context, skipAllow: Boolean): String {
 
-            if(!skipAllow && !UtilsContext(context).isTrackerAllowed){
+            if(!skipAllow && !ToolsContext(context).isTrackerAllowed){
                 return context.getString(R.string.error_tracker_disabled)
             }
 
@@ -82,12 +82,12 @@ class Tracker(private val context: MyContext, private val toolsHelper: ToolsHelp
             return
         }
 
-        if (location.distanceTo(lastLocation) > context.utilsContext.ignoreDistance) {
+        if (location.distanceTo(lastLocation) > context.toolsContext.ignoreDistance) {
             val dbLocation = DbLocation(location, actualRoute?.uid, location.distanceTo(lastLocation))
             lastLocation = location
             toolsHelper.communicationManager.sendLocation(dbLocation, isAlarm = false, cache = true)
 
-        } else if (location.time - lastLocation!!.time > context.utilsContext.timeout) {
+        } else if (location.time - lastLocation!!.time > context.toolsContext.timeout) {
             Log.d(tag, "Time not moving time interval passed. Tracker will be stopped.")
             disable()
         }
@@ -116,7 +116,7 @@ class Tracker(private val context: MyContext, private val toolsHelper: ToolsHelp
             setChanged()
             notifyObservers(true)
 
-            context.utilsContext.registerOnPreferenceChanged(this)
+            context.toolsContext.registerOnPreferenceChanged(this)
 
             Log.d(tag, "Tracker system is enabled.")
             toolsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, true)
@@ -130,7 +130,7 @@ class Tracker(private val context: MyContext, private val toolsHelper: ToolsHelp
             isEnabled = false
             toolsHelper.unregisterAllObservables(this)
 
-            context.utilsContext.unregisterOnPreferenceChanged(this)
+            context.toolsContext.unregisterOnPreferenceChanged(this)
 
             if(actualRoute != null) {
                 //Storage.getInstance(context.appContext).routeService.finishRoute(actualRoute!!) // No need to finish route
