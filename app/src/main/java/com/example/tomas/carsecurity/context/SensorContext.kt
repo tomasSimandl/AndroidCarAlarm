@@ -6,6 +6,11 @@ import com.example.tomas.carsecurity.sensors.LocationProvider
 import com.example.tomas.carsecurity.sensors.MoveDetector
 import com.example.tomas.carsecurity.sensors.SoundDetector
 
+/**
+ * Context contains data which are used in sensor package and they are stored in shared preferences or in resources.
+ *
+ * @param appContext is application context which will be shared across whole application.
+ */
 class SensorContext(appContext: Context) : BaseContext(appContext) {
 
 
@@ -27,7 +32,7 @@ class SensorContext(appContext: Context) : BaseContext(appContext) {
 
     /** Returns if [SoundDetector] can be in default used. Value is taken from shared preferences or it is used default value. */
     val isSoundAllowed
-        get() = when(mode) {
+        get() = when (mode) {
             Mode.Normal -> getBoolean(R.string.key_sensor_sound_is_allowed, R.bool.default_sensor_sound_is_allowed)
             Mode.PowerSaveMode -> appContext.resources.getBoolean(R.bool.battery_save_mode_sensor_sound_is_allowed)
         }
@@ -58,10 +63,4 @@ class SensorContext(appContext: Context) : BaseContext(appContext) {
     /** Returns priority of accuracy requests. Value is taken from shared preferences or it is used default value. */
     val accuracyPriority: Int
         get() = Integer.valueOf(getString(R.string.key_sensor_location_accuracy_priority, R.string.default_sensor_location_accuracy_priority))
-
-
-    // ====================================== BATTERY SENSOR =======================================
-
-    val isBatteryAllowed: Boolean
-        get() = getBoolean(R.string.key_sensor_battery_is_allowed, R.bool.default_sensor_battery_is_allowed)
 }
