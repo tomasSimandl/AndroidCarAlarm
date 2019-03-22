@@ -7,6 +7,7 @@ import android.content.IntentFilter
 import android.util.Log
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.utils.BatteryUtil
+import java.util.*
 
 /**
  * Class is used for observation of battery. Any battery changes are propagate over Observer design pattern.
@@ -21,16 +22,12 @@ class BatteryDetector(private val context: MyContext) : GeneralObservable() {
     /** Indications if observation of battery is enabled */
     private var enabled = false
 
-    /**
-     * Receiver which handles battery status changed actions.
-     */
-    private val batteryReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            Log.d(tag, """Battery action: ${intent.action}""")
-
-            notifyObservers(intent.action, intent)
-        }
-    }
+    /** Indication if battery is charging */
+    private var isCharging = false
+    /** State of battery level */
+    private var batteryCapacity = 1f
+    /** Timer for periodic checking of battery */
+    private var checkStatusTimer: Timer? = null
 
     /**
      * Receiver which handles Power connected and power disconnected actions.
@@ -39,12 +36,7 @@ class BatteryDetector(private val context: MyContext) : GeneralObservable() {
         override fun onReceive(context: Context, intent: Intent) {
             Log.d(tag, """Power action: ${intent.action}""")
 
-            val batteryStatus = BatteryUtil.getBatteryStatus(context)
-
-            if (batteryStatus.first != -1f) {
-                setChanged()
-                notifyObservers(Triple(intent.action, batteryStatus.second, batteryStatus.first))
-            }
+            notifyObservers(intent.action ?: "android.intent.action.BATTERY_CHANGED")
         }
     }
 
@@ -57,20 +49,28 @@ class BatteryDetector(private val context: MyContext) : GeneralObservable() {
     }
 
     /**
-     * Method notify observers of this class and sends them input action and actual battery state.
+     * Method notify observers of this class and sends them input action and actual battery state only if new battery
+     * state is different from the last one.
      *
      * @param action battery action which trigger this observation
-     * @param intent which contains battery status information.
      */
-    private fun notifyObservers(action: String?, intent: Intent) {
+    private fun notifyObservers(action: String) {
 
-        if (action == null) return
+        Log.i(tag, "Actual battery status: isCharging [$isCharging], level [$batteryCapacity]")
 
-        val isCharging: Boolean = BatteryUtil.batteryIsCharging(intent)
-        val batteryPct: Float = BatteryUtil.batteryPct(intent)
+        val batteryStatus = BatteryUtil.getBatteryStatus(context.appContext)
 
-        setChanged()
-        notifyObservers(Triple(action, isCharging, batteryPct))
+        if (batteryStatus.first != -1f &&
+                (batteryCapacity != batteryStatus.first || isCharging != batteryStatus.second)) {
+
+            Log.d(tag, "Battery status was changed.")
+
+            batteryCapacity = batteryStatus.first
+            isCharging = batteryStatus.second
+
+            setChanged()
+            notifyObservers(Triple(action, isCharging, batteryCapacity))
+        }
     }
 
 
@@ -81,23 +81,43 @@ class BatteryDetector(private val context: MyContext) : GeneralObservable() {
     override fun disable() {
         if (enabled) {
             enabled = false
-            context.appContext.unregisterReceiver(batteryReceiver)
             context.appContext.unregisterReceiver(powerReceiver)
+
+            checkStatusTimer?.cancel()
+            checkStatusTimer = null
+
             Log.d(tag, "Detector is disabled")
         }
     }
 
     /**
-     * Method enable observation of battery changes by registration of broadcast receivers.
+     * Method enable observation of battery changes by registration of broadcast receivers and starts of periodic
+     * battery checking.
      * Method can be called repeatedly.
      */
     override fun enable() {
         if (!enabled) {
             enabled = true
+            context.appContext.registerReceiver(
+                    powerReceiver,
+                    IntentFilter("android.intent.action.ACTION_POWER_CONNECTED"))
+            context.appContext.registerReceiver(
+                    powerReceiver,
+                    IntentFilter("android.intent.action.ACTION_POWER_DISCONNECTED"))
 
-            context.appContext.registerReceiver(batteryReceiver, IntentFilter("android.intent.action.BATTERY_CHANGED"))
-            context.appContext.registerReceiver(powerReceiver, IntentFilter("android.intent.action.ACTION_POWER_CONNECTED"))
-            context.appContext.registerReceiver(powerReceiver, IntentFilter("android.intent.action.ACTION_POWER_DISCONNECTED"))
+            // battery last status initialization
+            val batteryStatus = BatteryUtil.getBatteryStatus(context.appContext)
+            batteryCapacity = batteryStatus.first
+            isCharging = batteryStatus.second
+
+
+            // getting scheduler check interval from properties
+            val batteryCheckIntervalProperty = context.sensorContext.properties["battery.check.interval.millis"] as String?
+            val batteryCheckInterval: Long = batteryCheckIntervalProperty?.toLongOrNull() ?: 300000L
+
+            // schedule timer for periodic checking of battery status
+            checkStatusTimer = Timer("Check battery timer")
+            checkStatusTimer!!.schedule(checkStatusTask, batteryCheckInterval, batteryCheckInterval)
             Log.d(tag, "Detector is enabled")
         }
     }
@@ -110,4 +130,14 @@ class BatteryDetector(private val context: MyContext) : GeneralObservable() {
     override fun isEnable(): Boolean {
         return enabled
     }
+
+    /**
+     * Task which only call method notifyObservers with action BATTERY_CHANGED.
+     */
+    private val checkStatusTask: TimerTask
+        get() = object : TimerTask() {
+            override fun run() {
+                notifyObservers("android.intent.action.BATTERY_CHANGED")
+            }
+        }
 }
