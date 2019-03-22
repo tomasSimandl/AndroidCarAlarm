@@ -11,11 +11,21 @@ import com.example.tomas.carsecurity.storage.entity.Message
 import com.example.tomas.carsecurity.storage.entity.Route
 import com.example.tomas.carsecurity.storage.entity.User
 
+/**
+ * Representation of local Room database
+ */
 @Database(entities = [Location::class, Message::class, Route::class, User::class], version = 8)
-abstract class AppDatabase: RoomDatabase() {
+abstract class AppDatabase : RoomDatabase() {
 
+    /** DAO for access location table */
     abstract fun locationDao(): LocationDao
+
+    /** DAO for access message table */
     abstract fun messageDao(): MessageDao
+
+    /** DAO for access route table */
     abstract fun routeDao(): RouteDao
+
+    /** DAO for access user table */
     abstract fun userDao(): UserDao
 }
