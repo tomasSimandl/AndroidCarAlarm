@@ -126,16 +126,8 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
      * range of number is <1, 1000>
      */
     init {
-        var chunks = 30
-        try {
-            val properties = Properties()
-            properties.load(communicationContext.appContext.assets.open("config.properties"))
-            chunks = properties["send.locations.max.chunk.size"] as Int
-
-        } catch (e: Exception){
-            Log.w(tag, "Can not load configuration from properties. Default configuration will be used.")
-        }
-
+        val chunksProperty = communicationContext.properties["send.locations.max.chunk.size"] as String?
+        val chunks: Int = chunksProperty?.toIntOrNull() ?: 30
         locationChunkSize = chunks.coerceIn(1, 1000)
     }
 

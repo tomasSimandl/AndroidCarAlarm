@@ -67,11 +67,13 @@ class CommunicationContext(appContext: Context) : BaseContext(appContext) {
 
     /** Return url of server. Return value from sharedPreferences or empty string. */
     val serverUrl: String
-        get() = "${getString(R.string.key_communication_network_url, R.string.default_communication_network_url)}:${appContext.getString(R.string.default_communication_network_server_port)}/"
+        get() = "${getString(R.string.key_communication_network_url, R.string.default_communication_network_url)}:" +
+                "${properties["communication.network.server.port"] ?: "8080"}/"
 
     /** Return url of authorization server. Return value from sharedPreferences or empty string. */
     val authorizationServerUrl: String
-        get() = "${getString(R.string.key_communication_network_url, R.string.default_communication_network_url)}:${appContext.getString(R.string.default_communication_network_auth_port)}/"
+        get() = "${getString(R.string.key_communication_network_url, R.string.default_communication_network_url)}:" +
+                "${properties["communication.network.auth.server.port"] ?: "8081"}/"
 
     /**
      * Indicates if can be used cellular for network synchronization.

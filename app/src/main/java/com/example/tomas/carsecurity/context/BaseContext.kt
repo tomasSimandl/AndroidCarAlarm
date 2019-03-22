@@ -2,7 +2,9 @@ package com.example.tomas.carsecurity.context
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import com.example.tomas.carsecurity.R
+import java.util.*
 
 /**
  * Class represents base class for specific contexts. Contains mainly general methods for access values in
@@ -25,6 +27,21 @@ open class BaseContext(val appContext: Context) {
     /** Private shared preferences which are shared across whole application. */
     protected val sharedPreferences: SharedPreferences = appContext.getSharedPreferences(
             appContext.getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+
+    /** Properties which are loaded from config.properties file */
+    val properties = Properties()
+
+    /**
+     * Initialization of configuration properties from file
+     */
+    init {
+        try {
+            properties.load(appContext.assets.open("config.properties"))
+        } catch (e: Exception) {
+            Log.w("BaseContext",
+                    "Can not load configuration from properties. Default configuration will be used.")
+        }
+    }
 
     /**
      * Method returns integer value which is loaded from [sharedPreferences]. When value is not presents resource
