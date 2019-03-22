@@ -11,6 +11,10 @@ import com.example.tomas.carsecurity.sensors.SoundDetector
  * Class is used for preference screen for Sensors
  */
 class SensorsPreferenceFragment : MyPreferenceFragment() {
+
+    /**
+     * Method sets values to switch buttons and append listeners to change any value which disable these switches.
+     */
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         super.onCreatePreferences(savedInstanceState, rootKey)
 

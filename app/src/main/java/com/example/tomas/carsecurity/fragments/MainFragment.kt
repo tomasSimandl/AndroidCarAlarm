@@ -21,23 +21,38 @@ import com.example.tomas.carsecurity.tools.ToolsEnum
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.content_main.view.*
 
+/**
+ * Class represents main fragment which is displayed when application start. View contains only
+ * buttons to control tools.
+ */
 class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
+    /**
+     * Broadcast keys which can be used to communicate with this class over [BroadcastReceiver].
+     */
     enum class BroadcastKeys {
         BroadcastUpdateUI, KeyShowMessage, KeyUtilName, KeyUtilActivated
     }
 
+    /** Instance of [ToolsContext]. */
     private lateinit var toolsContext: ToolsContext
+    /** Indication if alarm activation progress bar is active */
     private var isProgressRun = false
+    /** Indication if alarm activation progress bar can be visible */
     private var canShowProgress = false
 
-
+    /**
+     * Method only initialize [toolsContext]
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         toolsContext = ToolsContext(requireContext())
     }
 
+    /**
+     * Method initialize view of fragment and sets buttons listeners.
+     */
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         val view = inflater.inflate(R.layout.content_main, container, false)
@@ -60,6 +75,10 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
         return view
     }
 
+    /**
+     * Method register this class to [BroadcastReceiver], display only allowed buttons and send request
+     * to [MainService] to get information about actual application status.
+     */
     override fun onResume() {
         super.onResume()
         canShowProgress = false
@@ -70,7 +89,6 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
         changeColor(actionTracker, false)
         changeColor(actionAlarm, false)
 
-
         sendIntent(MainService.Actions.ActionStatusUI.name)
 
         setVisibility(actionAlarm, toolsContext.isAlarmAllowed)
@@ -80,6 +98,9 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
         toolsContext.registerOnPreferenceChanged(this)
     }
 
+    /**
+     * Method only unregister this class from [BroadcastReceiver].
+     */
     override fun onStop() {
         super.onStop()
 
@@ -87,6 +108,10 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
         toolsContext.unregisterOnPreferenceChanged(this)
     }
 
+    /**
+     * Broadcast receiver which handle requests to show error to user or status information about actual
+     * application state.
+     */
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             Log.d(tag, "BroadcastReceiver.onReceive was triggered.")
@@ -107,7 +132,7 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
                 when (utilName) {
                     ToolsEnum.Alarm.name -> {
                         if (utilEnabled && canShowProgress) {
-                            runProgress(context)
+                            runProgress()
                         } else {
                             progressBar.max = 0
                         }
@@ -119,6 +144,16 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
         }
     }
 
+    /**
+     * Method is automatically triggered when value in shared preferences is changed. Method take action only
+     * when keys:
+     * tool_alarm_is_allowed
+     * tool_tracker_is_allowed
+     * tool_battery_mode
+     *
+     * @param p0 is [SharedPreferences] in which was value changed.
+     * @param key is key of actual changed value.
+     */
     override fun onSharedPreferenceChanged(p0: SharedPreferences?, key: String?) {
         when (key) {
             getString(R.string.key_tool_alarm_is_allowed) -> setVisibility(actionAlarm, toolsContext.isAlarmAllowed)
@@ -131,8 +166,11 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
         }
     }
 
-    private fun runProgress(context: Context) {
-        progressBar.max = ToolsContext(context).startAlarmInterval / 1000
+    /**
+     * Display progress bar to user and starts thread which changing its value.
+     */
+    private fun runProgress() {
+        progressBar.max = toolsContext.startAlarmInterval / 1000
         progressBar.progress = 0
 
         if (!isProgressRun) {
@@ -158,6 +196,12 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
         }
     }
 
+    /**
+     * Method sets given visibility to button specified with [button] value.
+     *
+     * @param button is view of which visibility will be changed.
+     * @param visible true = VISIBLE, false = GONE
+     */
     private fun setVisibility(button: View, visible: Boolean) {
         button.visibility = if (visible) {
             Button.VISIBLE
@@ -166,6 +210,12 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
         }
     }
 
+    /**
+     * Method change color of [button]. Color is specified by [enabled].
+     *
+     * @param button is button of which value will be changed.
+     * @param enabled true = Green color, false = Red color.
+     */
     private fun changeColor(button: Button, enabled: Boolean) {
         if (enabled) {
             button.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.enabled))
@@ -174,6 +224,11 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
         }
     }
 
+    /**
+     * Method send direct message over Intent to [MainService]. Intent action is specified by [action].
+     *
+     * @param action is action which will be send to [MainService].
+     */
     private fun sendIntent(action: String) {
         val applicationContext: Context = requireContext()
 
@@ -182,6 +237,11 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
         applicationContext.startService(intent)
     }
 
+    /**
+     * Method send direct message over Intent to [MainService]. Message sends command to change actual state of [util].
+     *
+     * @param util specification of util of which status should be changed.
+     */
     private fun sendIntentSwitchUtil(util: ToolsEnum) {
         val applicationContext: Context = requireContext()
 

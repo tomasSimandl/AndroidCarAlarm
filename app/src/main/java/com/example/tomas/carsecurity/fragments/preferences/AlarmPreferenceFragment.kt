@@ -11,6 +11,9 @@ import com.example.tomas.carsecurity.utils.CallProvider
  */
 class AlarmPreferenceFragment : MyPreferenceFragment() {
 
+    /**
+     * Method sets values to switch buttons and append listeners to change any value which disable these switches.
+     */
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         super.onCreatePreferences(savedInstanceState, rootKey)
 

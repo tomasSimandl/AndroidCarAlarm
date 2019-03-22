@@ -1,6 +1,10 @@
 package com.example.tomas.carsecurity.fragments
 
-import android.content.*
+import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.content.LocalBroadcastManager
@@ -18,16 +22,26 @@ import kotlinx.android.synthetic.main.dialog_create_car.*
 import kotlinx.android.synthetic.main.login_fragment.*
 import kotlinx.android.synthetic.main.login_fragment.view.*
 
+/**
+ * Class represents login view and part of login logic.
+ */
 class LoginFragment : Fragment() {
 
+    /**
+     * Enum of broadcast keys which can be used to communicate with this class over [BroadcastReceiver].
+     */
     enum class BroadcastKeys {
         BroadcastLoginResult, BroadcastGetCarsResult, BroadcastCreateCarsResult, KeySuccess, KeyErrorMessage, KeyCars
     }
 
+    /** Instance of [CommunicationManager] used for sending login requests. */
     private lateinit var communicationManager: CommunicationManager
+    /** Instance of [CommunicationContext] */
     private lateinit var communicationContext: CommunicationContext
 
-
+    /**
+     * Set login view and listeners to buttons in view.
+     */
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         val view = inflater.inflate(R.layout.login_fragment, container, false)
@@ -37,10 +51,14 @@ class LoginFragment : Fragment() {
         return view
     }
 
+    /**
+     * Initialize [communicationManager] and [communicationContext]. Register this class to [BroadcastReceiver] and
+     * decide if should be visible login or logout view.
+     */
     override fun onResume() {
         super.onResume()
 
-        if(!::communicationContext.isInitialized) communicationContext = CommunicationContext(requireContext())
+        if (!::communicationContext.isInitialized) communicationContext = CommunicationContext(requireContext())
         communicationManager = CommunicationManager.getInstance(communicationContext)
 
         login_error_text_view.visibility = View.GONE
@@ -56,21 +74,27 @@ class LoginFragment : Fragment() {
         }).start()
 
         val broadcastManager = LocalBroadcastManager.getInstance(requireContext())
-        broadcastManager.registerReceiver(receiver, IntentFilter(BroadcastKeys.BroadcastLoginResult.name))
+        broadcastManager.registerReceiver(loginReceiver, IntentFilter(BroadcastKeys.BroadcastLoginResult.name))
         broadcastManager.registerReceiver(getCarsReceiver, IntentFilter(BroadcastKeys.BroadcastGetCarsResult.name))
         broadcastManager.registerReceiver(createCarReceiver, IntentFilter(BroadcastKeys.BroadcastCreateCarsResult.name))
     }
 
+    /**
+     * Unregister this class from [BroadcastReceiver].
+     */
     override fun onStop() {
         super.onStop()
 
-        // communicationManager.destroy() CommunicationManager is destroyed at MainService
-        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(receiver)
+        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(loginReceiver)
         LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(getCarsReceiver)
         LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(createCarReceiver)
     }
 
-    private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
+    /**
+     * Receiver which handle results of login request to communication manager. On success login method change view
+     * and send request to list users cars. Otherwise show error.
+     */
+    private val loginReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             Log.d(tag, "BroadcastReceiver.onReceive was triggered.")
 
@@ -78,7 +102,7 @@ class LoginFragment : Fragment() {
 
             if (intent.getBooleanExtra(BroadcastKeys.KeySuccess.name, false)) {
                 communicationContext.isLogin = true
-                if(!communicationManager.sendNetworkGetCars()){
+                if (!communicationManager.sendNetworkGetCars()) {
                     showError(requireContext().getString(R.string.err_login_init_network))
                     logoutButtonAction()
                     btn_login.isEnabled = true
@@ -90,10 +114,12 @@ class LoginFragment : Fragment() {
         }
     }
 
+    /**
+     * Receiver which handle results of get list of users cars. On success show list to user. Otherwise show error.
+     */
     private val getCarsReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             Log.d(tag, "getCarsReceiver.onReceive was triggered.")
-
 
             val error = intent.getStringExtra(BroadcastKeys.KeyErrorMessage.name)
 
@@ -110,6 +136,9 @@ class LoginFragment : Fragment() {
         }
     }
 
+    /**
+     * Receiver which handle create new car request. On success inform [communicationManager]. Otherwise show error.
+     */
     private val createCarReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             Log.d(tag, "createCarReceiver.onReceive was triggered.")
@@ -125,11 +154,19 @@ class LoginFragment : Fragment() {
         }
     }
 
+    /**
+     * Method show login view.
+     */
     private fun showLogin() {
         logout_view.post { logout_view.visibility = View.GONE }
         login_view.post { login_view.visibility = View.VISIBLE }
     }
 
+    /**
+     * Method show logout view and display message with users name in view.
+     *
+     * @param username is name of actual login user.
+     */
     private fun showLogout(username: String) {
         logout_view.post { logout_view.visibility = View.VISIBLE }
         login_view.post { login_view.visibility = View.GONE }
@@ -138,6 +175,10 @@ class LoginFragment : Fragment() {
         }
     }
 
+    /**
+     * Method represents login button action. Form inputs are validate. On success validation login request is send
+     * to [communicationManager].
+     */
     private fun loginButtonAction() {
 
         btn_login.isEnabled = false
@@ -149,11 +190,14 @@ class LoginFragment : Fragment() {
         }
 
         // show spinner
-        if(!communicationManager.sendNetworkLogin(input_username.text.toString(), input_password.text.toString())){
+        if (!communicationManager.sendNetworkLogin(input_username.text.toString(), input_password.text.toString())) {
             showError(requireContext().getString(R.string.err_login_init_network))
         }
     }
 
+    /**
+     * Method represents logout button action. Database with all users data is cleared.
+     */
     private fun logoutButtonAction() {
         btn_logout.isEnabled = false
         btn_login.isEnabled = true
@@ -166,10 +210,19 @@ class LoginFragment : Fragment() {
         }).start()
     }
 
+    /**
+     * Method returns if form inputs on login view are valid for sending of login request.
+     * @return true if inputs are valid, false otherwise.
+     */
     private fun validInputs(): Boolean {
         return !input_username.text.isBlank() && !input_password.text.isBlank()
     }
 
+    /**
+     * Method display dialog of actual users cars and with option to create a new car.
+     *
+     * @param cars is list of cars which will be displayed. Car should be LinkedTreeMap with attribute name.
+     */
     private fun showCarListDialog(cars: List<*>) {
         val alertDialog: AlertDialog? = activity?.let {
 
@@ -197,10 +250,13 @@ class LoginFragment : Fragment() {
                     .setNeutralButton(R.string.create_new_car) { _, _ -> showCreateCarDialog() }
                     .create()
         }
-
         alertDialog?.show()
     }
 
+    /**
+     * Method show dialog to create new car. Non empty name is than sand to server over [communicationManager].
+     */
+    @SuppressLint("InflateParams")
     private fun showCreateCarDialog() {
         Log.d(tag, "New car will be created")
 
@@ -217,7 +273,7 @@ class LoginFragment : Fragment() {
                         if (name.isBlank()) {
                             showCreateCarDialog()
                         } else {
-                            if(!communicationManager.sendNetworkCreateCar(name.toString())){
+                            if (!communicationManager.sendNetworkCreateCar(name.toString())) {
                                 showError(requireContext().getString(R.string.err_login_init_network))
                                 logoutButtonAction()
                             }
@@ -229,7 +285,11 @@ class LoginFragment : Fragment() {
         alertDialog?.show()
     }
 
-    private fun showError(text: String){
+    /**
+     * Method display [text] as error message and allow click to login button.
+     * @param text is error message which will be visible to user.
+     */
+    private fun showError(text: String) {
         login_error_text_view.text = text
         login_error_text_view.visibility = View.VISIBLE
         btn_login.isEnabled = true

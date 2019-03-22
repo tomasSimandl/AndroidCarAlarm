@@ -11,8 +11,14 @@ import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.preference.CheckBoxPreference
 import android.support.v7.preference.Preference
-import com.example.tomas.carsecurity.*
+import com.example.tomas.carsecurity.CheckCodes
+import com.example.tomas.carsecurity.CheckObjByte
+import com.example.tomas.carsecurity.CheckObjString
+import com.example.tomas.carsecurity.R
 
+/**
+ * Base class of all preference fragment classes used in application.
+ */
 open class MyPreferenceFragment : PreferenceFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     /**
@@ -100,7 +106,7 @@ open class MyPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
      * @param prefKey preference key. Must be [SwitchPreference]
      * @param checkObj Class which is associated with preference key
      */
-    protected fun registerPreferenceCheck(prefKey: Int, checkObj: CheckObjString){
+    protected fun registerPreferenceCheck(prefKey: Int, checkObj: CheckObjString) {
 
         findPreference(getString(prefKey))?.setOnPreferenceChangeListener { _: Preference, value: Any ->
             if (value == true) {
@@ -126,7 +132,12 @@ open class MyPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
      * @param permMsg message which is describing why permission is needed
      * @param permissions array of requested permissions
      */
-    protected fun registerPreferenceCheck(prefKey: Int, checkObj: CheckObjByte, permMsg: String, permissions: Array<String>) {
+    protected fun registerPreferenceCheck(
+            prefKey: Int,
+            checkObj: CheckObjByte,
+            permMsg: String,
+            permissions: Array<String>
+    ) {
 
         findPreference(getString(prefKey))?.setOnPreferenceChangeListener { _: Preference, value: Any ->
             if (value == true) {
@@ -134,8 +145,18 @@ open class MyPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
                 val checkCode = checkObj.check(activity)
 
                 when (checkCode) {
-                    CheckCodes.invalidParameters -> showMessage(getString(R.string.error_invalid_params), getString(R.string.error_msg_title), DialogInterface.OnClickListener { _, _ ->  }, null)
-                    CheckCodes.hardwareNotSupported -> showMessage(getString(R.string.error_hw_not_supported), getString(R.string.error_msg_title), DialogInterface.OnClickListener { _, _ ->  }, null)
+                    CheckCodes.invalidParameters -> showMessage(
+                            getString(R.string.error_invalid_params),
+                            getString(R.string.error_msg_title),
+                            DialogInterface.OnClickListener { _, _ -> },
+                            null)
+
+                    CheckCodes.hardwareNotSupported -> showMessage(
+                            getString(R.string.error_hw_not_supported),
+                            getString(R.string.error_msg_title),
+                            DialogInterface.OnClickListener { _, _ -> },
+                            null)
+
                     CheckCodes.permissionDenied -> askForPermission(prefKey, permMsg, permissions)
                     else -> return@setOnPreferenceChangeListener true
                 }
@@ -148,16 +169,19 @@ open class MyPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
     /**
      * Method is used for displaying permission requests according to given parameters. When it is
      * necessary description message is displayed before before permission request. Result of
-     * request is processed by [SettingsActivity].
+     * request is processed by [com.example.tomas.carsecurity.activities.SettingsActivity].
      *
      * @param code preference key which is used as permission request code
      * @param permMsg message which is describing why permission is needed
      * @param permissions array of requested permissions
      */
-    private fun askForPermission(code: Int, permMsg: String, permissions: Array<String> ) {
+    private fun askForPermission(code: Int, permMsg: String, permissions: Array<String>) {
         if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.READ_CONTACTS)) {
-            showMessage(permMsg,"Permission request",
-                    DialogInterface.OnClickListener { _, _ -> ActivityCompat.requestPermissions(activity, permissions, code)},
+            showMessage(permMsg, "Permission request",
+                    DialogInterface.OnClickListener { _, _ ->
+                        ActivityCompat.requestPermissions(activity, permissions, code)
+                    },
+
                     DialogInterface.OnClickListener { _, _ -> }
             )
         } else {
@@ -173,13 +197,17 @@ open class MyPreferenceFragment : PreferenceFragment(), SharedPreferences.OnShar
      * @param positiveButton if null button is not displayed otherwise is displayed OK button
      * @param negativeButton if null button is not displayed otherwise is displayed CANCEL button
      */
-    private fun showMessage(msg: String, title: String, positiveButton: DialogInterface.OnClickListener?, negativeButton: DialogInterface.OnClickListener?) {
+    private fun showMessage(msg: String,
+                            title: String,
+                            positiveButton: DialogInterface.OnClickListener?,
+                            negativeButton: DialogInterface.OnClickListener?
+    ) {
         val dialog = AlertDialog.Builder(activity)
                 .setMessage(msg)
                 .setTitle(title)
 
         if (positiveButton != null) dialog.setPositiveButton(R.string.ok, positiveButton)
-        if(negativeButton != null) dialog.setNegativeButton(R.string.cancel, negativeButton)
+        if (negativeButton != null) dialog.setNegativeButton(R.string.cancel, negativeButton)
 
         dialog.create().show()
     }
