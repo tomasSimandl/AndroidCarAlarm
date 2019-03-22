@@ -21,19 +21,20 @@ import com.example.tomas.carsecurity.context.SensorContext
  */
 class MoveDetector(private val context: MyContext) : GeneralObservable(), SensorEventListener {
 
+    /** Logger tag */
     private val tag = "sensors.MoveDetector"
 
     /** Array contains data which are given by last acceleration sensor activity. */
-    private var lastAcceleration :FloatArray
+    private var lastAcceleration: FloatArray
     /** Indicates if accelerometer return some data from last activation. */
     private var firstRun = false
     /** Indicates if move detector is enabled */
     private var enabled = false
 
     /** Class which is used for accelerometer sensor controlling. */
-    private val manager :SensorManager
+    private val manager: SensorManager
     /** Class represents accelerometer sensor. */
-    private val sensor :Sensor?
+    private val sensor: Sensor?
 
 
     /**
@@ -45,12 +46,18 @@ class MoveDetector(private val context: MyContext) : GeneralObservable(), Sensor
         manager = context.appContext.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         sensor = manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
 
-        if(sensor == null){
+        if (sensor == null) {
             Log.e(tag, "No acceleration sensor in this device")
         }
     }
 
-    companion object Check: CheckObjByte {
+    /** Object is used for static access to check method */
+    companion object Check : CheckObjByte {
+        /**
+         * Method is used for check if move sensor observation can be enabled.
+         * @param context is application context
+         * @return [CheckCodes] which represents results of check method.
+         */
         override fun check(context: Context): Byte {
             return if (!context.packageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_ACCELEROMETER)) {
                 CheckCodes.hardwareNotSupported
@@ -62,6 +69,11 @@ class MoveDetector(private val context: MyContext) : GeneralObservable(), Sensor
         }
     }
 
+    /**
+     * Method return if observation of move sensor can be enabled.
+     *
+     * @return true when observation of move sensor by this class can be enabled.
+     */
     override fun canEnable(): Boolean {
         return check(context.appContext) == CheckCodes.success
     }
@@ -71,7 +83,7 @@ class MoveDetector(private val context: MyContext) : GeneralObservable(), Sensor
      * automatically turn off accelerometer sensor.
      */
     override fun disable() {
-        if(enabled) {
+        if (enabled) {
             manager.unregisterListener(this)
             enabled = false
             firstRun = true
@@ -83,7 +95,7 @@ class MoveDetector(private val context: MyContext) : GeneralObservable(), Sensor
      * Method activate accelerometer sensor.
      */
     override fun enable() {
-        if(!enabled && sensor != null && check(context.appContext) == CheckCodes.success) {
+        if (!enabled && sensor != null && check(context.appContext) == CheckCodes.success) {
             manager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL, Handler(context.mainServiceThreadLooper))
             enabled = true
             Log.d(tag, "Detector is enabled")
@@ -117,7 +129,7 @@ class MoveDetector(private val context: MyContext) : GeneralObservable(), Sensor
     override fun onSensorChanged(event: SensorEvent?) {
 
         if (event?.values?.size == null || event.values.size != context.sensorContext.dimensions) {
-            Log.w(tag,"Incoming event is invalid or have invalid dimension")
+            Log.w(tag, "Incoming event is invalid or have invalid dimension")
             return
         }
 

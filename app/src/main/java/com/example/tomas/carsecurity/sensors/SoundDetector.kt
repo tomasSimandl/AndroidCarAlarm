@@ -7,7 +7,10 @@ import android.content.pm.PackageManager
 import android.media.MediaRecorder
 import android.support.v4.content.ContextCompat
 import android.util.Log
-import com.example.tomas.carsecurity.*
+import com.example.tomas.carsecurity.CheckCodes
+import com.example.tomas.carsecurity.CheckObjByte
+import com.example.tomas.carsecurity.R
+import com.example.tomas.carsecurity.WorkerThread
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.context.SensorContext
 import java.io.IOException
@@ -19,8 +22,9 @@ import java.util.*
  *
  * @property  context which is used for getting global data and preferences.
  */
-class SoundDetector(private val context : MyContext) : GeneralObservable(), SharedPreferences.OnSharedPreferenceChangeListener {
+class SoundDetector(private val context: MyContext) : GeneralObservable(), SharedPreferences.OnSharedPreferenceChangeListener {
 
+    /** Logger tag */
     private val tag = "sensors.SoundDetector"
 
     /** Class used for audio recording. When sound detector is disable variable should be null */
@@ -28,9 +32,18 @@ class SoundDetector(private val context : MyContext) : GeneralObservable(), Shar
     /** Indicates when sound detector is enabled. */
     private var enabled = false
 
+    /** Timer which handles getting value from sound sensor with specific period. */
     private var timer: Timer? = null
 
-    companion object Check: CheckObjByte {
+    /**
+     * Object is used for static access to check method.
+     */
+    companion object Check : CheckObjByte {
+        /**
+         * Method check is used detection if observation of sound sensor can be enabled.
+         * @param context is application context
+         * @return true when observation of sound sensor can be enabled.
+         */
         override fun check(context: Context): Byte {
             return if (!context.packageManager.hasSystemFeature(PackageManager.FEATURE_MICROPHONE)) {
                 CheckCodes.hardwareNotSupported
@@ -44,10 +57,19 @@ class SoundDetector(private val context : MyContext) : GeneralObservable(), Shar
         }
     }
 
+    /**
+     * Method indicates if observation of sound sensor can be enabled.
+     *
+     * @return true when observation of sound sensor by this method can be enabled.
+     */
     override fun canEnable(): Boolean {
         return check(context.appContext) == CheckCodes.success
     }
 
+    /**
+     * Method is called when any value in shared preferences is changed. Method detects only change in sound measure
+     * interval value. When this value is changed. Sound sensor is reinitialized.
+     */
     override fun onSharedPreferenceChanged(p0: SharedPreferences?, key: String?) {
         val task = Runnable {
             when (key) {
@@ -65,7 +87,7 @@ class SoundDetector(private val context : MyContext) : GeneralObservable(), Shar
      * Method stop sound detector and stop recording audio from microphone.
      */
     override fun disable() {
-        if(enabled) {
+        if (enabled) {
             enabled = false
             timer?.cancel()
             timer = null
@@ -84,7 +106,7 @@ class SoundDetector(private val context : MyContext) : GeneralObservable(), Shar
      * It is possible that recording will not start.
      */
     override fun enable() {
-        if(!enabled && check(context.appContext) == CheckCodes.success) {
+        if (!enabled && check(context.appContext) == CheckCodes.success) {
 
             enabled = true
 
@@ -114,7 +136,7 @@ class SoundDetector(private val context : MyContext) : GeneralObservable(), Shar
      *
      * @return true if sound detector is enabled, false otherwise
      */
-    override fun isEnable() :Boolean {
+    override fun isEnable(): Boolean {
         return enabled
     }
 
@@ -127,7 +149,7 @@ class SoundDetector(private val context : MyContext) : GeneralObservable(), Shar
      * When sound detector is disabled thread ends before next amplitude checking. Can be in sleep
      * state for maximal [SensorContext].measureInterval milliseconds before it ends.
      */
-    private fun initSoundChecker(){
+    private fun initSoundChecker() {
         val timerTask = object : TimerTask() {
             override fun run() {
 
@@ -135,7 +157,7 @@ class SoundDetector(private val context : MyContext) : GeneralObservable(), Shar
 
                 val amplitude = recorder?.maxAmplitude ?: 0
                 if (amplitude > context.sensorContext.maxAmplitude) {
-                    Log.d(tag,"""Max amplitude $amplitude is over limit ${context.sensorContext.maxAmplitude}""")
+                    Log.d(tag, """Max amplitude $amplitude is over limit ${context.sensorContext.maxAmplitude}""")
 
                     setChanged()
                     notifyObservers()
@@ -145,6 +167,6 @@ class SoundDetector(private val context : MyContext) : GeneralObservable(), Shar
         }
 
         timer = Timer("SoundDetectorThread")
-        timer?.schedule( timerTask, context.sensorContext.measureInterval.toLong(), context.sensorContext.measureInterval.toLong())
+        timer?.schedule(timerTask, context.sensorContext.measureInterval.toLong(), context.sensorContext.measureInterval.toLong())
     }
 }
