@@ -12,7 +12,9 @@ import android.view.MenuItem
 import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.fragments.preferences.*
 
-
+/**
+ * This class represents activity with application settings.
+ */
 class SettingsActivity : AppCompatPreferenceActivity() {
 
     /**
@@ -23,12 +25,13 @@ class SettingsActivity : AppCompatPreferenceActivity() {
 
         actionBar?.setDisplayShowHomeEnabled(true)
         actionBar?.setDisplayHomeAsUpEnabled(true)
-//        val sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-//        sharedPreferences.edit().clear().apply()
     }
 
     /**
      * Handle back arrow click in action bar
+     *
+     * @param item is menuItem which was selected.
+     * @return true if action was handled, false otherwise.
      */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
@@ -42,13 +45,14 @@ class SettingsActivity : AppCompatPreferenceActivity() {
 
     /**
      * Return if preferences should be displayed in multi panel view.
+     * @return true if preferences should be displayed in multi panel view.
      */
     override fun onIsMultiPane(): Boolean {
         return resources.configuration.screenLayout and Configuration.SCREENLAYOUT_SIZE_MASK >= Configuration.SCREENLAYOUT_SIZE_XLARGE
     }
 
     /**
-     * Load preference headers.
+     * Loads preference headers.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     override fun onBuildHeaders(target: List<PreferenceActivity.Header>) {
@@ -56,7 +60,10 @@ class SettingsActivity : AppCompatPreferenceActivity() {
     }
 
     /**
-     * Method check if input fragment name is valid fragment which is allowed in this activity.
+     * Method check if input [fragmentName] is valid fragment which is allowed in this activity.
+     *
+     * @param fragmentName class name of fragment
+     * @return true if fragment is allowed, false otherwise
      */
     override fun isValidFragment(fragmentName: String): Boolean {
         return PreferenceFragment::class.java.name == fragmentName
@@ -68,12 +75,16 @@ class SettingsActivity : AppCompatPreferenceActivity() {
     }
 
     /**
-     * Method handle result of permission request.
+     * Method handle results of permission requests.
+     *
+     * @param requestCode identification number of our request
+     * @param permissions list of requested permissions
+     * @param grantResults list of permission request results.
      */
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>?, grantResults: IntArray?) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        if ((grantResults!!.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+        if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
 
             if (requestCode == R.string.key_sensor_sound_is_allowed
                     || requestCode == R.string.key_sensor_location_is_allowed
