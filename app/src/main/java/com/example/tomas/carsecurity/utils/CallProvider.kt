@@ -12,11 +12,23 @@ import com.example.tomas.carsecurity.CheckObjByte
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.context.ToolsContext
 
-class CallProvider (private val context: MyContext) {
+/**
+ * Class which is used for creating calls to phone number stored in SharedPreferences.
+ *
+ * @param context is my context used for access values in shared preferences.
+ */
+class CallProvider(private val context: MyContext) {
 
+    /** Logger tag */
     private val tag = "CallProvider"
 
-    companion object Check: CheckObjByte {
+    /**
+     * Object used for static access to [check] method.
+     */
+    companion object Check : CheckObjByte {
+        /**
+         * Method checks if service for making calls can be used.
+         */
         override fun check(context: Context): Byte {
             return if (!context.packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
                 CheckCodes.hardwareNotSupported
@@ -30,7 +42,9 @@ class CallProvider (private val context: MyContext) {
         }
     }
 
-
+    /**
+     * Method create call on phone number which is stored in SharedPreferences and set by user.
+     */
     fun createCall() {
         if (check(context.appContext) == CheckCodes.success) {
             val phoneNumber = context.communicationContext.phoneNumber
