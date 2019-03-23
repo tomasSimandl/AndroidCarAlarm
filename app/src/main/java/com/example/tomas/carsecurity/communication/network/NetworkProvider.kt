@@ -195,14 +195,26 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
 
                 val routes = storage.routeService.getRoutes()
                 val routesWithId: MutableList<Route> = ArrayList()
+                val emptyRoutes: MutableList<Route> = ArrayList()
                 var maxRouteId: Int = Integer.MIN_VALUE
                 for (route in routes) {
                     if (route.uid > maxRouteId) maxRouteId = route.uid
 
-                    if (route.serverRouteId != null) {
-                        routesWithId.add(route)
-                    } else {
-                        sendRoute(route)
+                    when {
+                        route.serverRouteId != null ->
+                            routesWithId.add(route)
+                        storage.locationService.getLocationsByLocalRouteId(route.uid).isEmpty() ->
+                            emptyRoutes.add(route)
+                        else ->
+                            sendRoute(route)
+                    }
+                }
+
+                emptyRoutes.forEach {
+                    // remove routes which has no positions and it is not the last route in db
+                    if (it.uid < maxRouteId) {
+                        storage.routeService.deleteRoute(it)
+                        Log.d(tag, "Removing empty route from date: ${it.time}")
                     }
                 }
 
