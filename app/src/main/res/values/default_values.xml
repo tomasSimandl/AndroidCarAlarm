@@ -47,7 +47,7 @@
     <!-- Minimal acceptable distance between last and new location in Tracker. -->
     <integer name="default_tool_tracker_ignore_distance">10</integer>
     <!-- Milliseconds after Tracker will be disabled when location is not changing. -->
-    <integer name="default_tool_tracker_timeout">6</integer>
+    <integer name="default_tool_tracker_timeout">300</integer>
 
     <!-- Indicates if battery mode can be automatically changed -->
     <bool name="default_tool_battery_mode_is_allowed">true</bool>

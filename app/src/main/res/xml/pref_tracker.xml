@@ -29,9 +29,9 @@
             android:dependency="@string/key_tool_tracker_is_allowed"
             android:defaultValue="@integer/default_tool_tracker_timeout"
 
-            sample:msbp_minValue="5"
-            sample:msbp_maxValue="300"
-            sample:msbp_interval="5"
+            sample:msbp_minValue="60"
+            sample:msbp_maxValue="600"
+            sample:msbp_interval="10"
             sample:msbp_measurementUnit="s"
             sample:msbp_dialogEnabled="false"/>
 
