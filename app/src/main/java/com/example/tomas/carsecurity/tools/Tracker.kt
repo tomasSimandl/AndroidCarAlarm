@@ -24,6 +24,8 @@ class Tracker(private val context: MyContext, private val toolsHelper: ToolsHelp
     private var lastLocation: Location? = null
     private var isEnabled = false
     private var actualRoute: Route? = null
+    private var lastUpdateTime: Date = Date()
+    private var timeoutTimer: Timer = Timer("TimeoutTimer")
 
     //private lateinit var timer: Timer
 
@@ -94,11 +96,9 @@ class Tracker(private val context: MyContext, private val toolsHelper: ToolsHelp
         if (location.distanceTo(lastLocation) > context.toolsContext.ignoreDistance) {
             val dbLocation = DbLocation(location, actualRoute?.uid, location.distanceTo(lastLocation))
             lastLocation = location
-            toolsHelper.communicationManager.sendLocation(dbLocation, isAlarm = false, cache = true)
+            lastUpdateTime = Date()
 
-        } else if (location.time - lastLocation!!.time > context.toolsContext.timeout) {
-            Log.d(tag, "Time not moving time interval passed. Tracker will be stopped.")
-            disable()
+            toolsHelper.communicationManager.sendLocation(dbLocation, isAlarm = false, cache = true)
         }
     }
 
@@ -121,6 +121,9 @@ class Tracker(private val context: MyContext, private val toolsHelper: ToolsHelp
 
             actualRoute = Route(carId = user.carId)
             actualRoute!!.uid = storage.routeService.saveRoute(actualRoute!!).toInt()
+
+            timeoutTimer.schedule(timeoutCheckTask, context.toolsContext.timeout)
+            lastUpdateTime = Date()
 
             setChanged()
             notifyObservers(true)
@@ -170,4 +173,17 @@ class Tracker(private val context: MyContext, private val toolsHelper: ToolsHelp
             false
         }
     }
+
+    private val timeoutCheckTask: TimerTask
+        get() = object: TimerTask() {
+            override fun run() {
+                val timeLeft = context.toolsContext.timeout - (Date().time - lastUpdateTime.time)
+                if(timeLeft <= 0) {
+                    Log.d(tag, "Not moving time interval passed. Tracker will be stopped.")
+                    disable()
+                } else {
+                    timeoutTimer.schedule(timeoutCheckTask, timeLeft)
+                }
+            }
+        }
 }

@@ -62,7 +62,7 @@ class ToolsContext(appContext: Context) : BaseContext(appContext) {
 
     /** Returns not moving timeout in milliseconds. Value is taken from shared preferences or it is used default value. */
     val timeout
-        get() = getInt(R.string.key_tool_tracker_timeout, R.integer.default_tool_tracker_timeout) * 1000
+        get() = getInt(R.string.key_tool_tracker_timeout, R.integer.default_tool_tracker_timeout).toLong() * 1000
 
 
     // ======================================== ALARM UTIL =========================================
