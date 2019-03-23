@@ -5,7 +5,7 @@ import java.util.*
 
 abstract class GeneralTool(private val toolsHelper: ToolsHelper) : Observer, Observable() {
 
-    abstract val thisUtilEnum: ToolsEnum
+    abstract val thisToolEnum: ToolsEnum
 
     // UtilsThread
     abstract fun action(observable: Observable, args: Any?)

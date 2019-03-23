@@ -11,7 +11,7 @@ import java.util.*
 
 class BatteryManager (private val context: MyContext, private val toolsHelper: ToolsHelper): GeneralTool(toolsHelper), SharedPreferences.OnSharedPreferenceChangeListener {
 
-    override val thisUtilEnum: ToolsEnum = ToolsEnum.Battery
+    override val thisToolEnum: ToolsEnum = ToolsEnum.Battery
     private val tag = "BatteryManager"
     private var enabled = false
     private var shouldBeSaveMode = false

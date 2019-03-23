@@ -23,6 +23,7 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
 
     private val tag = "tools.Alarm"
 
+    override val thisToolEnum: ToolsEnum = ToolsEnum.Alarm
     private var isEnabled = false
     private var isAlarm = false
     private var isAlert = false
@@ -33,7 +34,6 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
     private var sendSmsTimer: Timer? = null
     private var mediaPlayer: MediaPlayer? = null
 
-    override val thisUtilEnum: ToolsEnum = ToolsEnum.Alarm
 
     companion object Check: CheckObjString {
         override fun check(context: Context, skipAllow: Boolean): String {
@@ -188,7 +188,7 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
             Log.d(tag, "Alarm system is enabled")
             context.toolsContext.registerOnPreferenceChanged(this)
 
-            toolsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, true)
+            toolsHelper.communicationManager.sendUtilSwitch(thisToolEnum, true)
         }
 
     }
@@ -215,7 +215,7 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
 
             Log.d(tag, "Alarm system disabled")
 
-            toolsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, false)
+            toolsHelper.communicationManager.sendUtilSwitch(thisToolEnum, false)
         }
 
     }

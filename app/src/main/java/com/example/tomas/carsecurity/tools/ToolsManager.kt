@@ -50,7 +50,7 @@ class ToolsManager(private val context: MyContext): Observer, Observable() {
                 when (args) {
                     is Boolean -> {
                         setChanged()
-                        notifyObservers(Pair(observable.thisUtilEnum, args))
+                        notifyObservers(Pair(observable.thisToolEnum, args))
 
                         if (!isAnyUtilEnabled()) {
                             setChanged()
@@ -93,7 +93,7 @@ class ToolsManager(private val context: MyContext): Observer, Observable() {
 
     fun isAnyUtilEnabled(): Boolean{
         for (util in toolsMap.values){
-            if(!defaultUtils.contains(util.thisUtilEnum) && util.isEnabled()) return true
+            if(!defaultUtils.contains(util.thisToolEnum) && util.isEnabled()) return true
         }
         return false
     }

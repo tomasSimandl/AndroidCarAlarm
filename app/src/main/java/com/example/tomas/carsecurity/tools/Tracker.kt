@@ -27,7 +27,7 @@ class Tracker(private val context: MyContext, private val toolsHelper: ToolsHelp
 
     //private lateinit var timer: Timer
 
-    override val thisUtilEnum: ToolsEnum = ToolsEnum.Tracker
+    override val thisToolEnum: ToolsEnum = ToolsEnum.Tracker
 
     companion object Check : CheckObjString {
         override fun check(context: Context, skipAllow: Boolean): String {
@@ -128,7 +128,7 @@ class Tracker(private val context: MyContext, private val toolsHelper: ToolsHelp
             context.toolsContext.registerOnPreferenceChanged(this)
 
             Log.d(tag, "Tracker system is enabled.")
-            toolsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, true)
+            toolsHelper.communicationManager.sendUtilSwitch(thisToolEnum, true)
         }
 
     }
@@ -149,7 +149,7 @@ class Tracker(private val context: MyContext, private val toolsHelper: ToolsHelp
             notifyObservers(false)
 
             Log.d(tag, "Tracker system is disabled.")
-            toolsHelper.communicationManager.sendUtilSwitch(thisUtilEnum, false)
+            toolsHelper.communicationManager.sendUtilSwitch(thisToolEnum, false)
         }
 
     }
