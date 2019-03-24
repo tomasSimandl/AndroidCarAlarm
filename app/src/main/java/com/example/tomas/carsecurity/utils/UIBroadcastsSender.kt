@@ -24,7 +24,7 @@ class UIBroadcastsSender(private val context: Context) {
     fun informUI(utilEnum: ToolsEnum, enabled: Boolean) {
         Log.d(tag, """Sending information about util to UI. Util: ${utilEnum.name} is
             |${if (enabled) "enabled" else "disabled"}.""".trimMargin())
-        
+
         val intent = Intent(MainFragment.BroadcastKeys.BroadcastUpdateUI.name)
 
         intent.putExtra(MainFragment.BroadcastKeys.KeyUtilName.name, utilEnum.name)

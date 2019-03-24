@@ -8,39 +8,64 @@ import com.example.tomas.carsecurity.utils.BatteryUtil
 import java.util.*
 import kotlin.collections.HashMap
 
-class ToolsManager(private val context: MyContext): Observer, Observable() {
+/**
+ * Class is used for creating and stopping tools.
+ *
+ * @param context is my context used mainly for access shared preferences.
+ */
+class ToolsManager(private val context: MyContext) : Observer, Observable() {
 
+    /** Logger tag */
     private val tag = "tools.ToolsManager"
 
+    /** Instance of [ToolsHelper] used for connect sensors and tools. */
     private val toolsHelper = ToolsHelper(context)
 
+    /** List of tools identifies by their enums */
     private val toolsMap: MutableMap<ToolsEnum, GeneralTool> = HashMap()
 
-    // Utils which are activate in all application runtime even if service is not foreground
+    /** Utils which are activate in all application runtime even if service is not foreground */
     private val defaultUtils = arrayOf(ToolsEnum.Battery)
 
+    /**
+     * Run initialization of default tools.
+     */
     init {
         activateDefaultUtils()
     }
 
-    private fun activateDefaultUtils(){
-        for (util in defaultUtils){
+    /**
+     * Method activate all utils defined by [defaultUtils] variable.
+     */
+    private fun activateDefaultUtils() {
+        for (util in defaultUtils) {
             activateUtil(util)
         }
     }
 
-    fun destroy(){
+    /**
+     * Destroy all existing utils and [toolsHelper].
+     */
+    fun destroy() {
         Log.d(tag, "Destroy")
 
-        for(util in toolsMap.values){
+        for (util in toolsMap.values) {
             util.deleteObservers()
-            if(util.isEnabled()) util.disable(true)
+            if (util.isEnabled()) util.disable(true)
         }
 
         // destroy after all tools are disabled
         toolsHelper.destroy()
     }
 
+    /**
+     * Method respond on notifications from tools. Notification is send next by calling
+     * [notifyObservers] method. When all observers all disabled inform [MainService] to
+     * stop Foreground mode. Body of this method always run in MainServiceThread.
+     *
+     * @param observable which calls [notifyObservers] method
+     * @param args additional arguments.
+     */
     override fun update(observable: Observable, args: Any) {
 
         val task = Runnable {
@@ -72,6 +97,13 @@ class ToolsManager(private val context: MyContext): Observer, Observable() {
         }
     }
 
+    /**
+     * Method change status of tool.
+     * enable -> disable
+     * disable -> enable
+     *
+     * @param utilEnum identifies tool of which status will be changed.
+     */
     fun switchUtil(utilEnum: ToolsEnum) {
         // tasks are running sequentially in one thread
         val tool: GeneralTool = getGenericUtil(utilEnum)
@@ -83,34 +115,62 @@ class ToolsManager(private val context: MyContext): Observer, Observable() {
         }
     }
 
+    /**
+     * Method enable tool given by [utilEnum]
+     *
+     * @param utilEnum identifies tool which will be enabled.
+     */
     fun activateUtil(utilEnum: ToolsEnum) {
         getGenericUtil(utilEnum).enable()
     }
 
+    /**
+     * Method disable tool given by [utilEnum]
+     *
+     * @param utilEnum identifies tool which will be disabled.
+     */
     fun deactivateUtil(utilEnum: ToolsEnum) {
         getGenericUtil(utilEnum).disable()
     }
 
-    fun isAnyUtilEnabled(): Boolean{
-        for (util in toolsMap.values){
-            if(!defaultUtils.contains(util.thisToolEnum) && util.isEnabled()) return true
+    /**
+     * Method check if there is any enabled util. Default utils are an exception which is not
+     * counted.
+     *
+     * @return true when there is any non default enabled util.
+     */
+    fun isAnyUtilEnabled(): Boolean {
+        for (util in toolsMap.values) {
+            if (!defaultUtils.contains(util.thisToolEnum) && util.isEnabled()) return true
         }
         return false
     }
 
-    fun getEnabledUtils() : Set<ToolsEnum> {
+    /**
+     * Method return set of enabled tools.
+     *
+     * @return set of enabled tools given by their enums.
+     */
+    fun getEnabledUtils(): Set<ToolsEnum> {
         val enabledUtils: MutableSet<ToolsEnum> = HashSet()
 
-        for (util in toolsMap.keys){
-            if(toolsMap[util]?.isEnabled() == true) {
+        for (util in toolsMap.keys) {
+            if (toolsMap[util]?.isEnabled() == true) {
                 enabledUtils.add(util)
             }
         }
         return enabledUtils
     }
 
-    private fun getGenericUtil(utilEnum: ToolsEnum): GeneralTool{
-        if(toolsMap[utilEnum] == null){
+    /**
+     * Method get instance of input tool. Instance is taken form [toolsMap] or is created.
+     * This class is registered to observe created tool.
+     *
+     * @param utilEnum which identifies tool of which instance is required.
+     * @return requested instance.
+     */
+    private fun getGenericUtil(utilEnum: ToolsEnum): GeneralTool {
+        if (toolsMap[utilEnum] == null) {
             toolsMap[utilEnum] = utilEnum.getInstance(context, toolsHelper)
             toolsMap[utilEnum]!!.addObserver(this)
         }
@@ -118,7 +178,14 @@ class ToolsManager(private val context: MyContext): Observer, Observable() {
         return toolsMap[utilEnum] as GeneralTool
     }
 
-    fun sendStatus(communicatorHash: Int){
+    /**
+     * Method collect application status and send it via communication provider given by
+     * [communicatorHash].
+     *
+     * @param communicatorHash is hash of communication provider which will be used for sending
+     *          status message.
+     */
+    fun sendStatus(communicatorHash: Int) {
         Log.d(tag, "Command to send status to communicator with hash: $communicatorHash")
         val tools: MutableMap<ToolsEnum, Boolean> = HashMap()
         toolsMap.forEach { tools[it.key] = it.value.isEnabled() }

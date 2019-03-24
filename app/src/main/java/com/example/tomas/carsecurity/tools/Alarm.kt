@@ -15,30 +15,59 @@ import com.example.tomas.carsecurity.sensors.LocationProvider
 import com.example.tomas.carsecurity.sensors.MoveDetector
 import com.example.tomas.carsecurity.sensors.SoundDetector
 import com.example.tomas.carsecurity.utils.CallProvider
-import com.example.tomas.carsecurity.storage.entity.Location as DBLocation
 import java.util.*
 import com.example.tomas.carsecurity.ObservableEnum as OEnum
+import com.example.tomas.carsecurity.storage.entity.Location as DBLocation
 
-class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper) : GeneralTool(toolsHelper), SharedPreferences.OnSharedPreferenceChangeListener  {
+/**
+ * Class represents alarm system and all its logic.
+ *
+ * @param context is my context used mainly for access of shared preferences values.
+ * @param toolsHelper used mainly for registration of sensors
+ */
+class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper) :
+        GeneralTool(toolsHelper),
+        SharedPreferences.OnSharedPreferenceChangeListener {
 
+    /** Logger tag */
     private val tag = "tools.Alarm"
 
+    /** Identification of this tool by [ToolsEnum] */
     override val thisToolEnum: ToolsEnum = ToolsEnum.Alarm
+
+    /** Indication if alarm system is activated */
     private var isEnabled = false
+    /** Indication if system is in alarm mode. */
     private var isAlarm = false
+    /** Indication if system is in alert mode. Interval for alarm turn of when disruption was detected. */
     private var isAlert = false
 
+    /** Time when alarm starts. Used for startup interval */
     private var systemEnabledTime = -1L
+    /** Contains value of last known location, used for sending over communication providers. */
     private var lastLocation: Location? = null
-    private var timer: Timer? = null
+    /** Timer used for interval before alarm when disruption was detected. */
+    private var alarmTimer: Timer? = null
+    /** Timer for sending location SMS in specific intervals. */
     private var sendSmsTimer: Timer? = null
+    /** Media player used for sending alarm sound */
     private var mediaPlayer: MediaPlayer? = null
 
 
-    companion object Check: CheckObjString {
+    /**
+     * Object used for static access to [check] method.
+     */
+    companion object Check : CheckObjString {
+        /**
+         * Method checks if there is some restriction which prevents of alarm activation.
+         *
+         * @param context is application context
+         * @param skipAllow indicates if should be check alarm allow attribute set by user.
+         * @return Error message when there is some problem or empty string when alarm can be enabled.
+         */
         override fun check(context: Context, skipAllow: Boolean): String {
 
-            if(!skipAllow && !ToolsContext(context).isAlarmAllowed){
+            if (!skipAllow && !ToolsContext(context).isAlarmAllowed) {
                 return context.getString(R.string.error_alarm_disabled)
             }
 
@@ -55,16 +84,31 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
         }
     }
 
+    /**
+     * Method return if alarm can be enabled with use of [check] method.
+     *
+     * @return true when alarm can be enabled, false otherwise.
+     */
     override fun canEnable(): Boolean {
         return check(context.appContext, false).isBlank()
     }
 
+    /**
+     * Method is automatically called when any value in sharedPreferences is changed. Method interact only when
+     * key of changed values are:
+     * tool_battery_mode
+     * tool_alarm_send_location_interval
+     * In both cases method reinitialize timer for sending location sms messages.
+     *
+     * @param p0 is shared preferences storage in which was value changed.
+     * @param key of value which was changed.
+     */
     override fun onSharedPreferenceChanged(p0: SharedPreferences?, key: String?) {
         val task = Runnable {
             when (key) {
                 context.appContext.getString(R.string.key_tool_battery_mode),
                 context.appContext.getString(R.string.key_tool_alarm_send_location_interval) ->
-                    if(isEnabled && isAlarm && sendSmsTimer != null){
+                    if (isEnabled && isAlarm && sendSmsTimer != null) {
                         sendSmsTimer?.cancel()
                         scheduleSmsTimer()
                     }
@@ -73,6 +117,13 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
         toolsHelper.runOnUtilThread(task)
     }
 
+    /**
+     * This method is called when any observed sensor calls [notifyObservers] method. Only acceptable [Observable]
+     * objects are subclasses of [GeneralObservable].
+     *
+     * @param observable is [Observable] object which call [notifyObservers] method.
+     * @param args are additional arguments which was transfer with observation.
+     */
     override fun action(observable: Observable, args: Any?) {
         if (!isEnabled) return
 
@@ -82,6 +133,12 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
         }
     }
 
+    /**
+     * Method save location to [lastLocation] variable. When sms location interval is too big. Method unregister
+     * location sensor from this class.
+     *
+     * @param location is new location received from [LocationProvider]
+     */
     private fun onLocationUpdate(location: Location) {
         Log.d(tag, """Location update: $location""")
         this.lastLocation = location
@@ -90,6 +147,12 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
         }
     }
 
+    /**
+     * Method process sensor indication. Observations are ignored when start up interval did not pass. First detection
+     * switch system to alert mode which automatically switch to alarm mode after specific time period.
+     *
+     * @param observable is [GeneralObservable] which detects some suspicion data.
+     */
     private fun onSensorUpdate(observable: GeneralObservable) {
 
         val currentTime = Calendar.getInstance().timeInMillis
@@ -114,25 +177,32 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
 
             val timerTask = object : TimerTask() {
                 override fun run() {
-                    toolsHelper.runOnUtilThread( // runOnUtilThread because timer run in own thread.
+                    toolsHelper.runOnUtilThread( // runOnUtilThread because alarmTimer run in own thread.
                             Runnable {
                                 isAlarm = true
                                 onAlarm()
                             })
                 }
             }
-            timer = Timer("TimerThread")
-            timer!!.schedule(timerTask, context.toolsContext.alertAlarmInterval.toLong())
+            alarmTimer = Timer("TimerThread")
+            alarmTimer!!.schedule(timerTask, context.toolsContext.alertAlarmInterval.toLong())
         }
     }
 
+    /**
+     * Method trigger all actions when system switch to alarm mode.
+     * 1) send event to communication providers
+     * 2) call to specific number if it is allowed
+     * 3) start siren if it is allowed
+     * 4) start sending location sms if it is allowed
+     */
     private fun onAlarm() {
         Log.d(tag, "Alarm was activated.")
 
         // send alarm to communication providers
         toolsHelper.communicationManager.sendEvent(MessageType.Alarm, Calendar.getInstance().time.toString())
 
-        if(context.toolsContext.isCallAllow) {
+        if (context.toolsContext.isCallAllow) {
             CallProvider(context).createCall()
         }
 
@@ -145,29 +215,49 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
 
 
         // start send location loop
-        if (context.communicationContext.isMessageAllowed(SmsProvider::class.java.name, MessageType.AlarmLocation.name, "send")) {
+        if (context.communicationContext.isMessageAllowed(
+                        SmsProvider::class.java.name,
+                        MessageType.AlarmLocation.name,
+                        "send")
+        ) {
             toolsHelper.registerObserver(OEnum.LocationProvider, this)
             scheduleSmsTimer()
         }
     }
 
-    private fun scheduleSmsTimer(){
+    /**
+     * Method schedule timer of sending location messages in specific time interval. Time interval is get from
+     * shared preferences.
+     */
+    private fun scheduleSmsTimer() {
         sendSmsTimer = Timer("SendSmsTimer")
-        sendSmsTimer!!.schedule(getSmsTimerTask(), context.toolsContext.sendLocationInterval.toLong(), context.toolsContext.sendLocationInterval.toLong())
+        sendSmsTimer!!.schedule(
+                getSmsTimerTask(),
+                context.toolsContext.sendLocationInterval.toLong(),
+                context.toolsContext.sendLocationInterval.toLong())
     }
 
+    /**
+     * Method create and return task for sending location messages over communication provider.
+     * @return created task for sending location messages.
+     */
     private fun getSmsTimerTask(): TimerTask {
-        return object: TimerTask() {
+        return object : TimerTask() {
             override fun run() {
                 if (lastLocation != null) {
                     toolsHelper.communicationManager.sendLocation(DBLocation(lastLocation!!, null), true)
                 }
 
-                toolsHelper.registerObserver(OEnum.LocationProvider, this@Alarm) // on location update can unregister listener
+                // on location update can unregister listener
+                toolsHelper.registerObserver(OEnum.LocationProvider, this@Alarm)
             }
         }
     }
 
+    /**
+     * Method initialize and enable whole alarm system and inform all observers about this change.
+     * This method can be called repeatedly.
+     */
     override fun enable() {
         assert(Thread.currentThread().name == "UtilsThread")
         if (!isEnabled && canRun()) {
@@ -177,7 +267,7 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
             isAlert = false
             systemEnabledTime = Calendar.getInstance().timeInMillis
             sendSmsTimer = null
-            timer = null
+            alarmTimer = null
 
             toolsHelper.registerObserver(OEnum.MoveDetector, this)
             toolsHelper.registerObserver(OEnum.SoundDetector, this)
@@ -193,6 +283,10 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
 
     }
 
+    /**
+     * Method disable whole alarm system and inform observers about this change.
+     * @param force parameter force is not used in this implementation.
+     */
     override fun disable(force: Boolean) {
         assert(Thread.currentThread().name == "UtilsThread")
         if (isEnabled) {
@@ -203,7 +297,7 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
             isEnabled = false
 
             toolsHelper.unregisterAllObservables(this)
-            timer?.cancel()
+            alarmTimer?.cancel()
             sendSmsTimer?.cancel()
             lastLocation = null
             systemEnabledTime = -1L
@@ -220,10 +314,20 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
 
     }
 
+    /**
+     * Indicates if this alarm system is activated (enabled)
+     * @return if alarm system is enabled
+     */
     override fun isEnabled(): Boolean {
         return isEnabled
     }
 
+    /**
+     * Method use [check] method to check if alarm can be activated.
+     * When activation is not possible send error message to all observers of this class.
+     *
+     * @return true when alarm can be activated, false otherwise.
+     */
     private fun canRun(): Boolean {
         val msg = check(context.appContext, false)
 
