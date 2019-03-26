@@ -49,8 +49,8 @@ dependencies {
     implementation 'com.android.support:support-vector-drawable:28.0.0'
 
     // Firebase
-    implementation 'com.google.firebase:firebase-core:16.0.7'
-    implementation 'com.google.firebase:firebase-messaging:17.4.0'
+    implementation 'com.google.firebase:firebase-core:16.0.8'
+    implementation 'com.google.firebase:firebase-messaging:17.5.0'
 
     annotationProcessor "android.arch.persistence.room:compiler:$room_version"
     kapt "android.arch.persistence.room:compiler:$room_version"
@@ -65,7 +65,7 @@ dependencies {
 
 //  Seek bar view
     implementation project(":seekbarpreference")
-    compile "org.jetbrains.kotlin:kotlin-reflect:1.3.21"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:1.3.21"
 }
 
 apply plugin: 'com.google.gms.google-services'

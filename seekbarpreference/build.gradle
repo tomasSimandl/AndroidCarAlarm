@@ -4,7 +4,7 @@ android {
     compileSdkVersion 23
 
     defaultConfig {
-        minSdkVersion 7
+        minSdkVersion 14
         targetSdkVersion 23
         versionCode 13
         versionName "2.3.0"
