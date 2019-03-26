@@ -15,6 +15,7 @@ data class EventCreate(
         val time: Long,
 
         /** Id of car which is associated with this event. */
+        @SerializedName("car_id")
         val carId: Long,
 
         /** Information note for this event. */
