@@ -91,8 +91,8 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
 
         sendIntent(MainService.Actions.ActionStatusUI.name)
 
-        setVisibility(actionAlarm, toolsContext.isAlarmAllowed)
-        setVisibility(actionTracker, toolsContext.isTrackerAllowed)
+//        setVisibility(actionAlarm, toolsContext.isAlarmAllowed)
+//        setVisibility(actionTracker, toolsContext.isTrackerAllowed)
         setVisibility(power_save_indication, toolsContext.isPowerSaveMode)
 
         toolsContext.registerOnPreferenceChanged(this)
@@ -159,8 +159,8 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
             getString(R.string.key_tool_alarm_is_allowed) -> setVisibility(actionAlarm, toolsContext.isAlarmAllowed)
             getString(R.string.key_tool_tracker_is_allowed) -> setVisibility(actionTracker, toolsContext.isTrackerAllowed)
             getString(R.string.key_tool_battery_mode) -> {
-                setVisibility(actionAlarm, toolsContext.isAlarmAllowed)
-                setVisibility(actionTracker, toolsContext.isTrackerAllowed)
+//                setVisibility(actionAlarm, toolsContext.isAlarmAllowed)
+//                setVisibility(actionTracker, toolsContext.isTrackerAllowed)
                 setVisibility(power_save_indication, toolsContext.isPowerSaveMode)
             }
         }
