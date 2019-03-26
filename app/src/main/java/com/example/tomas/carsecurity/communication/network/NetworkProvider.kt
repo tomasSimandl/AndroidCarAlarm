@@ -167,7 +167,7 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
         get() = object : TimerTask() {
             override fun run() {
 
-                if (!isSynchronize.getAndSet(true)) {
+                if (isSynchronize.getAndSet(true)) {
                     Log.d(tag, "Stopping network synchronization thread. Another thread already running.")
                     return
                 }
