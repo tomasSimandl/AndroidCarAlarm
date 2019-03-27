@@ -52,6 +52,7 @@ class BatteryManager(private val context: MyContext, private val toolsHelper: To
     override fun onSharedPreferenceChanged(p0: SharedPreferences?, key: String?) {
         val task = Runnable {
             when (key) {
+                context.appContext.getString(R.string.key_tool_battery_critical_level),
                 context.appContext.getString(R.string.key_tool_battery_mode_is_allowed) -> changePowerSaveMode()
             }
         }
