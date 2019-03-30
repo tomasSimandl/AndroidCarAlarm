@@ -15,6 +15,7 @@ import com.example.tomas.carsecurity.MainService
 import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.fragments.LoginFragment
 import com.example.tomas.carsecurity.fragments.MainFragment
+import com.example.tomas.carsecurity.fragments.StatusFragment
 import com.example.tomas.carsecurity.storage.Storage
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
@@ -122,6 +123,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 isHomePage = true; showFragment(MainFragment(), item)
             }
             R.id.menu_login -> showFragment(LoginFragment(), item)
+            R.id.menu_status -> showFragment(StatusFragment(), item)
             R.id.menu_settings -> openSettings()
         }
 

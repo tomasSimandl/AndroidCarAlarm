@@ -21,6 +21,14 @@ interface MessageDao {
     fun getAllByCommunicatorHash(communicatorHash: Int): List<Message>
 
     /**
+     * Method return number of all messages in database.
+     * @param communicatorHash hash of communication provider
+     * @return number of messages in database
+     */
+    @Query("SELECT COUNT(uid) FROM message WHERE communicator = :communicatorHash")
+    fun count(communicatorHash: Int): Long
+
+    /**
      * Method save input message to database.
      * @param message which will be saved to database.
      */

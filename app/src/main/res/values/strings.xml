@@ -39,6 +39,14 @@
     <string name="pref_header_communication">Communication</string>
     <string name="pref_header_power_save_mode">Power-save mode</string>
 
+    <!-- ========================= STRINGS RELATED TO STATUS ACTIVITY ========================== -->
+    <string name="title_fragment_status">Status</string>
+    <string name="status_fragment_label">Records in database</string>
+    <string name="status_fragment_event_message">Number of events: %d</string>
+    <string name="status_fragment_route_message">Number of routes: %d</string>
+    <string name="status_fragment_position_message">Number of positions: %d</string>
+
+
     <!-- ================================ Tools Alarm settings ================================= -->
     <string name="pref_tools_alarm_group_name">Alarm</string>
 
@@ -186,6 +194,7 @@
     <string name="menu_settings_title">Settings</string>
     <string name="menu_login_title">Login</string>
     <string name="menu_home_title">Home</string>
+    <string name="menu_status_title">Status</string>
 
 
     <!-- =============================== STRINGS OF SMS MESSAGES =============================== -->

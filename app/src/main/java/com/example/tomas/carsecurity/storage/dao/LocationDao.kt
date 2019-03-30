@@ -33,6 +33,13 @@ interface LocationDao {
     fun getAllByLocalRouteId(routeId: Int?): List<Location>
 
     /**
+     * Method return number of all locations in database.
+     * @return number of locations in database
+     */
+    @Query("SELECT COUNT(uid) FROM location")
+    fun count(): Long
+
+    /**
      * Method store input location in database.
      * @param location which will be stored in database.
      */

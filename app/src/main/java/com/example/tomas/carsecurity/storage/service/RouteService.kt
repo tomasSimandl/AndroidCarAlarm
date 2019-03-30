@@ -44,6 +44,14 @@ class RouteService(private val database: AppDatabase) {
     }
 
     /**
+     * Method return number of all routes in database.
+     * @return number of routes in database
+     */
+    fun countRoutes(): Long {
+        return database.routeDao().count()
+    }
+
+    /**
      * Method delete input route from database.
      * @param route which will be deleted.
      */

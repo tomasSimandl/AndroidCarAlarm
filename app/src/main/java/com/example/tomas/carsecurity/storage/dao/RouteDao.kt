@@ -25,6 +25,13 @@ interface RouteDao {
     fun get(routeId: Int): Route
 
     /**
+     * Method return number of all routes in database.
+     * @return number of routes in database
+     */
+    @Query("SELECT COUNT(uid) FROM route")
+    fun count(): Long
+
+    /**
      * Method insert one route to database.
      * @param route which will be inserted to database.
      * @return database id of inserted route

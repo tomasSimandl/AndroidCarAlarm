@@ -27,6 +27,15 @@ class MessageService(private val database: AppDatabase) {
     }
 
     /**
+     * Method return number of all messages in database.
+     * @param communicatorHash hash of communication provider
+     * @return number of messages in database
+     */
+    fun countMessages(communicatorHash: Int): Long {
+        return database.messageDao().count(communicatorHash)
+    }
+
+    /**
      * Method delete all messages of given communicator.
      * @param communicatorHash hash of communicator provider of which messages will be deleted.
      */

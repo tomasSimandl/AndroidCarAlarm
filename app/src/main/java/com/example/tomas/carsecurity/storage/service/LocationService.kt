@@ -35,6 +35,14 @@ class LocationService(private val database: AppDatabase) {
     }
 
     /**
+     * Method return number of all locations in database.
+     * @return number of locations in database
+     */
+    fun countLocations(): Long {
+        return database.locationDao().count()
+    }
+
+    /**
      * Delete all locations given by input list from database.
      * @param locations list of location which will be deleted from database.
      */
