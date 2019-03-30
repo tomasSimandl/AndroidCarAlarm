@@ -32,6 +32,7 @@
     <string name="key_tool_battery_mode_is_allowed">tool_battery_mode_is_allowed</string>
     <string name="key_tool_battery_mode">tool_battery_mode</string>
     <string name="key_tool_battery_critical_level">tool_battery_critical_level</string>
+    <string name="key_tool_tracker_actual_length">tool_tracker_actual_length</string>
 
 
     <!--===================================== Communication =====================================-->

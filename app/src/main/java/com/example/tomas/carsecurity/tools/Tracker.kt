@@ -156,6 +156,7 @@ class Tracker(private val context: MyContext, private val toolsHelper: ToolsHelp
             lastUpdateTime = Date()
 
             toolsHelper.communicationManager.sendLocation(dbLocation, isAlarm = false, cache = true)
+            context.toolsContext.actualLength += dbLocation.distance
         }
     }
 
@@ -178,6 +179,7 @@ class Tracker(private val context: MyContext, private val toolsHelper: ToolsHelp
             isEnabled = true
             lastLocation = null
             toolsHelper.registerObserver(ObservableEnum.LocationProvider, this)
+            context.toolsContext.actualLength = 0f
 
             actualRoute = Route(carId = user.carId)
             actualRoute!!.uid = storage.routeService.saveRoute(actualRoute!!).toInt()
@@ -208,6 +210,7 @@ class Tracker(private val context: MyContext, private val toolsHelper: ToolsHelp
             toolsHelper.unregisterAllObservables(this)
 
             context.toolsContext.unregisterOnPreferenceChanged(this)
+            context.toolsContext.actualLength = -1f
 
             timeoutTimer?.cancel()
             timeoutTimer = null

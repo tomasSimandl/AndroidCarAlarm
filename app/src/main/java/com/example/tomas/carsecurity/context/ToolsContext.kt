@@ -64,6 +64,10 @@ class ToolsContext(appContext: Context) : BaseContext(appContext) {
     val timeout
         get() = getInt(R.string.key_tool_tracker_timeout, R.integer.default_tool_tracker_timeout).toLong() * 1000
 
+    /** Length af actual recorder route in meters. */
+    var actualLength: Float
+        get() = getFloat(R.string.key_tool_tracker_actual_length, -1f)
+        set(value) = putFloat(R.string.key_tool_tracker_actual_length, value)
 
     // ======================================== ALARM UTIL =========================================
 

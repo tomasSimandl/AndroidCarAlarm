@@ -58,6 +58,18 @@ open class BaseContext(val appContext: Context) {
     }
 
     /**
+     * Method returns float value which is loaded in [sharedPreferences]. When value is not presents
+     * [defValue] is returned.
+     *
+     * @param resourceKeyId is resource id of string which identifies value in [sharedPreferences]
+     * @param defValue which is return when value [resourceKeyId] is not in [sharedPreferences].
+     * @return loaded value from [sharedPreferences] or default value
+     */
+    protected fun getFloat(resourceKeyId: Int, defValue: Float): Float {
+        return sharedPreferences.getFloat(appContext.getString(resourceKeyId), defValue)
+    }
+
+    /**
      * Method returns string value which is loaded from [sharedPreferences]. When value is not presents resource
      * specified by [defValueId] is returned.
      *
@@ -80,6 +92,18 @@ open class BaseContext(val appContext: Context) {
     protected fun putString(resourceKeyId: Int, value: String) {
         sharedPreferences.edit()
                 .putString(appContext.getString(resourceKeyId), value)
+                .apply()
+    }
+
+    /**
+     * Method store [value] to shared preferences under string key specified by string resource id [resourceKeyId].
+     *
+     * @param resourceKeyId is id to string resource which identifies value in [sharedPreferences]
+     * @param value is new value which will be inserted to [sharedPreferences]
+     */
+    protected fun putFloat(resourceKeyId: Int, value: Float) {
+        sharedPreferences.edit()
+                .putFloat(appContext.getString(resourceKeyId), value)
                 .apply()
     }
 

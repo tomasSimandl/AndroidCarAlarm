@@ -163,6 +163,7 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
 //                setVisibility(actionTracker, toolsContext.isTrackerAllowed)
                 setVisibility(power_save_indication, toolsContext.isPowerSaveMode)
             }
+            getString(R.string.key_tool_tracker_actual_length) -> setTrackerLength()
         }
     }
 
@@ -193,6 +194,22 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
                     isProgressRun = false
                 }
             }).start()
+        }
+    }
+
+    /**
+     * Method set text to tracker button. Text is set according to value from sharedPreferences
+     * with key_tool_tracker_actual_length. When value is smaller than 0 default text is set.
+     * When value is zero or higher Then is set value as a text.
+     */
+    private fun setTrackerLength() {
+        val length = toolsContext.actualLength
+        when {
+            length < 0 -> actionTracker.setText(R.string.tracker_button_text)
+            length < 500 -> actionTracker.text = requireContext().getString(
+                    R.string.tracker_button_text_meters, toolsContext.actualLength)
+            else -> actionTracker.text = requireContext().getString(
+                    R.string.tracker_button_text_kilometers, toolsContext.actualLength / 1000)
         }
     }
 
