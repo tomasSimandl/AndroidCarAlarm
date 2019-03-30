@@ -44,7 +44,8 @@ class BatteryManager(private val context: MyContext, private val toolsHelper: To
 
     /**
      * Method is automatically trigger when any value in shared preferences is changed. Method
-     * only take action when value with key tool_battery_mode_is_allowed is changed.
+     * only take action when values with key tool_battery_mode_is_allowed or
+     * tool_battery_critical_level is changed.
      *
      * @param p0 is sharedPreferences storage in which was value changed.
      * @param key is key ov preference which was changed.

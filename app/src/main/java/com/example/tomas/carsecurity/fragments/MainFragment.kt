@@ -96,6 +96,7 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
         setVisibility(power_save_indication, toolsContext.isPowerSaveMode)
 
         toolsContext.registerOnPreferenceChanged(this)
+        setTrackerLength()
     }
 
     /**
