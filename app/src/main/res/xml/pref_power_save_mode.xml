@@ -15,7 +15,7 @@
         android:defaultValue="@integer/default_tool_battery_critical_level"
 
         sample:msbp_minValue="5"
-        sample:msbp_maxValue="90"
+        sample:msbp_maxValue="100"
         sample:msbp_interval="1"
         sample:msbp_measurementUnit="%"
         sample:msbp_dialogEnabled="false"/>
