@@ -16,7 +16,9 @@ import android.widget.Button
 import android.widget.ProgressBar
 import com.example.tomas.carsecurity.MainService
 import com.example.tomas.carsecurity.R
+import com.example.tomas.carsecurity.context.CommunicationContext
 import com.example.tomas.carsecurity.context.ToolsContext
+import com.example.tomas.carsecurity.storage.Storage
 import com.example.tomas.carsecurity.tools.ToolsEnum
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.content_main.view.*
@@ -36,6 +38,8 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
 
     /** Instance of [ToolsContext]. */
     private lateinit var toolsContext: ToolsContext
+    /** Instance of [CommunicationContext]. */
+    private lateinit var communicationContext: CommunicationContext
     /** Indication if alarm activation progress bar is active */
     private var isProgressRun = false
     /** Indication if alarm activation progress bar can be visible */
@@ -48,6 +52,7 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
         super.onCreate(savedInstanceState)
 
         toolsContext = ToolsContext(requireContext())
+        communicationContext = CommunicationContext(requireContext())
     }
 
     /**
@@ -90,6 +95,17 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
         changeColor(actionAlarm, false)
 
         sendIntent(MainService.Actions.ActionStatusUI.name)
+
+        Thread(Runnable {
+            Log.d(tag, "Check if user is login correctly.")
+            val storage = Storage.getInstance(requireContext())
+            val user = storage.userService.getUser()
+            if (user == null || user.carId == -1L || user.username.isBlank()) {
+                Log.d(tag, "Set preference is login to false. Incorrect login.")
+                communicationContext.isLogin = false
+                storage.clearAllTables()
+            }
+        }).start()
 
 //        setVisibility(actionAlarm, toolsContext.isAlarmAllowed)
 //        setVisibility(actionTracker, toolsContext.isTrackerAllowed)

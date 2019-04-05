@@ -230,7 +230,7 @@ class LoginFragment : Fragment() {
 
             AlertDialog.Builder(it)
                     .setTitle(R.string.select_car)
-                    .setCancelable(false)
+                    .setCancelable(true)
                     .setItems(names.toTypedArray()
                     ) { _, i ->
                         // Save selected car to DB in entity user
@@ -248,6 +248,7 @@ class LoginFragment : Fragment() {
                         }).start()
                     }
                     .setNeutralButton(R.string.create_new_car) { _, _ -> showCreateCarDialog() }
+                    .setOnCancelListener { logoutButtonAction() }
                     .create()
         }
         alertDialog?.show()
@@ -266,7 +267,7 @@ class LoginFragment : Fragment() {
 
             AlertDialog.Builder(it)
                     .setTitle(R.string.create_new_car)
-                    .setCancelable(false)
+                    .setCancelable(true)
                     .setView(inflater.inflate(R.layout.dialog_create_car, null))
                     .setPositiveButton(R.string.ok) { dialog, _ ->
                         val name = (dialog as AlertDialog).car_dialog_name.text
@@ -279,6 +280,7 @@ class LoginFragment : Fragment() {
                             }
                         }
                     }
+                    .setOnCancelListener { logoutButtonAction() }
                     .create()
         }
 
