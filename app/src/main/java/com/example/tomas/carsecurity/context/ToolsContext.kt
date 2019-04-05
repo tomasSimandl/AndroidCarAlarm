@@ -51,10 +51,7 @@ class ToolsContext(appContext: Context) : BaseContext(appContext) {
 
     /** Returns if tracker is allowed by user */
     val isTrackerAllowed
-        get() = when (mode) {
-            Mode.Normal -> getBoolean(R.string.key_tool_tracker_is_allowed, R.bool.default_tool_tracker_is_allowed)
-            Mode.PowerSaveMode -> appContext.resources.getBoolean(R.bool.battery_save_mode_tool_tracker_is_allowed)
-        }
+        get() = getBoolean(R.string.key_tool_tracker_is_allowed, R.bool.default_tool_tracker_is_allowed)
 
     /** Returns new location ignore distance in meters. Value is taken from shared preferences or it is used default value. */
     val ignoreDistance

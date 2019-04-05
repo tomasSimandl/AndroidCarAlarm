@@ -7,6 +7,7 @@ import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.communication.MessageType
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.sensors.BatteryDetector
+import com.example.tomas.carsecurity.utils.BatteryUtil
 import java.util.*
 
 /**
@@ -27,11 +28,6 @@ class BatteryManager(private val context: MyContext, private val toolsHelper: To
 
     /** Identification if [BatteryManager] is enabled. */
     private var enabled = false
-    /**
-     * Identification if application should be in power save mode no matter if it is or not in
-     * power save mode.
-     */
-    private var shouldBeSaveMode = false
 
     /**
      * Tool does not need any prerequisites so this method return true.
@@ -54,7 +50,11 @@ class BatteryManager(private val context: MyContext, private val toolsHelper: To
         val task = Runnable {
             when (key) {
                 context.appContext.getString(R.string.key_tool_battery_critical_level),
-                context.appContext.getString(R.string.key_tool_battery_mode_is_allowed) -> changePowerSaveMode()
+                context.appContext.getString(R.string.key_tool_battery_mode_is_allowed) -> {
+                    val pair = BatteryUtil.getBatteryStatus(context.appContext)
+                    val percent = (pair.first * 100).toInt()
+                    if(pair.first != -1f) batteryChanged(percent, pair.second)
+                }
             }
         }
         toolsHelper.runOnUtilThread(task)
@@ -84,7 +84,8 @@ class BatteryManager(private val context: MyContext, private val toolsHelper: To
 
 
     /**
-     * Method decide if save mode should be activated or deactivated based on input params.
+     * Method decide if save mode should be activated or deactivated based on input params and
+     * variable and values from shared preferences.
      *
      * @param percent level of battery <0,100>
      * @param charging indication if device is connected to external source of energy
@@ -92,28 +93,21 @@ class BatteryManager(private val context: MyContext, private val toolsHelper: To
     private fun batteryChanged(percent: Int, charging: Boolean) {
         Log.d(tag, """Battery status changed. Capacity: $percent Charging: $charging""")
 
-        if (percent <= context.toolsContext.batteryCriticalLevel) {
-            if (!shouldBeSaveMode) {
-                toolsHelper.communicationManager.sendEvent(MessageType.BatteryWarn, percent.toString(), "% of battery")
-                shouldBeSaveMode = true
-                changePowerSaveMode()
-            }
-        } else {
-            if (shouldBeSaveMode) {
-                shouldBeSaveMode = false
-                changePowerSaveMode()
+        if (context.toolsContext.isBatteryModeAllowed){
+            // is allowed
+            if (percent <= context.toolsContext.batteryCriticalLevel) {
+                // should be activated
+                if (!context.toolsContext.isPowerSaveMode) {
+                    context.toolsContext.enablePowerSaveMode()
+                    toolsHelper.communicationManager.sendEvent(MessageType.BatteryWarn, percent.toString(), "% of battery")
+                }
+
+                return
             }
         }
-    }
 
-    /**
-     * Method activate or deactivate power save mode based on value from shared prefrences and
-     * variable [shouldBeSaveMode].
-     */
-    private fun changePowerSaveMode() {
-        if (context.toolsContext.isBatteryModeAllowed && shouldBeSaveMode) {
-            context.toolsContext.enablePowerSaveMode()
-        } else {
+        if (context.toolsContext.isPowerSaveMode) {
+            // should be deactivated
             context.toolsContext.disablePowerSaveMode()
         }
     }
@@ -152,6 +146,8 @@ class BatteryManager(private val context: MyContext, private val toolsHelper: To
             enabled = true
             toolsHelper.registerObserver(ObservableEnum.BatteryDetector, this)
             context.toolsContext.registerOnPreferenceChanged(this)
+
+            onSharedPreferenceChanged(null, context.appContext.getString(R.string.key_tool_battery_critical_level))
         }
     }
 

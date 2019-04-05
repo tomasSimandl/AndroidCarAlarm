@@ -11,6 +11,8 @@ import java.util.*
 
 /**
  * Class is used for observation of battery. Any battery changes are propagate over Observer design pattern.
+ * When no changes are detected class propagate battery status in regular intervals sets by property:
+ * battery.check.interval.millis
  *
  * @param context used for access values in shared preferences.
  */
@@ -22,10 +24,6 @@ class BatteryDetector(private val context: MyContext) : GeneralObservable() {
     /** Indications if observation of battery is enabled */
     private var enabled = false
 
-    /** Indication if battery is charging */
-    private var isCharging = false
-    /** State of battery level */
-    private var batteryCapacity = 1f
     /** Timer for periodic checking of battery */
     private var checkStatusTimer: Timer? = null
 
@@ -49,27 +47,21 @@ class BatteryDetector(private val context: MyContext) : GeneralObservable() {
     }
 
     /**
-     * Method notify observers of this class and sends them input action and actual battery state only if new battery
-     * state is different from the last one.
+     * Method notify observers of this class and sends them input action and actual battery state.
      *
      * @param action battery action which trigger this observation
      */
     private fun notifyObservers(action: String) {
 
-        Log.i(tag, "Actual battery status: isCharging [$isCharging], level [$batteryCapacity]")
-
         val batteryStatus = BatteryUtil.getBatteryStatus(context.appContext)
+        Log.i(tag, "Actual battery status: isCharging [${batteryStatus.second}], level [${batteryStatus.first}]")
 
-        if (batteryStatus.first != -1f &&
-                (batteryCapacity != batteryStatus.first || isCharging != batteryStatus.second)) {
+        if (batteryStatus.first != -1f) {
 
             Log.d(tag, "Battery status was changed.")
 
-            batteryCapacity = batteryStatus.first
-            isCharging = batteryStatus.second
-
             setChanged()
-            notifyObservers(Triple(action, isCharging, batteryCapacity))
+            notifyObservers(Triple(action, batteryStatus.second, batteryStatus.first))
         }
     }
 
@@ -104,11 +96,6 @@ class BatteryDetector(private val context: MyContext) : GeneralObservable() {
             context.appContext.registerReceiver(
                     powerReceiver,
                     IntentFilter("android.intent.action.ACTION_POWER_DISCONNECTED"))
-
-            // battery last status initialization
-            val batteryStatus = BatteryUtil.getBatteryStatus(context.appContext)
-            batteryCapacity = batteryStatus.first
-            isCharging = batteryStatus.second
 
 
             // getting scheduler check interval from properties
