@@ -41,10 +41,8 @@
 
     <!-- ========================= STRINGS RELATED TO STATUS ACTIVITY ========================== -->
     <string name="title_fragment_status">Status</string>
-    <string name="status_fragment_label">Records in database</string>
-    <string name="status_fragment_event_message">Number of events: %d</string>
-    <string name="status_fragment_route_message">Number of routes: %d</string>
-    <string name="status_fragment_position_message">Number of positions: %d</string>
+    <string name="status_fragment_sync_status">Status: %s</string>
+    <string name="status_fragment_label">Local routes</string>
 
 
     <!-- ================================ Tools Alarm settings ================================= -->

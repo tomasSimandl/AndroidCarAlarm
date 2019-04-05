@@ -46,7 +46,7 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
     private var canShowProgress = false
 
     /**
-     * Method only initialize [toolsContext]
+     * Method only initialize [toolsContext] and [communicationContext]
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

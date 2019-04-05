@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.communication.network.NetworkProvider
 import com.example.tomas.carsecurity.communication.sms.SmsProvider
+import java.lang.IllegalArgumentException
 
 /**
  * Context contains data which are used in communication package and they are stored in
@@ -12,6 +13,33 @@ import com.example.tomas.carsecurity.communication.sms.SmsProvider
  * @param appContext is application context which will be shared across whole application.
  */
 class CommunicationContext(appContext: Context) : BaseContext(appContext) {
+
+    /**
+     * Enum for synchronization status visible on status page
+     */
+    enum class SyncStatus{
+        Synchronizing, Offline, Unknown, SyncReady;
+
+        companion object {
+            fun syncValueOf(status: String?): SyncStatus {
+
+                if (status.isNullOrBlank()) return Unknown
+
+                return try{
+                    valueOf(status)
+                } catch (e: IllegalArgumentException) {
+                    Unknown
+                }
+            }
+        }
+    }
+
+    /**
+     * Identification of actual synchronization status.
+     */
+    var synchronizationStatus: SyncStatus
+        get() = SyncStatus.syncValueOf((sharedPreferences.getString(appContext.getString(R.string.key_communication_network_sync_status), "")))
+        set(value) = sharedPreferences.edit().putString(appContext.getString(R.string.key_communication_network_sync_status), value.name).apply()
 
     /** Contains default setting of sending of messages. Value is taken from resources. */
     private val defIsMsgAllowed: Boolean =

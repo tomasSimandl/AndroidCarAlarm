@@ -47,5 +47,6 @@
     <string name="key_communication_network_cellular">communication_network_cellular</string>
     <string name="key_communication_network_update_interval">communication_network_update_interval</string>
 
+    <string name="key_communication_network_sync_status">communication_network_sync_status</string>
     <string name="key_communication_network_firebase_token">communication_network_firebase_token</string>
 </resources>

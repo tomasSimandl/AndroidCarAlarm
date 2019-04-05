@@ -221,7 +221,15 @@ class Tracker(private val context: MyContext, private val toolsHelper: ToolsHelp
             timeoutTimer?.cancel()
             timeoutTimer = null
 
+
             if (actualRoute != null) {
+                // Remove route when there is no created position
+                val storage = Storage.getInstance(context.appContext)
+                val positions = storage.locationService.getLocationsByLocalRouteId(actualRoute!!.uid).size
+                if(positions <= 0) {
+                    Log.d(tag, "Removing route from database. No positions.")
+                    storage.routeService.deleteRoute(actualRoute!!)
+                }
                 actualRoute = null
             }
 

@@ -1,20 +1,29 @@
 package com.example.tomas.carsecurity.fragments
 
+import android.content.SharedPreferences
 import android.os.Bundle
-import android.os.Handler
 import android.support.v4.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.SimpleAdapter
 import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.communication.network.NetworkProvider
+import com.example.tomas.carsecurity.context.CommunicationContext
 import com.example.tomas.carsecurity.storage.Storage
 import kotlinx.android.synthetic.main.status_fragment.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * Class represents status view.
  */
-class StatusFragment : Fragment() {
+class StatusFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
+
+    /** Instance of [CommunicationContext] */
+    private lateinit var communicationContext: CommunicationContext
 
     /**
      * Set status view and all text views.
@@ -25,31 +34,91 @@ class StatusFragment : Fragment() {
     }
 
     /**
-     * Method sets texts to all status messages on page.
+     * Method only initialize [communicationContext]
+     */
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        communicationContext = CommunicationContext(requireContext())
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
+
+        when (key) {
+            requireContext().getString(R.string.key_communication_network_sync_status) -> {
+                Log.d(tag, "Sync status was changed")
+                updateStatus()
+            }
+        }
+    }
+
+
+    /**
+     * Method sets texts to all status messages on page and register this class to on preferenceChanged listener.
      */
     override fun onResume() {
         super.onResume()
 
-        val handler = Handler()
+        status_layout_refresh.setOnRefreshListener { updateStatus() }
+
+        communicationContext.registerOnPreferenceChanged(this)
+        updateStatus()
+    }
+
+
+    /**
+     * Method only unregister this class from OnPreferenceChanged.
+     */
+    override fun onStop() {
+        super.onStop()
+        communicationContext.unregisterOnPreferenceChanged(this)
+    }
+
+    private fun updateStatus() {
+
+        status_layout.post {
+            status_sync_status.text = getString(
+                    R.string.status_fragment_sync_status,
+                    communicationContext.synchronizationStatus.name
+            )
+        }
 
         Thread {
             val storage = Storage.getInstance(requireContext())
-            val messageCount = storage.messageService.countMessages(NetworkProvider.hashCode())
-            var routeCount = storage.routeService.countRoutes()
-            val locationCount = storage.locationService.countLocations()
 
-            if (locationCount == 0L) routeCount = 0L
+            val listItems = ArrayList<HashMap<String, String>>()
 
-            handler.post {
-                status_event_message_text_view.text =
-                        getString(R.string.status_fragment_event_message, messageCount)
+            storage.routeService.getRoutes().forEach {
+                val positionSize = storage.locationService.getLocationsByLocalRouteId(it.uid).size
 
-                status_route_message_text_view.text =
-                        getString(R.string.status_fragment_route_message, routeCount)
+                if (positionSize != 0) {
+                    val format = SimpleDateFormat.getDateTimeInstance()
+                    val time = format.format(Date(it.time))
 
-                status_position_message_text_view.text =
-                        getString(R.string.status_fragment_position_message, locationCount)
+                    val map = HashMap<String, String>(2)
+                    map["first"] = time
+                    map["second"] = "positions: $positionSize"
+                    listItems.add(map)
+                }
             }
+
+            if (listItems.isEmpty()){
+                val map = HashMap<String, String>(2)
+                map["first"] = "No local route"
+                map["second"] = ""
+                listItems.add(map)
+            }
+
+            val adapter = SimpleAdapter(
+                    requireContext(),
+                    listItems,
+                    android.R.layout.simple_list_item_2,
+                    arrayOf("first", "second"),
+                    arrayOf(android.R.id.text1, android.R.id.text2).toIntArray()
+            )
+
+            status_layout_refresh.post { routes_list.adapter = adapter }
+
+            status_layout_refresh.isRefreshing = false
         }.start()
     }
 }

@@ -151,9 +151,11 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
             if (canUseConnection()) {
                 Log.d(tag, "Network connectivity was changed and it is possible to send data.")
                 initSynchronizeTimer()
+                communicationContext.synchronizationStatus = CommunicationContext.SyncStatus.SyncReady
             } else {
                 Log.d(tag, "Network connectivity was changed. Can not send data.")
                 destroySynchronizeTimer()
+                communicationContext.synchronizationStatus = CommunicationContext.SyncStatus.Offline
             }
         }
     }
@@ -183,6 +185,8 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
                     Log.d(tag, "Stopping network synchronization thread. User is not login.")
                     return
                 }
+
+                communicationContext.synchronizationStatus = CommunicationContext.SyncStatus.Synchronizing
 
                 sendFirebaseToken()
 
@@ -236,6 +240,7 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
                 val locations = storage.locationService.getLocationsByLocalRouteId(null)
                 locations.chunked(locationChunkSize).forEach { sendLocations(it) }
 
+                communicationContext.synchronizationStatus = CommunicationContext.SyncStatus.SyncReady
                 isSynchronize.set(false)
             }
         }
