@@ -57,8 +57,14 @@ class Tracker(private val context: MyContext, private val toolsHelper: ToolsHelp
          */
         override fun check(context: Context, skipAllow: Boolean): String {
 
-            if (!skipAllow && !ToolsContext(context).isTrackerAllowed) {
+            val toolsContext = ToolsContext(context)
+
+            if (!skipAllow && !toolsContext.isTrackerAllowed) {
                 return context.getString(R.string.error_tracker_disabled)
+            }
+
+            if (toolsContext.isPowerSaveMode) {
+                return context.getString(R.string.error_tracker_in_power_save_mode)
             }
 
             val locationCheck = LocationProvider.check(context)

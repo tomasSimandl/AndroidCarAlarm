@@ -235,6 +235,7 @@
     <string name="error_alarm_no_detector">Alarm needs at least one detection sensor. No sensor is available.\nMoves sensor:\n%s\nMicrophone:\n%s</string>
 
     <string name="error_tracker_disabled">Tracker is disabled by user. Enable it in Tools settings.</string>
+    <string name="error_tracker_in_power_save_mode">Tracker is not allowed in power save mode.</string>
     <string name="error_tracker_location_not_supported">Tracker needs to get device location for creating of log book but this device not support location access.</string>
     <string name="error_tracker_location_not_permitted">Tracker needs to get device location for creating of log book but application is not permitted to get device location. Please request for permissions in sensors setting.</string>
     <string name="error_tracker_location_not_allowed">Tracker needs to get device location for creating of log book but sensor is disabled by user. Enable location sensor in Sensors setting.</string>
