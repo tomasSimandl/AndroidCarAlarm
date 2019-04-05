@@ -205,8 +205,11 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
                             routesWithId.add(route)
                         storage.locationService.getLocationsByLocalRouteId(route.uid).isEmpty() ->
                             emptyRoutes.add(route)
-                        else ->
+                        else -> {
                             sendRoute(route)
+                            if (route.serverRouteId != null) routesWithId.add(route)
+                        }
+
                     }
                 }
 
