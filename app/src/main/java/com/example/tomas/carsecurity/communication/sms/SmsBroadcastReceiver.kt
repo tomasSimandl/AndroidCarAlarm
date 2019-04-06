@@ -94,10 +94,6 @@ class SmsBroadcastReceiver(private val communicationContext: CommunicationContex
                 if (communicationContext.isMessageAllowed(SmsProvider::class.java.name, MessageType.Status.name, "recv")) {
                     sendIntentStatus()
                 }
-            smsBody == "position" ->
-                if (communicationContext.isMessageAllowed(SmsProvider::class.java.name, MessageType.Location.name, "recv")) {
-                    sendIntent(MainService.Actions.ActionGetPosition.name)
-                }
         }
     }
 

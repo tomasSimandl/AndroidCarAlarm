@@ -147,7 +147,6 @@
         <item>Send power disconnected</item>
         <item>Command tool switch</item>
         <item>Command send status</item>
-        <item>Command send location</item>
     </string-array>
 
     <!-- ============================ Communication network settings =========================== -->

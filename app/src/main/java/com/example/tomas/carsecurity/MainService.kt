@@ -27,7 +27,7 @@ class MainService : Service(), Observer {
      * Enum of actions which can [MainService] accept.
      */
     enum class Actions {
-        ActionStatus, ActionStatusUI, ActionGetPosition, ActionForegroundStop,
+        ActionStatus, ActionStatusUI, ActionForegroundStop,
         ActionSwitchUtil, ActionActivateUtil, ActionDeactivateUtil, ActionAutomaticMode,
         ActionTryStop, ActionAlarm;
     }
