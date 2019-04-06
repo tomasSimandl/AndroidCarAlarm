@@ -219,7 +219,7 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
 
 
         // start send location loop
-        if (context.communicationContext.isMessageAllowed(
+        if (!context.toolsContext.isPowerSaveMode && context.communicationContext.isMessageAllowed(
                         SmsProvider::class.java.name,
                         MessageType.AlarmLocation.name,
                         "send")
