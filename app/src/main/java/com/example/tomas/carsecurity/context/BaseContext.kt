@@ -24,6 +24,12 @@ open class BaseContext(val appContext: Context) {
         get() = Mode.valueOf(sharedPreferences.getString(appContext.getString(R.string.key_tool_battery_mode), Mode.Normal.name)
                 ?: Mode.Normal.name)
 
+    /**
+     * Indication if application is in power save mode.
+     */
+    val isPowerSaveMode
+        get() = sharedPreferences.getString(appContext.getString(R.string.key_tool_battery_mode), "") == Mode.PowerSaveMode.name
+
     /** Private shared preferences which are shared across whole application. */
     protected val sharedPreferences: SharedPreferences = appContext.getSharedPreferences(
             appContext.getString(R.string.preference_file_key), Context.MODE_PRIVATE)

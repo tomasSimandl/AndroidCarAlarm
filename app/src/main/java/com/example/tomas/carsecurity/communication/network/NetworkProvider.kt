@@ -859,7 +859,7 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
 
         var removePositions = false
 
-        if (canUseConnection()) {
+        if (canUseConnection() && !communicationContext.isPowerSaveMode) {
 
             val locationsToSend = prepareLocation(locations)
 
@@ -898,7 +898,7 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
             return
         }
 
-        if (canUseConnection()) {
+        if (canUseConnection() && !communicationContext.isPowerSaveMode) {
             val storage = Storage.getInstance(communicationContext.appContext)
 
             val response = routeController.createRoute(route.carId, route.time)

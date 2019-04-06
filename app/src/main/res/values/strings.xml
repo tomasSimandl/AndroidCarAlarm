@@ -247,6 +247,7 @@
     <string name="error_check_codes_not_permitted">hardware permission denied</string>
     <string name="error_check_codes_not_allowed">disabled by user</string>
     <string name="error_check_codes_invalid_params">invalid setting</string>
+    <string name="error_check_codes_power_save_mode">disabled by power save mode</string>
     <string name="error_check_codes_success">OK</string>
 
 </resources>

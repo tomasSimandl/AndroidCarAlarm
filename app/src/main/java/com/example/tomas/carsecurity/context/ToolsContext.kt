@@ -30,12 +30,6 @@ class ToolsContext(appContext: Context) : BaseContext(appContext) {
     }
 
     /**
-     * Indication if application is in power save mode.
-     */
-    val isPowerSaveMode
-        get() = sharedPreferences.getString(appContext.getString(R.string.key_tool_battery_mode), "") == Mode.PowerSaveMode.name
-
-    /**
      * Indication if application can be switched to power save mode.
      */
     val isBatteryModeAllowed
@@ -90,10 +84,7 @@ class ToolsContext(appContext: Context) : BaseContext(appContext) {
      * Returns interval in which will be send position sms messages to user when alarm is triggered.
      */
     val sendLocationInterval
-        get() = when (mode) {
-            Mode.Normal -> getInt(R.string.key_tool_alarm_send_location_interval, R.integer.default_tool_alarm_send_location_interval) * 1000
-            Mode.PowerSaveMode -> appContext.resources.getInteger(R.integer.battery_save_mode_tool_alarm_send_location_interval) * 1000
-        }
+        get() = getInt(R.string.key_tool_alarm_send_location_interval, R.integer.default_tool_alarm_send_location_interval) * 1000
 
     /**
      * Returns interval indicates limit to turn off location sensor when update intervals are slow.
