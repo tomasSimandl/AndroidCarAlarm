@@ -16,6 +16,8 @@ object CheckCodes {
     const val notAllowed: Byte = -3
     /** Sensor can not be enabled. Invalid configuration in settings */
     const val invalidParameters: Byte = -4
+    /** Sensor can not be enabled because power save mode is active. */
+    const val notAllowedPowerSaveMode: Byte = -5
 
     /**
      * Method returns information messages for user based on input [checkCode].
@@ -30,6 +32,7 @@ object CheckCodes {
             permissionDenied -> context.getString(R.string.error_check_codes_not_permitted)
             notAllowed -> context.getString(R.string.error_check_codes_not_allowed)
             invalidParameters -> context.getString(R.string.error_check_codes_invalid_params)
+            notAllowedPowerSaveMode -> context.getString(R.string.error_check_codes_power_save_mode)
             success -> context.getString(R.string.error_check_codes_success)
             else -> ""
         }

@@ -32,10 +32,7 @@ class SensorContext(appContext: Context) : BaseContext(appContext) {
 
     /** Returns if [SoundDetector] can be in default used. Value is taken from shared preferences or it is used default value. */
     val isSoundAllowed
-        get() = when (mode) {
-            Mode.Normal -> getBoolean(R.string.key_sensor_sound_is_allowed, R.bool.default_sensor_sound_is_allowed)
-            Mode.PowerSaveMode -> appContext.resources.getBoolean(R.bool.battery_save_mode_sensor_sound_is_allowed)
-        }
+        get() = getBoolean(R.string.key_sensor_sound_is_allowed, R.bool.default_sensor_sound_is_allowed)
 
     /** Return maximal allowed amplitude before alarm is triggered. Value is from shared preferences or it is default value. */
     val maxAmplitude

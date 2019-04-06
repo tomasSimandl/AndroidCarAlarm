@@ -13,6 +13,7 @@ import com.example.tomas.carsecurity.R
 import com.example.tomas.carsecurity.WorkerThread
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.context.SensorContext
+import com.example.tomas.carsecurity.context.ToolsContext
 import java.io.IOException
 import java.util.*
 
@@ -45,7 +46,9 @@ class SoundDetector(private val context: MyContext) : GeneralObservable(), Share
          * @return true when observation of sound sensor can be enabled.
          */
         override fun check(context: Context): Byte {
-            return if (!context.packageManager.hasSystemFeature(PackageManager.FEATURE_MICROPHONE)) {
+            return if(ToolsContext(context).isPowerSaveMode) {
+                CheckCodes.notAllowedPowerSaveMode
+            } else if (!context.packageManager.hasSystemFeature(PackageManager.FEATURE_MICROPHONE)) {
                 CheckCodes.hardwareNotSupported
             } else if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
                 CheckCodes.permissionDenied
