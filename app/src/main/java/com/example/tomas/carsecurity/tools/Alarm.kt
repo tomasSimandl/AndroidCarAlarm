@@ -38,7 +38,7 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
     /** Indication if alarm system is activated */
     private var isEnabled = false
     /** Indication if system is in alarm mode. */
-    private var isAlarm = false
+    var isAlarm = false
     /** Indication if system is in alert mode. Interval for alarm turn of when disruption was detected. */
     private var isAlert = false
 
@@ -202,6 +202,10 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
         // send alarm to communication providers
         toolsHelper.communicationManager.sendEvent(MessageType.Alarm, Calendar.getInstance().time.toString())
 
+        // Notify UI that alarm is triggered
+        setChanged()
+        notifyObservers(MainService.Actions.ActionAlarm)
+
         if (context.toolsContext.isCallAllow) {
             CallProvider(context).createCall()
         }
@@ -295,6 +299,7 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
             mediaPlayer?.release()
             mediaPlayer = null
             isEnabled = false
+            isAlarm = false
 
             toolsHelper.unregisterAllObservables(this)
             alarmTimer?.cancel()

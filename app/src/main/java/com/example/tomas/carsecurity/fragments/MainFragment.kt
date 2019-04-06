@@ -33,7 +33,7 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
      * Broadcast keys which can be used to communicate with this class over [BroadcastReceiver].
      */
     enum class BroadcastKeys {
-        BroadcastUpdateUI, KeyShowMessage, KeyUtilName, KeyUtilActivated
+        BroadcastUpdateUI, KeyShowMessage, KeyUtilName, KeyUtilActivated, KeyAlarm
     }
 
     /** Instance of [ToolsContext]. */
@@ -142,6 +142,8 @@ class MainFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
                         .setPositiveButton(R.string.ok, null)
                         .create().show()
 
+            } else if (intent.hasExtra(BroadcastKeys.KeyAlarm.name)) {
+                actionAlarm.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.alarm))
             } else {
                 val utilName = intent.getStringExtra(BroadcastKeys.KeyUtilName.name)
                 val utilEnabled = intent.getBooleanExtra(BroadcastKeys.KeyUtilActivated.name, false)

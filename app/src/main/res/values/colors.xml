@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="disabled">#FF2330</color>
-    <color name="enabled">#119F27</color>
+    <color name="disabled">#ff009688</color>
+    <color name="enabled">#2B9E3A</color>
+    <color name="alarm">#D10313</color>
+    <color name="text_light">#F5F5F5</color>
     <color name="text_error">#A20811</color>
 </resources>

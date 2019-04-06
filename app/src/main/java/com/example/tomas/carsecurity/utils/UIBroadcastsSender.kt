@@ -37,10 +37,25 @@ class UIBroadcastsSender(private val context: Context) {
      *
      * @param enabledUtils set of enabled tools.
      */
-    fun informUI(enabledUtils: Set<ToolsEnum>) {
+    fun informUI(enabledUtils: Set<ToolsEnum>, isAlarm: Boolean) {
         for (util in enabledUtils) {
             informUI(util, true)
         }
+
+        if (isAlarm) {
+            informUIAlarm()
+        }
+    }
+
+    /**
+     * Method send Broadcast about alarm trigger.
+     */
+    fun informUIAlarm() {
+        Log.d(tag, "Sending information about alarm to UI.")
+
+        val intent = Intent(MainFragment.BroadcastKeys.BroadcastUpdateUI.name)
+        intent.putExtra(MainFragment.BroadcastKeys.KeyAlarm.name, "")
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
     }
 
     /**

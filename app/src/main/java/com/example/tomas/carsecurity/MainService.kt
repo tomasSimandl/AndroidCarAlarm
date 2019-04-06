@@ -29,7 +29,7 @@ class MainService : Service(), Observer {
     enum class Actions {
         ActionStatus, ActionStatusUI, ActionGetPosition, ActionForegroundStop,
         ActionSwitchUtil, ActionActivateUtil, ActionDeactivateUtil, ActionAutomaticMode,
-        ActionTryStop;
+        ActionTryStop, ActionAlarm;
     }
 
     /** Logger tag */
@@ -137,10 +137,11 @@ class MainService : Service(), Observer {
                 Actions.ActionSwitchUtil.name -> toolsManager.switchUtil(intent.getSerializableExtra("util") as ToolsEnum)
                 Actions.ActionActivateUtil.name -> toolsManager.activateUtil(intent.getSerializableExtra("util") as ToolsEnum)
                 Actions.ActionDeactivateUtil.name -> toolsManager.deactivateUtil(intent.getSerializableExtra("util") as ToolsEnum)
-                Actions.ActionStatusUI.name -> UIBroadcastsSender.informUI(toolsManager.getEnabledUtils())
+                Actions.ActionStatusUI.name -> UIBroadcastsSender.informUI(toolsManager.getEnabledUtils(), toolsManager.isAlarm())
                 Actions.ActionForegroundStop.name -> stopService(true)
                 Actions.ActionTryStop.name -> if (!isForeground) stopSelf()
                 Actions.ActionStatus.name -> toolsManager.sendStatus(intent.getIntExtra("communicator", -1))
+                Actions.ActionAlarm.name -> UIBroadcastsSender.informUIAlarm()
                 else -> Log.w(tag, "onStartCommand - invalid action")
             }
         }

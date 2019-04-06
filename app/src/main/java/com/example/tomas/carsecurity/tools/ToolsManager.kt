@@ -82,7 +82,8 @@ class ToolsManager(private val context: MyContext) : Observer, Observable() {
                             notifyObservers(MainService.Actions.ActionForegroundStop)
                         }
                     }
-                    is String -> {
+                    is String,
+                    is MainService.Actions -> {
                         setChanged()
                         notifyObservers(args)
                     }
@@ -160,6 +161,20 @@ class ToolsManager(private val context: MyContext) : Observer, Observable() {
             }
         }
         return enabledUtils
+    }
+
+    /**
+     * Method return if alarm is triggered.
+     *
+     * @return if alarm is triggered.
+     */
+    fun isAlarm(): Boolean {
+        for (util in toolsMap.values) {
+            if (util is Alarm){
+                return util.isAlarm
+            }
+        }
+        return false
     }
 
     /**
