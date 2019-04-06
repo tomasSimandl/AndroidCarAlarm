@@ -229,11 +229,6 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
                     val locations = storage.locationService.getLocationsByLocalRouteId(route.uid)
                     // send routes locations in package by 50 locations
                     locations.chunked(locationChunkSize).forEach { sendLocations(it) }
-
-                    // Can not remove last route because it is possibility that is still used
-                    if (route.uid < maxRouteId && storage.locationService.getLocationsByLocalRouteId(route.uid).isEmpty()) {
-                        storage.routeService.deleteRoute(route)
-                    }
                 }
 
                 // send locations in package by 50 locations
@@ -480,7 +475,12 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
             if (cache) {
                 Storage.getInstance(communicationContext.appContext).locationService.saveLocation(location)
             } else {
-                sendLocations(listOf(location))
+                if (isAlarm) {
+                    val message = communicationContext.appContext.getString(R.string.network_location, location.latitude.toString(), location.longitude.toString())
+                    sendEvent(MessageType.AlarmLocation, message)
+                } else {
+                    sendLocations(listOf(location))
+                }
             }
         }
         workerThread.postTask(task)
@@ -1043,10 +1043,10 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
     private fun getEventType(messageType: MessageType): Int {
         return when (messageType) {
             MessageType.UtilSwitch,
-            MessageType.AlarmLocation,
             MessageType.Location,
             MessageType.Status ->
                 communicationContext.appContext.resources.getInteger(R.integer.event_unknown)
+            MessageType.AlarmLocation,
             MessageType.Alarm ->
                 communicationContext.appContext.resources.getInteger(R.integer.event_alarm_on)
             MessageType.BatteryWarn ->
@@ -1067,7 +1067,8 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
     private fun canSendEvent(messageType: MessageType): Boolean {
         return when (messageType) {
 
-            MessageType.Alarm ->
+            MessageType.Alarm,
+            MessageType.AlarmLocation ->
                 communicationContext.isMessageAllowed(this.javaClass.name, "Alarm_Position_send")
             MessageType.BatteryWarn,
             MessageType.PowerConnected,
