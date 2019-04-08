@@ -2,6 +2,7 @@ package com.example.tomas.carsecurity.storage.entity
 
 import android.arch.persistence.room.ColumnInfo
 import android.arch.persistence.room.Entity
+import android.arch.persistence.room.Ignore
 import android.arch.persistence.room.PrimaryKey
 import java.util.*
 
@@ -10,7 +11,7 @@ import java.util.*
  * Data class represents table route in Room database.
  */
 @Entity(tableName = "route")
-data class Route(
+data class Route @Ignore constructor(
 
         /** Id which identifies route in database */
         @PrimaryKey(autoGenerate = true)
@@ -27,4 +28,6 @@ data class Route(
         /** Time when route was created. Millis since 1.1.1970 */
         @ColumnInfo(name = "time")
         var time: Long = Date().time
-)
+) {
+    constructor() : this(0, null, 0, Date().time)
+}

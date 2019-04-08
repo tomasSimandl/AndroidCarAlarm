@@ -1,9 +1,6 @@
 package com.example.tomas.carsecurity.storage.entity
 
-import android.arch.persistence.room.ColumnInfo
-import android.arch.persistence.room.Entity
-import android.arch.persistence.room.ForeignKey
-import android.arch.persistence.room.PrimaryKey
+import android.arch.persistence.room.*
 import android.location.Location
 import com.google.gson.annotations.SerializedName
 
@@ -11,11 +8,12 @@ import com.google.gson.annotations.SerializedName
  * Data class represents table location in Room database.
  */
 @Entity(tableName = "location",
+        indices = [Index(value = arrayOf("local_route_id"), unique = false)],
         foreignKeys = [ForeignKey(entity = Route::class,
                 parentColumns = arrayOf("uid"),
                 childColumns = arrayOf("local_route_id"),
                 onDelete = ForeignKey.CASCADE)])
-data class Location(
+data class Location @Ignore constructor(
 
         /** Id which identifies location in database */
         @PrimaryKey(autoGenerate = true)
@@ -58,13 +56,16 @@ data class Location(
         @ColumnInfo(name = "local_route_id")
         @Transient // Ignored in Retrofit but not in Room
         var localRouteId: Int? = null
-
 ) {
+
+    constructor() : this(0, 0.0, 0.0, 0.0, 0L, 0F, 0F, 0F, null, null)
+
     /**
      * @param location recorded location returned from sensor.
      * @param localRouteId is identification number of route in local database.
      * @param distance from last recorded location.
      */
+    @Ignore
     constructor(location: Location, localRouteId: Int? = null, distance: Float = 0F) : this(
             latitude = location.latitude,
             longitude = location.longitude,
