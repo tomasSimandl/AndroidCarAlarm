@@ -14,7 +14,7 @@ import com.example.tomas.carsecurity.storage.entity.User
 /**
  * Representation of local Room database
  */
-@Database(entities = [Location::class, Message::class, Route::class, User::class], version = 8, exportSchema = false)
+@Database(entities = [Location::class, Message::class, Route::class, User::class], version = 9, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
     /** DAO for access location table */
