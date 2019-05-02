@@ -116,9 +116,11 @@ class StatusFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeLis
                     arrayOf(android.R.id.text1, android.R.id.text2).toIntArray()
             )
 
-            status_layout_refresh.post { routes_list.adapter = adapter }
+            status_layout_refresh.post {
+                routes_list.adapter = adapter
+                status_layout_refresh.isRefreshing = false
+            }
 
-            status_layout_refresh.isRefreshing = false
         }.start()
     }
 }

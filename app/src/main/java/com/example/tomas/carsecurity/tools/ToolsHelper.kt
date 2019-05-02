@@ -156,6 +156,7 @@ class ToolsHelper(private val context: MyContext) : SharedPreferences.OnSharedPr
             }
 
             observablesMap[observableEnum]?.deleteObserver(tool)
+            toolsMap[tool]?.remove(observableEnum)
             Log.d(tag, """Observer $tool was un-registered from observable $observableEnum""")
         }
     }

@@ -249,7 +249,11 @@ class SmsProvider(private val communicationContext: CommunicationContext) : ICom
     override fun sendLocation(location: Location, isAlarm: Boolean, cache: Boolean): Boolean {
         return if (communicationContext.isMessageAllowed(this.javaClass.name, if (isAlarm) MessageType.AlarmLocation.name else MessageType.Location.name, "send")) {
             Log.d(tag, "Sending SMS message with actual device location.")
-            sendMessage(communicationContext.appContext.getString(R.string.sms_location, location.latitude.toString(), location.longitude.toString()))
+            val time = Date(location.time).toString()
+            val latitude = location.latitude.toString()
+            val longitude = location.longitude.toString()
+            val accuracy = location.accuracy.toString()
+            sendMessage(communicationContext.appContext.getString(R.string.sms_location, time, latitude, longitude, accuracy))
         } else {
             Log.d(tag, "SMS message with location is not allowed.")
             false

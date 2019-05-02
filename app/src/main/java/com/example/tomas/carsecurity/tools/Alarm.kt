@@ -7,6 +7,7 @@ import android.media.MediaPlayer
 import android.util.Log
 import com.example.tomas.carsecurity.*
 import com.example.tomas.carsecurity.communication.MessageType
+import com.example.tomas.carsecurity.communication.network.NetworkProvider
 import com.example.tomas.carsecurity.communication.sms.SmsProvider
 import com.example.tomas.carsecurity.context.MyContext
 import com.example.tomas.carsecurity.context.ToolsContext
@@ -52,6 +53,8 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
     private var sendSmsTimer: Timer? = null
     /** Media player used for sending alarm sound */
     private var mediaPlayer: MediaPlayer? = null
+    /** Indications if location should be send on next location update */
+    private var shouldSendLocation = false
 
 
     /**
@@ -142,8 +145,15 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
     private fun onLocationUpdate(location: Location) {
         Log.d(tag, """Location update: $location""")
         this.lastLocation = location
+
         if (context.toolsContext.sendLocationInterval > context.toolsContext.disableSendLocationInterval) {
             toolsHelper.unregisterObservable(OEnum.LocationProvider, this)
+        }
+
+        if (lastLocation != null && shouldSendLocation) {
+            toolsHelper.communicationManager.sendLocation(DBLocation(lastLocation!!, null), true)
+            lastLocation = null
+            shouldSendLocation = false
         }
     }
 
@@ -217,13 +227,13 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
             mediaPlayer?.start()
         }
 
-
         // start send location loop
-        if (!context.toolsContext.isPowerSaveMode && context.communicationContext.isMessageAllowed(
-                        SmsProvider::class.java.name,
-                        MessageType.AlarmLocation.name,
-                        "send")
-        ) {
+        val isSmsLocationAllowed = context.communicationContext.isMessageAllowed(
+                SmsProvider::class.java.name, MessageType.AlarmLocation.name, "send")
+        val isNetworkLocationAllowed = context.communicationContext.isMessageAllowed(
+                NetworkProvider::class.java.name, "Alarm_Position_send")
+
+        if (isSmsLocationAllowed || isNetworkLocationAllowed) {
             toolsHelper.registerObserver(OEnum.LocationProvider, this)
             scheduleSmsTimer()
         }
@@ -248,12 +258,16 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
     private fun getSmsTimerTask(): TimerTask {
         return object : TimerTask() {
             override fun run() {
+
                 if (lastLocation != null) {
                     toolsHelper.communicationManager.sendLocation(DBLocation(lastLocation!!, null), true)
+                    lastLocation = null
+                    shouldSendLocation = false
+                } else {
+                    // on location update can unregister listener
+                    toolsHelper.registerObserver(OEnum.LocationProvider, this@Alarm)
+                    shouldSendLocation = true
                 }
-
-                // on location update can unregister listener
-                toolsHelper.registerObserver(OEnum.LocationProvider, this@Alarm)
             }
         }
     }
@@ -272,6 +286,8 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
             systemEnabledTime = Calendar.getInstance().timeInMillis
             sendSmsTimer = null
             alarmTimer = null
+            shouldSendLocation = false
+            lastLocation = null
 
             toolsHelper.registerObserver(OEnum.MoveDetector, this)
             toolsHelper.registerObserver(OEnum.SoundDetector, this)
@@ -305,6 +321,7 @@ class Alarm(private val context: MyContext, private val toolsHelper: ToolsHelper
             alarmTimer?.cancel()
             sendSmsTimer?.cancel()
             lastLocation = null
+            shouldSendLocation = false
             systemEnabledTime = -1L
 
             context.toolsContext.unregisterOnPreferenceChanged(this)

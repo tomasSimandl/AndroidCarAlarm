@@ -59,8 +59,8 @@
     <string name="pref_tools_alarm_alert_interval_title">Alert interval</string>
     <string name="pref_tools_alarm_alert_interval_description">Interval before alarm is triggered after any detection.</string>
 
-    <string name="pref_tools_alarm_send_location_interval_title">Sms location interval</string>
-    <string name="pref_tools_alarm_send_location_interval_description">How often will be send sms with car location when alarm is triggered. Used only when send sms on alarm is enabled.</string>
+    <string name="pref_tools_alarm_send_location_interval_title">Message location interval</string>
+    <string name="pref_tools_alarm_send_location_interval_description">How often will be send message with car location when alarm is triggered. Used only when location messages are allowed.</string>
 
     <string name="pref_tools_alarm_siren_is_allowed_title">Siren</string>
     <string name="pref_tools_alarm_siren_is_allowed_description">Enable or disable siren sound on trigger alarm. Is recommended to use only with external siren.</string>
@@ -124,11 +124,11 @@
     </string-array>
 
     <!-- ============================== Communication sms settings ============================= -->
-    <string name="pref_communication_sms_group_name">SMS</string>
+    <string name="pref_communication_sms_group_name">GSM</string>
 
     <string name="pref_communication_sms_permission_message">For sending and receiving sms messages application needs permission. Next dialog will be asking for needed permission.</string>
 
-    <string name="pref_communication_sms_switch_title">Allow sms communication</string>
+    <string name="pref_communication_sms_switch_title">Allow GSM communication</string>
     <string name="pref_communication_sms_switch_description"> </string>
 
     <string name="pref_communication_sms_phone_number_title">Phone number</string>
@@ -198,7 +198,7 @@
     <string name="sms_util_enabled">%s is enabled</string>
     <string name="sms_util_disabled">%s is disabled</string>
     <string name="sms_alarm">Alarm was triggered at: %s.</string>
-    <string name="sms_location">Actual car location is lat: %1$s, long: %2$s https://www.google.com/maps/search/\?api=1&amp;query=%1$s,%2$s</string>
+    <string name="sms_location">Last known car location is lat: %2$s, long: %3$s, accuracy: %4$s m. https://www.google.com/maps/search/\?api=1&amp;query=%2$s,%3$s</string>
     <string name="sms_battery_warn">Battery capacity is low: %s %%</string>
     <string name="sms_info_battery_charging">Battery is charging and capacity is %s %%</string>
     <string name="sms_info_battery_not_charging">Battery is not charging and capacity is %s %%</string>
@@ -211,7 +211,7 @@
     <string name="network_util_enabled">%s is enabled</string>
     <string name="network_util_disabled">%s is disabled</string>
     <string name="network_alarm">Alarm was triggered at: %s.</string>
-    <string name="network_location"><![CDATA[Actual car location is lat: %1$s, long: %2$s <a href=\'https://www.google.com/maps/search/\?api=1&amp;query=%1$s,%2$s\'>Google Maps</a>]]></string>
+    <string name="network_location"><![CDATA[Last known car location from %1$s is lat: %2$s, long: %3$s, accuracy: %4$s m. <a href=\'https://www.google.com/maps/search/\?api=1&amp;query=%2$s,%3$s\'>Google Maps</a>]]></string>
     <string name="network_battery_warn">Battery capacity is low: %d %%</string>
     <string name="network_power_connected">Power is connected. Battery level is %d %%</string>
     <string name="network_power_disconnected">Power is disconnected! Battery level is %d %%</string>

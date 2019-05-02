@@ -18,7 +18,7 @@ class CommunicationContext(appContext: Context) : BaseContext(appContext) {
      * Enum for synchronization status visible on status page
      */
     enum class SyncStatus{
-        Synchronizing, Offline, Unknown, SyncReady;
+        Synchronizing, Offline, Unknown, SyncReady, Unauthorized;
 
         companion object {
             fun syncValueOf(status: String?): SyncStatus {

@@ -50,13 +50,15 @@
     <integer name="default_tool_tracker_timeout">300</integer>
 
     <!-- Indicates if battery mode can be automatically changed -->
-    <bool name="default_tool_battery_mode_is_allowed">true</bool>
+    <bool name="default_tool_battery_mode_is_allowed">false</bool>
     <!-- Indicates which battery mode is enabled. -->
     <string name="default_tool_battery_power_save_mode">Normal</string>
     <!-- Battery level when power save mode will be enabled -->
     <integer name="default_tool_battery_critical_level">15</integer>
     <!-- Indicates if siren is allowed in power save mode. -->
     <bool name="battery_save_mode_tool_alarm_siren_is_allowed">false</bool>
+    <!-- Interval indicates how often will be send location message in power save mode [seconds] -->
+    <integer name="battery_save_mode_tool_alarm_send_location_interval">600</integer>
 
 
     <!--===================================== Communication =====================================-->

@@ -49,7 +49,7 @@ object BatteryUtil {
      * Method get from input [intent] actual level of battery. Level is in interval <0,1>.
      *
      * @param intent is [Intent] which contains battery info.
-     * @return nuber from interval <0,1> which represents actual battery level.
+     * @return number from interval <0,1> which represents actual battery level.
      */
     private fun batteryPct(intent: Intent): Float {
         val batteryLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)

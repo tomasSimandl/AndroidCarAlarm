@@ -69,13 +69,6 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
     /** Controller for communication with server over Firebase endpoint. */
     private lateinit var firebaseController: FirebaseController
 
-    /**
-     * Connectivity service user for getting connection status (Connected/Disconnected) and type
-     * of connection (Cellular/Wifi)
-     */
-    private val connectivityService = communicationContext.appContext
-            .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
-
     /** Indicates if this class was already successfully initialized */
     private var isInitialized: Boolean = false
 
@@ -476,7 +469,11 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
                 Storage.getInstance(communicationContext.appContext).locationService.saveLocation(location)
             } else {
                 if (isAlarm) {
-                    val message = communicationContext.appContext.getString(R.string.network_location, location.latitude.toString(), location.longitude.toString())
+                    val time = Date(location.time).toString()
+                    val latitude = location.latitude.toString()
+                    val longitude = location.longitude.toString()
+                    val accuracy = location.accuracy.toString()
+                    val message = communicationContext.appContext.getString(R.string.network_location, time, latitude, longitude, accuracy)
                     sendEvent(MessageType.AlarmLocation, message)
                 } else {
                     sendLocations(listOf(location))
@@ -537,11 +534,12 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
 
             val status = StatusCreate(battery, isCharging, powerSaveMode, tools, longTime, user.carId)
             val result = statusController.createStatus(status)
+            isUnauthorized(result.code())
+
             if (result.isSuccessful) {
                 Log.d(tag, "Status message was send successfully")
             } else {
                 Log.d(tag, "Send of status message ends with status code: ${result.code()}")
-                logoutIfUnauthorized(result.code())
             }
         }
 
@@ -627,6 +625,8 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
 
             try {
                 val carsResponse = carController.getCars()
+                isUnauthorized(carsResponse.code())
+
                 if (carsResponse.isSuccessful) {
 
                     Log.d(tag, "Parsing get cars response: ${carsResponse.body().toString()}")
@@ -642,7 +642,6 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
 
                 } else {
                     Log.d(tag, "Can not get cars: $carsResponse")
-                    logoutIfUnauthorized(carsResponse.code())
                     sendGetCarsBroadcast(arrayListOf(), R.string.err_login_bad_request, carsResponse.code())
                 }
 
@@ -673,6 +672,7 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
 
             try {
                 val carResponse = carController.createCar(name)
+                isUnauthorized(carResponse.code())
 
                 when (carResponse.code()) {
 
@@ -693,7 +693,6 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
                     }
                     else -> {
                         Log.d(tag, "Can not create car: $carResponse")
-                        logoutIfUnauthorized(carResponse.code())
                         sendCreateCarBroadcast(R.string.err_create_car_failed)
                     }
                 }
@@ -779,10 +778,10 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
             val result = eventController.createEvent(msg.message)
             Log.d(tag, "SendEvent response: ${result.code()}")
 
+            isUnauthorized(result.code())
+
             if (result.isSuccessful) {
                 inDB = false
-            } else {
-                if (logoutIfUnauthorized(result.code())) return // Logout and all data cleared nothing to do
             }
         }
 
@@ -866,10 +865,12 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
             if (locationsToSend.isNotEmpty()) {
                 val result = locationController.createLocations(locationsToSend)
                 Log.d(tag, "SendLocations response: ${result.code()}")
+
+                isUnauthorized(result.code())
+
                 if (result.isSuccessful) {
                     removePositions = true
                 } else {
-                    if (logoutIfUnauthorized(result.code())) return // Logout and all data cleared nothing to do
                     if (result.code() == HttpURLConnection.HTTP_CONFLICT) removePositions = true
                 }
 
@@ -904,6 +905,8 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
             val response = routeController.createRoute(route.carId, route.time)
             Log.d(tag, "SendRoute response: ${response.code()}")
 
+            isUnauthorized(response.code())
+
             if (response.isSuccessful) {
                 val jsonResponse = JsonParser().parse(response.body().toString()).asJsonObject
                 val serverRouteId = jsonResponse["route_id"].asLong
@@ -916,8 +919,6 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
                 }
 
                 Log.d(tag, "Route was successfully created and stored to DB")
-            } else {
-                if (logoutIfUnauthorized(response.code())) return // Logout and all data cleared nothing to do
             }
         }
 
@@ -970,6 +971,9 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
      * @return if device is connected to network.
      */
     private fun isConnected(): Boolean {
+        val connectivityService = communicationContext.appContext
+                .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+
         return connectivityService?.activeNetworkInfo?.isConnected ?: false
     }
 
@@ -979,6 +983,10 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
      * @return true if network connection is cellular, false - otherwise
      */
     private fun isCellular(): Boolean {
+
+        val connectivityService = communicationContext.appContext
+                .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+
         return if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M) {
             @Suppress("DEPRECATION")
             connectivityService?.activeNetworkInfo?.type == ConnectivityManager.TYPE_MOBILE
@@ -1082,22 +1090,21 @@ class NetworkProvider(private val communicationContext: CommunicationContext) :
     }
 
     /**
-     * This method should be called on most of responses. When server return unauthorized actual login user will be
-     * logout. Application should never request unauthorized request this means that unauthorized is return only when
-     * user is logout from server.
-     *
-     * Method change login status in shared preferences based on input status code.
+     * This method should be called on most of responses. Method sets status to synchronizationStatus.
+     * When return [statusCode] is 401 or 403 set status unauthorized, otherwise sets sync ready.
      *
      * @param statusCode returned http status code
-     * @return true when user will be logout, false - otherwise
+     * @return true when server return unauthorized, false - otherwise
      */
-    private fun logoutIfUnauthorized(statusCode: Int): Boolean {
-        if (statusCode == 401 || statusCode == 403) {
-            Log.d(tag, "Response status code: $statusCode. Logging out user from application.")
-            communicationContext.isLogin = false
-            return true
+    private fun isUnauthorized(statusCode: Int): Boolean {
+        return if (statusCode == 401 || statusCode == 403) {
+            Log.d(tag, "Response status code: $statusCode. Setting status unauthorized.")
+            communicationContext.synchronizationStatus = CommunicationContext.SyncStatus.Unauthorized
+            true
+        } else {
+            communicationContext.synchronizationStatus = CommunicationContext.SyncStatus.SyncReady
+            false
         }
-        return false
     }
 
     /**
