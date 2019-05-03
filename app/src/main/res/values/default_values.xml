@@ -4,7 +4,7 @@
 
     <!--======================================== Sensors ========================================-->
     <!-- Indicates if sound detector can be used. -->
-    <bool name="default_sensor_sound_is_allowed">true</bool>
+    <bool name="default_sensor_sound_is_allowed">false</bool>
     <!-- How often is control last measured amplitude in SoundDetector (in seconds) -->
     <integer name="default_sensor_sound_interval">1</integer>
     <!-- Maximal value of amplitude which not invoke alarm -->
@@ -33,11 +33,11 @@
     <!-- Interval before alarm will be triggered after detection. -->
     <integer name="default_tool_alarm_alert_interval">15</integer>
     <!-- Interval before alarm will be activated after alarm activation. -->
-    <integer name="default_tool_alarm_start_interval">30</integer>
+    <integer name="default_tool_alarm_start_interval">15</integer>
     <!-- Interval how often location will be send when alarm is triggered -->
     <integer name="default_tool_alarm_send_location_interval">60</integer>
     <!-- Indicates if siren is allowed -->
-    <bool name="default_tool_alarm_siren_is_allowed">false</bool>
+    <bool name="default_tool_alarm_siren_is_allowed">true</bool>
     <!-- Indicates if call should be made when alarm is triggered -->
     <bool name="default_tool_alarm_is_call_allowed">false</bool>
 
@@ -45,7 +45,7 @@
     <!-- Indicates if is tracker system allowed by user to use/ -->
     <bool name="default_tool_tracker_is_allowed">true</bool>
     <!-- Minimal acceptable distance between last and new location in Tracker. -->
-    <integer name="default_tool_tracker_ignore_distance">10</integer>
+    <integer name="default_tool_tracker_ignore_distance">5</integer>
     <!-- Milliseconds after Tracker will be disabled when location is not changing. -->
     <integer name="default_tool_tracker_timeout">300</integer>
 
@@ -63,7 +63,7 @@
 
     <!--===================================== Communication =====================================-->
     <!-- Indicates if sms communication provider is allowed. -->
-    <bool name="default_communication_sms_is_allowed">true</bool>
+    <bool name="default_communication_sms_is_allowed">false</bool>
     <!-- Indicates if messages can be send by default if there is no value in shared preferences. -->
     <bool name="default_communication_is_message_allowed">true</bool>
     <!-- Indicates if user is logged in. -->
@@ -76,7 +76,7 @@
     <!-- Indicates if network communication will only be via WiFi. -->
     <bool name="default_communication_network_cellular">false</bool>
     <!-- Specify how often will be data synchronize with server -->
-    <integer name="default_communication_network_update_interval">30</integer>
+    <integer name="default_communication_network_update_interval">1</integer>
 
 
     <!-- CAN NOT CHANGE WITH VALUE FROM SHARED PREFERENCES -->
